@@ -1,26 +1,62 @@
+
+from rest_framework import status
+from rest_framework.response import Response
+from api.repositories.student import StudentRepository
+from api.authentication import Authentication 
+from rest_framework.views import APIView
 from api.models.student import Student
-from api.serializers import StudentSerializer
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
-from passlib.hash import pbkdf2_sha256 as sha256
-from api.util.utilities import HttpStatus
 
-class StudentView:
+class StudentList(APIView):
+    """
+    List all students, or create a new student.
+    """
+    def get(self, request, format=None):
+        student = StudentRepository.get_all_students()
+        return Response(student.data)
 
-    @csrf_exempt
-    def get_all_students_or_create(request):
-        if request.method == 'GET':
-            students = Student.objects.all()
-            serializer = StudentSerializer(students, many=True)
-            return JsonResponse(serializer.data, safe=False)
-        elif request.method == 'POST':
-            data = JSONParser().parse(request)
-            data['password'] =  sha256.hash(data['password'])
-            print(data)
-            serializer = StudentSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data, status=HttpStatus.CREATED)
-            else:
-                return JsonResponse(serializer._errors, status=HttpStatus.BAD_REQUEST)
+    def post(self, request, format=None):
+        errors = Authentication.get_auth_errors(request)
+
+        if len(errors) > 0:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        Authentication.hash_password(request)
+        student = StudentRepository.create_student(request)
+            
+        return Response(student.data 
+        if student.is_valid() 
+        else student._errors, 
+        status = status.HTTP_201_CREATED 
+        if student.is_valid() 
+        else status.HTTP_400_BAD_REQUEST)
+
+class StudentDetail(APIView):
+    """
+    Retrieve, update or delete a student instance.
+    """
+    def get(self, request, pk, format=None):
+        try:
+            student = StudentRepository.get_student_by_id(pk)
+            return Response(student.data)
+        except Student.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk, format=None):
+        errors = Authentication.get_auth_errors(request, pk)
+
+        if len(errors) > 0:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        Authentication.hash_password(request)
+        student = StudentRepository.update_student(request, pk)
+
+        return Response(student.data 
+        if student.is_valid() 
+        else student._errors, 
+        status = status.HTTP_201_CREATED 
+        if student.is_valid() 
+        else status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        StudentRepository.delete_student(pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
