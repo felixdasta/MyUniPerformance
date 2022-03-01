@@ -5,6 +5,8 @@ from api.repositories.student import StudentRepository
 from api.authentication import Authentication 
 from rest_framework.views import APIView
 from api.models.student import Student
+from django.urls import reverse
+from django.shortcuts import render, redirect
 
 class StudentList(APIView):
     """
@@ -22,6 +24,7 @@ class StudentList(APIView):
 
         Authentication.hash_password(request)
         student = StudentRepository.create_student(request)
+        Authentication.send_activation_email(student.data, request)
             
         return Response(student.data 
         if student.is_valid() 
@@ -60,3 +63,10 @@ class StudentDetail(APIView):
     def delete(self, request, pk, format=None):
         StudentRepository.delete_student(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+def activate_student(request, uidb64, token):
+    student = StudentRepository.activate_student(request, uidb64, token)
+    return (redirect(reverse('login')) 
+    if student.is_email_verified 
+    else render(request, 'authentication/activate-failed.html', 
+    {"student": student}))
