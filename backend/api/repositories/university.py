@@ -4,7 +4,7 @@ from api.models.university import University
 class UniversityRepository:
 
     @staticmethod
-    def get_all_students():
+    def get_all_universities():
         university = University.objects.all()
         serializer = UniversitySerializer(university, many=True)
         return serializer

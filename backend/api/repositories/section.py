@@ -1,4 +1,3 @@
-import statistics
 from api.serializers import SectionSerializer
 from api.models.section import Section
 
@@ -28,7 +27,7 @@ class SectionRepository:
 
     #get_all_sections_by_instructor -> Pick by instructor and get all that
     #match criteria
-    
+
     @staticmethod
     def update_section(request, pk):
         section = Section.objects.get(pk=pk)
