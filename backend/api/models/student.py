@@ -3,6 +3,7 @@ from django.db import models
 from api.models.curriculum import Curriculum
 
 class Student(models.Model):
+    is_email_verified = models.BooleanField(default=False)
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=46, null=False)
     last_name = models.CharField(max_length=46, null=False)

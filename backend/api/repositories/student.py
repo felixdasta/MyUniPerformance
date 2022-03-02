@@ -1,5 +1,9 @@
 from api.serializers import StudentSerializer
 from api.models.student import Student
+from api.utils import generate_token
+from django.utils.encoding import force_str
+from django.contrib import messages
+from base64 import urlsafe_b64decode
 
 class StudentRepository:
     
@@ -40,3 +44,20 @@ class StudentRepository:
     def delete_student(pk):
         student = Student.objects.get(pk=pk)
         return student.delete()
+
+    @staticmethod
+    def activate_student(request,uidb64,token):
+        try:
+            uid=force_str(urlsafe_b64decode(uidb64))
+            student = Student.objects.get(pk=uid)
+            serializer = StudentSerializer(student)
+        except Exception as e:
+            student = None
+
+        if student and generate_token.check_token(serializer.data,token):
+            student.is_email_verified = True
+            student.save()
+
+            messages.add_message(request, messages.SUCCESS,
+                                'Email verified, you can now login')
+        return student
