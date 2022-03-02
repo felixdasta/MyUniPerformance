@@ -1,6 +1,11 @@
 from rest_framework.serializers import ModelSerializer
 from api import models
 
+class SectionSerializer(ModelSerializer):
+    class Meta:
+        model = models.section.Section
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course_id', 'instructor_id', 'enrolled_students', 'likes']
+
 class UniversitySerializer(ModelSerializer):
 
     class Meta:
