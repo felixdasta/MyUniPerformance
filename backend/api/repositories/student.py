@@ -1,4 +1,5 @@
 from api.serializers import StudentSerializer
+from api.models.curriculum import Curriculum
 from api.models.student import Student
 from api.utils import generate_token
 from django.utils.encoding import force_str
@@ -33,9 +34,23 @@ class StudentRepository:
         return serializer
 
     @staticmethod
+    def get_students_by_curriculum(curriculum_id):
+        curriculums = Student.objects.prefetch_related('curriculums').filter(curriculums=curriculum_id)
+        serializer = StudentSerializer(curriculums, many=True)
+        return serializer
+
+    @staticmethod
     def update_student(request, pk):
         student = Student.objects.get(pk=pk)
-        serializer = StudentSerializer(student, data=request.data)
+        serializer = StudentSerializer(student, data=request.data, partial=True)
+        
+        if 'curriculums' in request.data:
+            curriculums = []
+            for curriculum_id in request.data['curriculums']:
+                curriculum = Curriculum.objects.get(pk=curriculum_id)
+                curriculums.append(curriculum)
+            student.curriculums.set(curriculums)
+
         if serializer.is_valid():
             serializer.save()
         return serializer
