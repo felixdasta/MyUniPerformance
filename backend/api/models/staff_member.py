@@ -8,4 +8,4 @@ class Staff_Member(models.Model):
     first_name = models.CharField(max_length=46, null=False)
     last_name = models.CharField(max_length=46, null=False)
     institutional_email = models.CharField(max_length=320, null=False)
-    department_id = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)

@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+    <table style ="      
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;">
+        <tr>
+            <div style="height: 100px; background-color: black;">
+                <img 
+                style="
+                display: block;
+                margin: auto;
+                padding-top: 25px;"
+                src="https://lh3.googleusercontent.com/pw/AM-JKLX-oP5fGhZpMKhD0C2KGwOhfwu1rVyrk7ldBuCJozDooXmbmcLWTVLGjfqYEVhipsDbfoe-bCMiyldHTyjpTLAKPnzKObIiYrtYBapUpWp0D7TSp5JOkKSKtq-TE84uWDH_8NPtbATUpy6hUpeHfXI=w552-h50-no">
+            </div>
+        </tr>
+        <tr>
+            <td style = "
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            ">
+                <div>
+                    <p>
+                        Hi {{user.first_name}},
+                        <br><br>
+                        Please use the link below to verify your account.
+                        <br><br>
+                        http://{{domain}}{%url 'activate' uidb64=uid token=token%}
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </table>
+</html>
