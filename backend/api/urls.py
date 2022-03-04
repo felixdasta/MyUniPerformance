@@ -4,8 +4,8 @@ from api.views.student import StudentList, StudentDetail
 from api.views.university import UniversityDetail, UniversityList
 from api.views.section import SectionDetail, SectionList
 from api.views.course import CourseList, CourseDetail
-from api.views.grade_stats import GradeStatsList, GradeStatsDetail
-from backend.api.views.feedback import FeedbackSection
+from api.views.grade_stats import GradeStatsDetail
+from api.views.feedback import FeedbackSection
 
 
 urlpatterns = [
