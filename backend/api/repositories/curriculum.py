@@ -23,6 +23,12 @@ class CurriculumRepository:
         return serializer
 
     @staticmethod
+    def get_curriculums_by_university(university_id):
+        curriculums = Curriculum.objects.select_related('department').select_related('department__university').filter(department__university=university_id)
+        serializer = CurriculumSerializer(curriculums, many=True)
+        return serializer
+
+    @staticmethod
     def update_curriculum(request, pk):
         curriculum = Curriculum.objects.get(pk=pk)
         serializer = CurriculumSerializer(curriculum, data=request.data)
