@@ -6,7 +6,7 @@ from api.models.grade_stats import Grade_stats
 
 class GradeStatsList(APIView):
     """
-    List all grade stats for a section, or add new ones
+    List all grade stats for all sections, or add new ones
     """
     def get(self, request, format=None):
         grade_stats = GradeStatsRepository.get_all_grade_stats()
@@ -45,5 +45,5 @@ class GradeStatsDetail(APIView):
 
     def delete(self, request, pk, format=None):
         GradeStatsRepository.delete_grade_stats(pk)
-        return Response(status=status.HTTP_204_NO_CONTENT)     
+        return Response(status=status.HTTP_204_NO_CONTENT)
         

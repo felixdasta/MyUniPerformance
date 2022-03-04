@@ -5,6 +5,7 @@ from api.views.university import UniversityDetail, UniversityList
 from api.views.section import SectionDetail, SectionList
 from api.views.course import CourseList, CourseDetail
 from api.views.grade_stats import GradeStatsList, GradeStatsDetail
+from backend.api.views.feedback import FeedbackSection
 
 
 urlpatterns = [
@@ -20,9 +21,8 @@ urlpatterns = [
 
     path('sections/', SectionList.as_view()),
     path('sections/<pk>', SectionDetail.as_view()),
-
-    path('grade-stats/', GradeStatsList.as_view()),
-    path('grade-stats/<pk>', GradeStatsDetail.as_view()),
+    #path('sections/<pk>/feedback', FeedbackSection.as_view()),
+    #path('sections/<pk>/grade-stats', GradeStatsDetail.as_view()),
 
     path('curriculums/<curriculum_id>/students', student.CurriculumStudentList.as_view()),
     path('curriculums/<pk>', curriculum.CurriculumDetail.as_view()),

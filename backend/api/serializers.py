@@ -48,3 +48,11 @@ class GradeStatsSerializer(ModelSerializer):
     class Meta:
         model = models.grade_stats.Grade_stats
         fields = ['a_count', 'b_count', 'c_count', 'd_count', 'f_count', 'p_count', 'w_count', 'ib_count', 'ic_count', 'id_count', 'if_count', 'section']
+
+class FeedbackSerializer(ModelSerializer):
+    section = SectionSerializer(read_only=True)
+    student = StudentSerializer(read_only=True)
+
+    class Meta:
+        model = models.feedback.Feedback
+        fields = ['feedback_id', 'timestamp', 'praises', 'criticism', 'section', 'student', 'is_misplaced', 'likes']
