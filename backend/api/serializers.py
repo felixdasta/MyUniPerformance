@@ -34,3 +34,17 @@ class SectionSerializer(ModelSerializer):
     class Meta:
         model = models.section.Section
         fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructor', 'enrolled_students', 'likes']
+
+class CourseSerializer(ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
+
+    class Meta:
+        model = models.course.Course
+        fields = ['course_id', 'course_name', 'course_code', 'course_credits', 'department']
+
+class GradeStatsSerializer(ModelSerializer):
+    section = SectionSerializer(read_only=True)
+
+    class Meta:
+        model = models.grade_stats.Grade_stats
+        fields = ['a_count', 'b_count', 'c_count', 'd_count', 'f_count', 'p_count', 'w_count', 'ib_count', 'ic_count', 'id_count', 'if_count', 'section']
