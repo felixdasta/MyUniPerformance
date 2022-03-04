@@ -49,7 +49,7 @@ class SectionDetail(APIView):
         Authentication.hash_password(request)
         section = SectionRepository.update_section(request, pk)
 
-        return Response(v.data 
+        return Response(section.data 
         if section.is_valid() 
         else section._errors, 
         status = status.HTTP_201_CREATED 

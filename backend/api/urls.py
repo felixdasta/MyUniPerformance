@@ -3,6 +3,7 @@ from api.views import student, curriculum
 from api.views.student import StudentList, StudentDetail
 from api.views.university import UniversityDetail, UniversityList
 from api.views.section import SectionDetail, SectionList
+from api.views.department import DepartmentDetail, DepartmentList
 
 urlpatterns = [
     path('students', student.StudentList.as_view()),
@@ -14,6 +15,6 @@ urlpatterns = [
     path('university/<pk>', UniversityDetail.as_view()),
     path('section/', SectionList.as_view()),
     path('section/<pk>', SectionDetail.as_view()),
-    #path('department'),
-    #path('department/<pk>')
+    path('department', DepartmentList.as_view()),
+    path('department/<pk>', DepartmentDetail.as_view())
 ]
