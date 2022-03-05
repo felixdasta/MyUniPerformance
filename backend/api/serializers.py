@@ -8,14 +8,27 @@ class UniversitySerializer(ModelSerializer):
         fields = ['university_id','university_name','university_website','university_location', 'institutional_domain']
 
 class DepartmentSerializer(ModelSerializer):
-    university = UniversitySerializer(read_only=True)
-
     class Meta:
         model = models.department.Department
         fields = ['department_id','department_name','university']
 
+class CourseSerializer(ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
+
+    class Meta:
+        model = models.course.Course
+        fields = ['course_id', 'course_name', 'course_code', 'course_credits', 'department']
+
+class CurriculumCourseSerializer(ModelSerializer):
+    course = CourseSerializer(read_only=True)
+
+    class Meta:
+        model = models.curriculum.Curriculum_Courses
+        fields = ['semester', 'course']
+
 class CurriculumSerializer(ModelSerializer):
     department = DepartmentSerializer(read_only=True)
+    courses = CurriculumCourseSerializer(source='curriculum_courses_set', many=True, read_only=True)
 
     class Meta:
         model = models.curriculum.Curriculum
@@ -34,13 +47,6 @@ class SectionSerializer(ModelSerializer):
     class Meta:
         model = models.section.Section
         fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructor', 'enrolled_students', 'likes']
-
-class CourseSerializer(ModelSerializer):
-    department = DepartmentSerializer(read_only=True)
-
-    class Meta:
-        model = models.course.Course
-        fields = ['course_id', 'course_name', 'course_code', 'course_credits', 'department']
 
 class GradeStatsSerializer(ModelSerializer):
     section = SectionSerializer(read_only=True)
