@@ -10,5 +10,10 @@ class Section(models.Model):
     section_term = models.CharField(max_length=11, null=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     instructor = models.ForeignKey(Staff_Member, on_delete=models.CASCADE)
-    enrolled_students = models.ManyToManyField(Student)
+    enrolled_students = models.ManyToManyField(Student, through='Section_Students')
     likes = models.ManyToManyField(Student,related_name="section_likes", blank=True)
+
+class Section_Students(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    grade_obtained = models.CharField(max_length=2, null=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
