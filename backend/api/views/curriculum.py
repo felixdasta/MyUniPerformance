@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.curriculum import CurriculumRepository
 from api.models.curriculum import Curriculum
+from api.repositories.university import UniversityRepository
 
 class CurriculumList(APIView):
     """
@@ -48,13 +49,6 @@ class CurriculumDetail(APIView):
         CurriculumRepository.delete_curriculum(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from api.repositories.university import UniversityRepository
-from api.models.curriculum import Curriculum
-
 class UniversityCurriculumList(APIView):
     """
     List all university curriculums
@@ -65,3 +59,4 @@ class UniversityCurriculumList(APIView):
             return Response(curriculums.data)
         except Curriculum.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        

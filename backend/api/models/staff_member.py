@@ -5,7 +5,6 @@ from api.models.department import Department
 
 class Staff_Member(models.Model):
     member_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    first_name = models.CharField(max_length=46, null=False)
-    last_name = models.CharField(max_length=46, null=False)
-    institutional_email = models.CharField(max_length=320, null=False)
+    name = models.CharField(max_length=256, null=False, default="")
+    institutional_email = models.CharField(max_length=320, null=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
