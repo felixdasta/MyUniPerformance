@@ -59,6 +59,10 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000"
+]
+
 ROOT_URLCONF = 'config.urls'
 
 SETTINGS_PATH = os.path.normpath(os.path.dirname(__file__))

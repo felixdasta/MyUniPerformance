@@ -1,23 +1,25 @@
-import logo from './logo.svg';
+import React from 'react';
+import {Typography, Container, Grid } from '@mui/material'
+import StudentProfile from './components/StudentProfile'
 import './App.css';
+import {Query, QueryClient, QueryClientProvider} from "react-query";
 
 function App() {
+
+  const queryClient = new QueryClient();
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <QueryClientProvider client={queryClient}>
+      <Typography>Student Profile View</Typography>
+        <body>
+          <Grid container spacing={3}>
+            <Grid item container sx={{my:15, mx:5}}>
+              <StudentProfile/>
+            </Grid>
+          </Grid>  
+        </body>
+        </QueryClientProvider>
     </div>
   );
 }
