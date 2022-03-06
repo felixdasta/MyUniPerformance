@@ -2,7 +2,6 @@ from rest_framework.serializers import ModelSerializer
 from api import models
 
 class UniversitySerializer(ModelSerializer):
-
     class Meta:
         model = models.university.University
         fields = ['university_id','university_name','university_website','university_location', 'institutional_domain']
@@ -11,6 +10,11 @@ class DepartmentSerializer(ModelSerializer):
     class Meta:
         model = models.department.Department
         fields = ['department_id','department_name','university']
+
+class StaffMemberSerializer(ModelSerializer):
+    class Meta:
+        model = models.staff_member.Staff_Member
+        fields = ['member_id', 'name', 'institutional_email', 'department']
 
 class CourseSerializer(ModelSerializer):
     department = DepartmentSerializer(read_only=True)
@@ -43,10 +47,11 @@ class StudentSerializer(ModelSerializer):
 
 class SectionSerializer(ModelSerializer):
     enrolled_students = StudentSerializer(many=True, read_only=True)
+    instructors = StaffMemberSerializer(many=True, read_only=True)
     
     class Meta:
         model = models.section.Section
-        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructor', 'enrolled_students', 'likes']
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructors', 'enrolled_students', 'likes']
 
 class GradeStatsSerializer(ModelSerializer):
     section = SectionSerializer(read_only=True)
@@ -58,7 +63,8 @@ class GradeStatsSerializer(ModelSerializer):
 class FeedbackSerializer(ModelSerializer):
     section = SectionSerializer(read_only=True)
     student = StudentSerializer(read_only=True)
+    instructor = StaffMemberSerializer(read_only=True)
 
     class Meta:
         model = models.feedback.Feedback
-        fields = ['feedback_id', 'timestamp', 'praises', 'criticism', 'section', 'student', 'is_misplaced', 'likes']
+        fields = ['feedback_id', 'timestamp', 'praises', 'criticism', 'section', 'instructor', 'student', 'is_misplaced', 'likes']

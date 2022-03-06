@@ -9,7 +9,7 @@ class Section(models.Model):
     section_syllabus = models.FileField(upload_to='syllabuses/')
     section_term = models.CharField(max_length=11, null=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    instructor = models.ForeignKey(Staff_Member, on_delete=models.CASCADE)
+    instructors = models.ManyToManyField(Staff_Member)
     enrolled_students = models.ManyToManyField(Student, through='Section_Students')
     likes = models.ManyToManyField(Student,related_name="section_likes", blank=True)
 
