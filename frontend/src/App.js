@@ -4,12 +4,15 @@ import StudentProfile from './components/StudentProfile'
 import UserCurriculum from './components/UserCurriculum';
 import './App.css';
 import {Query, QueryClient, QueryClientProvider} from "react-query";
+import { React } from "react";
+import { Link } from 'react-router-dom';
 
 function App() {
 
   const queryClient = new QueryClient();
 
   return (
+
     <div className="App">
       <QueryClientProvider client={queryClient}>
       <Typography>Student Profile View</Typography>
@@ -21,6 +24,10 @@ function App() {
           </Grid>    
         </body>
         </QueryClientProvider>
+    <div>
+      <h1>Sandunga</h1>
+      <Link to="/dashboard">Dashboard</Link>
+      </div>
     </div>
   );
 }
