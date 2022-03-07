@@ -2,9 +2,7 @@ import React from 'react';
 import {Typography, Container, Grid } from '@mui/material'
 import StudentProfile from './components/StudentProfile'
 import UserCurriculum from './components/UserCurriculum';
-import './App.css';
 import {Query, QueryClient, QueryClientProvider} from "react-query";
-import { React } from "react";
 import { Link } from 'react-router-dom';
 
 function App() {
