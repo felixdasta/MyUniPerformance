@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Box, Card, CardActions, CardContent, Button, Typography, Icon} from '@mui/material'
+import { Box, Card, CardActions, CardContent, Button, Typography, Icon } from '@mui/material'
 import axios from "axios";
 import { useState, useEffect } from 'react';
 import { useQuery } from "react-query";
@@ -8,28 +8,28 @@ import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/
 import { Paper } from '@mui/material';
 
 
-function UserCurriculum(props){
+function UserCurriculum(props) {
 
     const [payload, setPayload] = useState([])
 
     const userQuery = useQuery("user", async () => {
-    
-        const {data} = await axios.get(
+
+        const { data } = await axios.get(
             'http://127.0.0.1:8000/students/37b03faa-4725-458d-aebb-8f7399102508'
         )
         setPayload(data.curriculums[0]);
         console.log(data.curriculums[0])
         return data;
     })
-    
-    if(userQuery.isLoading){
+
+    if (userQuery.isLoading) {
         console.log("Curriculum Query is Loading...")
-        return(
+        return (
             <div>
                 <Typography>Loading...</Typography>
             </div>
         );
-    }else{
+    } else {
         return (
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -43,10 +43,10 @@ function UserCurriculum(props){
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {(payload.courses).map((courseData) =>(
-                            <TableRow 
-                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                            key={courseData.course.course_name}
+                        {(payload.courses).map((courseData) => (
+                            <TableRow
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                key={courseData.course.course_name}
                             >
                                 <TableCell component="th" scope='row'>
                                     {courseData.course.course_name}
@@ -57,7 +57,6 @@ function UserCurriculum(props){
                                 <TableCell align='right'>{courseData.course.department.department_name}</TableCell>
                             </TableRow>
                         ))}
-
                     </TableBody>
                 </Table>
             </TableContainer>
