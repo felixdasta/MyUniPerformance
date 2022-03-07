@@ -27,7 +27,7 @@ function StudentProfile(props){
     });
     
     if(userQuery.isLoading){
-        console.log("Query is loading")
+        console.log("Student Profile Query is loading")
         return(
             <div>
                 <Typography>Loading...</Typography>

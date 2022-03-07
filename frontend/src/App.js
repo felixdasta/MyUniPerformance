@@ -1,6 +1,7 @@
 import React from 'react';
 import {Typography, Container, Grid } from '@mui/material'
 import StudentProfile from './components/StudentProfile'
+import UserCurriculum from './components/UserCurriculum';
 import './App.css';
 import {Query, QueryClient, QueryClientProvider} from "react-query";
 
@@ -15,9 +16,9 @@ function App() {
         <body>
           <Grid container spacing={3}>
             <Grid item container sx={{my:15, mx:5}}>
-              <StudentProfile/>
+              <UserCurriculum/>
             </Grid>
-          </Grid>  
+          </Grid>    
         </body>
         </QueryClientProvider>
     </div>
