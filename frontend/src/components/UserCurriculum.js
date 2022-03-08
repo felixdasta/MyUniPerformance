@@ -55,6 +55,7 @@ function UserCurriculum(props) {
                                 <TableCell align='right'>{courseData.course.course_id}</TableCell>
                                 <TableCell align='right'>{courseData.course.course_credits}</TableCell>
                                 <TableCell align='right'>{courseData.course.department.department_name}</TableCell>
+                                <TableCell align='right'>{courseData.semester}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

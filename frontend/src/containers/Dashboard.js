@@ -10,7 +10,6 @@ export default function Dashboard() {
   const queryClient2 = new QueryClient(); //TOCHANGE
   return (
     <main>
-      <Navbar />
       <Grid container justifyContent={"space-between"} direction={"row"}>
         <Grid item xs={1} sx={{mx:3, my:3}}>
           <QueryClientProvider client={queryClient2}>

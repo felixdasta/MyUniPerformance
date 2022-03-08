@@ -5,14 +5,11 @@ import App from './App';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import Dashboard from './containers/Dashboard';
+import Professors from './containers/Professors';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="dashboard" element={<Dashboard />} />
-    </Routes>
-  </BrowserRouter>,
+  <App>
+  </App>,
   document.getElementById('root')
 );
 
