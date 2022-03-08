@@ -8,13 +8,8 @@ import Dashboard from './containers/Dashboard';
 import Professors from './containers/Professors';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="professors" element={<Professors />} />
-    </Routes>
-  </BrowserRouter>,
+  <App>
+  </App>,
   document.getElementById('root')
 );
 

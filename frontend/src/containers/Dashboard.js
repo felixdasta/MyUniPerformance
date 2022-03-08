@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import { Typography, Container, Grid } from '@mui/material'
 import StudentProfile from '../components/StudentProfile'
 import UserCurriculum from '../components/UserCurriculum';
@@ -10,9 +9,7 @@ export default function Dashboard() {
     const queryClient2 = new QueryClient(); //TOCHANGE
     return (
         <main>
-            <Navbar />
             <QueryClientProvider client={queryClient}>
-                <Typography>Dashboard</Typography>
                 <Grid container spacing={3}>
                     <Grid item container sx={{ my: 15, mx: 5 }}>
                         <UserCurriculum />
