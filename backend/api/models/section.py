@@ -6,7 +6,7 @@ from api.models.student import Student
 class Section(models.Model):
     section_id = models.AutoField(primary_key=True, editable=False)
     section_code = models.CharField(max_length=4, null=False)
-    section_syllabus = models.FileField(upload_to='syllabuses/')
+    section_syllabus = models.FileField(upload_to='syllabuses/', null=True)
     section_term = models.CharField(max_length=11, null=False)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     instructors = models.ManyToManyField(Staff_Member)
