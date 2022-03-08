@@ -12,7 +12,7 @@ export default function Dashboard() {
         <main>
             <Navbar />
             <QueryClientProvider client={queryClient}>
-                <Typography>Student Profile View</Typography>
+                <Typography>Dashboard</Typography>
                 <Grid container spacing={3}>
                     <Grid item container sx={{ my: 15, mx: 5 }}>
                         <UserCurriculum />
