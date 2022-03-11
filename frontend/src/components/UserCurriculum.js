@@ -31,13 +31,12 @@ function UserCurriculum(props) {
         );
     } else {
         return (
-            <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableContainer component={Paper} sx={{maxHeight: 350}}>
+                <Table sx={{ minWidth: 350 }} aria-label="simple table" stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell>Course Name</TableCell>
                             <TableCell align='right'>Course Code</TableCell>
-                            <TableCell align='right'>Course ID</TableCell>
                             <TableCell align='right'>Credit Hours</TableCell>
                             <TableCell align='right'>Department Name</TableCell>
                         </TableRow>
@@ -52,10 +51,8 @@ function UserCurriculum(props) {
                                     {courseData.course.course_name}
                                 </TableCell>
                                 <TableCell align='right'>{courseData.course.course_code}</TableCell>
-                                <TableCell align='right'>{courseData.course.course_id}</TableCell>
                                 <TableCell align='right'>{courseData.course.course_credits}</TableCell>
                                 <TableCell align='right'>{courseData.course.department.department_name}</TableCell>
-                                <TableCell align='right'>{courseData.semester}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

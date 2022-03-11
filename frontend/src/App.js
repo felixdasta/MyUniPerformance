@@ -7,9 +7,6 @@ import Curriculum from './containers/Curriculum'
 import Navbar from "./components/Navbar";
 
 function App() {
-
-
-
   return (
     <BrowserRouter>
       <Navbar />
@@ -21,7 +18,6 @@ function App() {
         <Route path="/curriculum" element={<Curriculum />} />
       </Routes>
     </BrowserRouter>
-
   );
 }
 
