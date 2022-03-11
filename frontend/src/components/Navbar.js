@@ -2,30 +2,37 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { useNavigate } from 'react-router-dom';
-import { Button, ButtonGroup } from '@mui/material';
-import { green } from '@mui/material/colors';
+import { Avatar, Box, Button, ButtonGroup, Tooltip, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 
-const pages = ['Dashboard', 'Professors', 'Courses', 'Curriculum'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Account', 'Dashboard', 'Logout'];
 
-/* const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1
-    },
-}));
- */
 const Navbar = () => {
     //const classes = useStyles();
     let navigate = useNavigate();
+    const [accountSettingsToggle, setAccountSettingsToggle] = React.useState(null);
+
+    const handleOpenUserMenu = (event) => {
+        setAccountSettingsToggle(event.currentTarget);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAccountSettingsToggle(null);
+    };
+
     return (
-        <AppBar position='static'>
+        <AppBar position='static' elevation={0}>
             <Toolbar>
+                {/* Page Routes Navbar */}
                 <ButtonGroup
-                    variant="text"
+                    variant="contained"
                     size='large'
-                    fullWidth='true'
-                    color='inherit'
-                >
+                    color='primary'
+                    sx={{
+                        display: 'flex',
+                        flex: 1,
+                        justifyContent: 'center',
+                        boxShadow: 'none',
+                    }}>
                     <Button onClick={() => {
                         navigate("/dashboard")
                     }}>
@@ -47,6 +54,37 @@ const Navbar = () => {
                         Curriculum
                     </Button>
                 </ButtonGroup>
+
+                {/* Account Settings */}
+                <Box sx={{ flexGrow: 0 }}>
+                    <Tooltip title="Open settings">
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={accountSettingsToggle}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(accountSettingsToggle)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        {settings.map((setting) => (
+                            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                <Typography textAlign="center">{setting}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+                </Box>
             </Toolbar>
         </AppBar>
     );

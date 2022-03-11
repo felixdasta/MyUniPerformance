@@ -8,8 +8,7 @@ import Dashboard from './containers/Dashboard';
 import Professors from './containers/Professors';
 
 ReactDOM.render(
-  <App>
-  </App>,
+  <App />,
   document.getElementById('root')
 );
 
