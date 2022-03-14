@@ -46,12 +46,12 @@ class StudentSerializer(ModelSerializer):
         fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'is_email_verified', 'password', 'curriculums']
 
 class SectionSerializer(ModelSerializer):
-    enrolled_students = StudentSerializer(many=True, read_only=True)
     instructors = StaffMemberSerializer(many=True, read_only=True)
+    course = CourseSerializer(read_only=True)
     
     class Meta:
         model = models.section.Section
-        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructors', 'enrolled_students', 'likes']
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'course', 'instructors', 'likes']
 
 class GradeStatsSerializer(ModelSerializer):
     section = SectionSerializer(read_only=True)

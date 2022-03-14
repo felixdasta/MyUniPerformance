@@ -4,8 +4,13 @@ from api.models.curriculum import Curriculum
 class CurriculumRepository:
     
     @staticmethod
-    def get_all_curriculums():        
-        curriculums = Curriculum.objects.all()
+    def get_all_curriculums(university_id):  
+        curriculums = Curriculum.objects.prefetch_related('curriculum_courses_set__course__department') \
+        .select_related('department__university')
+
+        if university_id != None:
+            curriculums = curriculums.filter(department__university = university_id)
+
         serializer = CurriculumSerializer(curriculums, many=True)
         return serializer
 
@@ -18,14 +23,9 @@ class CurriculumRepository:
 
     @staticmethod
     def get_curriculum_by_id(pk):
-        curriculum = Curriculum.objects.get(pk=pk)
+        curriculum = Curriculum.objects.prefetch_related('curriculum_courses_set__course__department') \
+        .select_related('department__university').get(pk=pk)
         serializer = CurriculumSerializer(curriculum)
-        return serializer
-
-    @staticmethod
-    def get_curriculums_by_university(university_id):
-        curriculums = Curriculum.objects.select_related('department').select_related('department__university').filter(department__university=university_id)
-        serializer = CurriculumSerializer(curriculums, many=True)
         return serializer
 
     @staticmethod

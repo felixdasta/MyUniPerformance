@@ -1,30 +1,28 @@
 from django.urls import path
-from api.views import student, curriculum
-from api.views.student import StudentList, StudentDetail
-from api.views.university import UniversityDetail, UniversityList
-from api.views.section import SectionDetail, SectionList
-from api.views.department import DepartmentDetail, DepartmentList
-from api.views.course import CourseList, CourseDetail
-from api.views.grade_stats import GradeStatsDetail
-from api.views.feedback import FeedbackSection
+from api.views \
+import student, curriculum, \
+course, university, section, \
+grade_stats, feedback
+
 
 urlpatterns = [
     path('students', student.StudentList.as_view()),
     path('students/<pk>', student.StudentDetail.as_view()),
-    path('universities', UniversityList.as_view()),
-    path('universities/<pk>', UniversityDetail.as_view()),
-    path('section/', SectionList.as_view()),
-    path('section/<pk>', SectionDetail.as_view()),
-    path('department', DepartmentList.as_view()),
-    path('department/<pk>', DepartmentDetail.as_view()),
-    path('universities/<university_id>/curriculums', curriculum.UniversityCurriculumList.as_view()),
-    path('courses/', CourseList.as_view()),
-    path('courses/<pk>', CourseDetail.as_view()),
-    path('sections/', SectionList.as_view()),
-    path('sections/<pk>', SectionDetail.as_view()),
-    #path('sections/<pk>/feedback', FeedbackSection.as_view()),
+    path('students/<user_id>/sections/<section_id>', section.EnrollStudent.as_view()),
+    
+    path('universities', university.UniversityList.as_view()),
+    path('universities/<pk>', university.UniversityDetail.as_view()),
+    path('universities/<university_id>/curriculums', curriculum.CurriculumList.as_view()),
+    path('universities/<university_id>/sections', section.SectionList.as_view()),
+
+    path('courses', course.CourseList.as_view()),
+    path('courses/<pk>', course.CourseDetail.as_view()),
+
+    path('sections', section.SectionList.as_view()),
+    path('sections/<pk>', section.SectionDetail.as_view()),
+    path('sections/<section_id>/feedbacks', feedback.FeedbackList.as_view()),
     #path('sections/<pk>/grade-stats', GradeStatsDetail.as_view()),
-    path('curriculums/<curriculum_id>/students', student.CurriculumStudentList.as_view()),
+
     path('curriculums/<pk>', curriculum.CurriculumDetail.as_view()),
     path('curriculums', curriculum.CurriculumList.as_view()),
     path('activate-user/<uidb64>/<token>', student.activate_student, name='activate')
