@@ -3,16 +3,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.feedback import FeedbackRepository
 from api.models.feedback import Feedback
+from api.serializers import FeedbackSerializer
+from api.utils import paginate_result
 
 class FeedbackList(APIView):
     """
-    List all feedbacks for all sections or add a new one
+    List all feedbacks for all sections, a specific section or add a new one
     """
-    def get(self, request, format=None):
-        feedback = FeedbackRepository.get_all_feedback()
-        return Response(feedback.data)
+    def get(self, request, section_id=None, format=None):
+        queryprms = request.GET
+        feedback = FeedbackRepository.get_feedback_by_params(section_id)
+        page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
+        feedback = paginate_result(feedback, FeedbackSerializer, 'feedbacks', page)
+        return Response(feedback)
 
-    def post(self, request, format=None):
+    def post(self, request, section_id=None, format=None):
+        #section id may be passed on url parameter
+        if section_id != None:
+            request['section_id'] = section_id
         feedback = FeedbackRepository.create_feedback(request)
 
         return Response(feedback.data 
@@ -46,8 +54,3 @@ class FeedbackDetail(APIView):
     def delete(self, request, pk, format=None):
         FeedbackRepository.delete_feedback(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class FeedbackSection(APIView):
-    def get(Self, request, pk, format=None):
-        feedback = FeedbackRepository.get_all_feedback_by_section(pk)
-        return Response(feedback.data)

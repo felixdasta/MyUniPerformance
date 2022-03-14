@@ -4,7 +4,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from api.repositories.student import StudentRepository
 from api.models.student import Student
+from api.serializers import StudentSerializer
 from api.authentication import Authentication 
+from api.utils import paginate_result
 from django.urls import reverse
 from django.shortcuts import render, redirect
 
@@ -13,8 +15,11 @@ class StudentList(APIView):
     List all students, or create a new student.
     """
     def get(self, request, format=None):
-        student = StudentRepository.get_all_students()
-        return Response(student.data)
+        queryprms = request.GET
+        student = StudentRepository.get_students_by_params(queryprms)
+        page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
+        student = paginate_result(student, StudentSerializer, 'students', page)
+        return Response(student)
 
     def post(self, request, format=None):
         errors = Authentication.validate_email(request)
@@ -75,17 +80,6 @@ class StudentDetail(APIView):
     def delete(self, request, pk, format=None):
         StudentRepository.delete_student(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class CurriculumStudentList(APIView):
-    """
-    List all students from a certain curriculum
-    """
-    def get(self, request, curriculum_id, format=None):
-        try:
-            curriculums = StudentRepository.get_students_by_curriculum(curriculum_id)
-            return Response(curriculums.data)
-        except Student.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 def activate_student(request, uidb64, token):
     student = StudentRepository.activate_student(request, uidb64, token)

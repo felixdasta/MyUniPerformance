@@ -1,30 +1,29 @@
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.section import SectionRepository
-from rest_framework.views import APIView
+from api.serializers import SectionSerializer
 from api.models.section import Section
+from api.models.student import Student
+from api.utils import paginate_result
 
 class SectionList(APIView):
     """
     List all sections, or create a new one.
     """
-    def get(self, request, format=None):
-        section = SectionRepository.get_all_sections()
-        return Response(section.data)
-
-    def post(self, request, format=None):
-        section = SectionRepository.create_section(request)
-            
-        return Response(section.data 
-        if section.is_valid() 
-        else section._errors, 
-        status = status.HTTP_201_CREATED 
-        if section.is_valid() 
-        else status.HTTP_400_BAD_REQUEST) 
+    def get(self, request, university_id=None, format=None):
+        try:
+            queryprms = request.GET
+            sections = SectionRepository.get_sections_by_params(queryprms, university_id)
+            page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
+            sections = paginate_result(sections, SectionSerializer, 'sections', page)
+            return Response(sections)
+        except Section.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 class SectionDetail(APIView):
     """
-    Retrieve, update or delete a section instance
+    Retrieve a section instance
     """
     def get(self, request, pk, format=None):
         try:
@@ -33,16 +32,26 @@ class SectionDetail(APIView):
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, pk, format=None):
-        section = SectionRepository.update_section(request, pk)
+class EnrollStudent(APIView):
+    """
+    Enroll a student to section instance
+    """
+    def put(self, request, user_id, section_id, format=None):
+        request.data['student_id'] = user_id
+        request.data['section_id'] = section_id
+        section = SectionRepository.enroll_student_or_update_grade(request)
 
-        return Response(section.data 
-        if section.is_valid() 
-        else section._errors, 
-        status = status.HTTP_201_CREATED 
-        if section.is_valid() 
-        else status.HTTP_400_BAD_REQUEST)
+        try:
+            return Response({'section': section.data, 'message' : 'Student has been successfully enrolled in this section'})
+        except:
+            return Response(status = status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
-        SectionRepository.delete_section(pk)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, user_id, section_id, format=None):
+        request.data['student_id'] = user_id
+        request.data['section_id'] = section_id
+        
+        try:
+            section = SectionRepository.drop_student(request)
+            return Response({'section': section, 'message' : 'Student is no longer enrolled in this section!'})
+        except Exception as err:
+            return Response({'error': str(err)},status = status.HTTP_400_BAD_REQUEST)

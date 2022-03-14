@@ -1,14 +1,16 @@
-from os import stat
 from api.serializers import FeedbackSerializer
 from api.models.feedback import Feedback
 
 class FeedbackRepository:
 
     @staticmethod
-    def get_all_feedback():
+    def get_feedback_by_params(section_id):
         feedback = Feedback.objects.all()
-        serializer = FeedbackSerializer(feedback, many=True)
-        return serializer
+
+        if section_id != None:
+            feedback = feedback.filter(section = section_id)
+
+        return feedback
 
     @staticmethod
     def create_feedback(request):
@@ -35,9 +37,3 @@ class FeedbackRepository:
     def delete_feedback(pk):
         feedback = Feedback.objects.get(pk=pk)
         return feedback.delete()
-
-    @staticmethod
-    def get_all_feedback_by_section(pk):
-        feedback = Feedback.objects.select_related('section').filter(section=pk)
-        serializer = FeedbackSerializer(feedback, many=True)
-        return serializer
