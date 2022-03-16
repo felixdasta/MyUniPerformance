@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { Box, Card, CardActions, CardContent, Button, Typography, Icon } from '@mui/material'
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import { useState, useEffect } from 'react';
 import { useQuery } from "react-query";
 import Table from '@mui/material/Table'
 import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Paper } from '@mui/material';
+import MuiTableHead from "@material-ui/core/TableHead";
+import MuiTable from "@material-ui/core/Table"
+
 
 
 function UserCurriculum(props) {
@@ -22,6 +26,9 @@ function UserCurriculum(props) {
         return data;
     })
 
+    //Defining Styles for Table
+ 
+
     if (userQuery.isLoading) {
         console.log("Curriculum Query is Loading...")
         return (
@@ -32,7 +39,7 @@ function UserCurriculum(props) {
     } else {
         return (
             <TableContainer component={Paper} sx={{maxHeight: 350}}>
-                <Table sx={{ minWidth: 350 }} aria-label="simple table" stickyHeader>
+                <Table sx={{ minWidth: 350}} aria-label="simple table" stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell>Course Name</TableCell>
@@ -61,4 +68,4 @@ function UserCurriculum(props) {
         );
     }
 
-} export default UserCurriculum;
+} export default (UserCurriculum);
