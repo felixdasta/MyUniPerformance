@@ -20,7 +20,7 @@ class FeedbackList(APIView):
     def post(self, request, section_id=None, format=None):
         #section id may be passed on url parameter
         if section_id != None:
-            request['section_id'] = section_id
+            request.data['section_id'] = section_id
         feedback = FeedbackRepository.create_feedback(request)
 
         return Response(feedback.data 
