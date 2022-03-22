@@ -2,7 +2,7 @@ from django.urls import path
 from api.views \
 import student, curriculum, \
 course, university, section, \
-grade_stats, feedback
+grade_stats, feedback, grade_stats
 
 
 
@@ -22,7 +22,7 @@ urlpatterns = [
     path('sections', section.SectionList.as_view()),
     path('sections/<pk>', section.SectionDetail.as_view()),
     path('sections/<section_id>/feedbacks', feedback.FeedbackList.as_view()),
-    #path('sections/<pk>/grade-stats', GradeStatsDetail.as_view()),
+    path('sections/<pk>/grade-stats', grade_stats.GradeStatsDetail.as_view()),
 
     path('curriculums/<pk>', curriculum.CurriculumDetail.as_view()),
     path('curriculums', curriculum.CurriculumList.as_view()),
