@@ -80,3 +80,7 @@ class Authentication:
     def hash_password(request):
         request.data['password'] =  sha256.hash(request.data['password'])
         return request.data['password']
+
+    @staticmethod
+    def verify_passwords(password, hashed_password):
+        return sha256.verify(password, hashed_password)

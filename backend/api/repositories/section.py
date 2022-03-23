@@ -15,6 +15,8 @@ class SectionRepository:
 
         modality = queryprms.get('modality')
 
+        if queryprms.get('course_code'):
+            sections = sections.filter(course__course_code = queryprms.get('course_code'))
         if queryprms.get('section_term'):
             sections = sections.filter(section_term = queryprms.get('section_term'))
         if queryprms.get('section_code'):

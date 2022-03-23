@@ -35,7 +35,10 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  
+    ],
 }
 
 # Application definition
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'api',
     'corsheaders',
 ]
@@ -149,11 +153,11 @@ USE_TZ = True
 # EMAIL CONFIG
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Static files (CSS, JavaScript, Images)

@@ -81,6 +81,25 @@ class StudentDetail(APIView):
         StudentRepository.delete_student(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class StudentLogin(APIView):
+    """
+    Retrieve a student instance.
+    """
+    def post(self, request, format=None):
+        try:
+            student = StudentRepository.get_student_by_email(request.data['institutional_email'])
+
+            if Authentication.verify_passwords(request.data['password'], student.data['password']):
+                if student.data['is_email_verified']:
+                    return Response(student.data)
+                else:
+                    return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({"error": "The password you entered is incorrect."}, status=status.HTTP_404_NOT_FOUND)
+        except Student.DoesNotExist:
+            return Response({"error": "The email you entered is incorrect."}, status=status.HTTP_404_NOT_FOUND)
+
+
 def activate_student(request, uidb64, token):
     student = StudentRepository.activate_student(request, uidb64, token)
     return (redirect(reverse('login')) 
