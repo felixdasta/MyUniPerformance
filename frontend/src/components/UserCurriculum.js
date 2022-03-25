@@ -1,42 +1,13 @@
 import * as React from 'react';
-import { Box, Card, CardActions, CardContent, Button, Typography, Icon } from '@mui/material'
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import axios from "axios";
-import { useState, useEffect } from 'react';
-import { useQuery } from "react-query";
 import Table from '@mui/material/Table'
 import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Paper } from '@mui/material';
-import MuiTableHead from "@material-ui/core/TableHead";
-import MuiTable from "@material-ui/core/Table"
 
+function UserCurriculum() {
+    let loggedInUser = JSON.parse(localStorage.getItem("user"));
 
-
-function UserCurriculum(props) {
-
-    const [payload, setPayload] = useState([])
-
-    const userQuery = useQuery("user", async () => {
-
-        const { data } = await axios.get(
-            'http://127.0.0.1:8000/students/37b03faa-4725-458d-aebb-8f7399102508'
-        )
-        setPayload(data.curriculums[0]);
-        console.log(data.curriculums[0])
-        return data;
-    })
-
-    //Defining Styles for Table
- 
-
-    if (userQuery.isLoading) {
-        console.log("Curriculum Query is Loading...")
-        return (
-            <div>
-                <Typography>Loading...</Typography>
-            </div>
-        );
-    } else {
+    //Defining styles for table
+    if(loggedInUser) {
         return (
             <TableContainer component={Paper} sx={{maxHeight: 350}}>
                 <Table sx={{ minWidth: 350}} aria-label="simple table" stickyHeader>
@@ -49,7 +20,7 @@ function UserCurriculum(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(payload.courses).map((courseData) => (
+                        {(loggedInUser.curriculums[0].courses).map((courseData) => (
                             <TableRow
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 key={courseData.course.course_name}

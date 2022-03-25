@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from api.repositories.student import StudentRepository
 from api.models.student import Student
+from api.models.curriculum import Curriculum
 from api.serializers import StudentSerializer
 from api.authentication import Authentication 
 from api.utils import paginate_result
@@ -31,15 +32,13 @@ class StudentList(APIView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         Authentication.hash_password(request)
-        student = StudentRepository.create_student(request)
-        Authentication.send_activation_email(student.data, request)
+        serialized_student = StudentRepository.create_student(request)
             
-        return Response(student.data 
-        if student.is_valid() 
-        else student._errors, 
-        status = status.HTTP_201_CREATED 
-        if student.is_valid() 
-        else status.HTTP_400_BAD_REQUEST)
+        if serialized_student.is_valid():
+            Authentication.send_activation_email(serialized_student.data, request)
+            return Response(serialized_student.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(serialized_student._errors, status = status.HTTP_400_BAD_REQUEST)
 
 class StudentDetail(APIView):
     """
@@ -48,7 +47,8 @@ class StudentDetail(APIView):
     def get(self, request, pk, format=None):
         try:
             student = StudentRepository.get_student_by_id(pk)
-            return Response(student.data)
+            serializer = StudentSerializer(student)
+            return Response(serializer.data)
         except Student.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -70,12 +70,20 @@ class StudentDetail(APIView):
             
         student = StudentRepository.update_student(request, pk)
 
-        return Response(student.data 
-        if student.is_valid() 
-        else student._errors, 
-        status = status.HTTP_201_CREATED 
-        if student.is_valid() 
-        else status.HTTP_400_BAD_REQUEST)
+        serializer = StudentSerializer(student, data=request.data, partial=True)
+        
+        if 'curriculums' in request.data:
+            curriculums = []
+            for curriculum_id in request.data['curriculums']:
+                curriculum = Curriculum.objects.get(pk=curriculum_id)
+                curriculums.append(curriculum)
+            student.curriculums.set(curriculums)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer._errors, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         StudentRepository.delete_student(pk)
@@ -88,10 +96,11 @@ class StudentLogin(APIView):
     def post(self, request, format=None):
         try:
             student = StudentRepository.get_student_by_email(request.data['institutional_email'])
+            serializer = StudentSerializer(student)
 
-            if Authentication.verify_passwords(request.data['password'], student.data['password']):
-                if student.data['is_email_verified']:
-                    return Response(student.data)
+            if Authentication.verify_passwords(request.data['password'], student.password):
+                if student.is_email_verified:
+                    return Response(serializer.data)
                 else:
                     return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_404_NOT_FOUND)
             else:

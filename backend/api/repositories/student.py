@@ -1,7 +1,6 @@
 from django.utils.encoding import force_str
 from django.contrib import messages
 from api.models.student import Student
-from api.models.curriculum import Curriculum
 from api.serializers import StudentSerializer
 from api.utils import generate_token
 from base64 import urlsafe_b64decode
@@ -35,30 +34,17 @@ class StudentRepository:
     @staticmethod
     def get_student_by_id(pk):
         student = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department').get(pk=pk)
-        serializer = StudentSerializer(student)
-        return serializer
+        return student
 
     @staticmethod
     def get_student_by_email(email):
         student = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department').get(institutional_email=email)
-        serializer = StudentSerializer(student)
-        return serializer
+        return student
 
     @staticmethod
     def update_student(request, pk):
         student = Student.objects.get(pk=pk)
-        serializer = StudentSerializer(student, data=request.data, partial=True)
-        
-        if 'curriculums' in request.data:
-            curriculums = []
-            for curriculum_id in request.data['curriculums']:
-                curriculum = Curriculum.objects.get(pk=curriculum_id)
-                curriculums.append(curriculum)
-            student.curriculums.set(curriculums)
-
-        if serializer.is_valid():
-            serializer.save()
-        return serializer
+        return student
 
     @staticmethod
     def delete_student(pk):

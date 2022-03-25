@@ -1,26 +1,19 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import { Typography, Container, Grid } from "@mui/material";
 import StudentProfile from "../components/StudentProfile";
 import UserCurriculum from "../components/UserCurriculum";
-import { Query, QueryClient, QueryClientProvider } from "react-query";
-import { Box, maxHeight, maxWidth } from "@mui/system";
+import { QueryClient } from "react-query";
+import { Box, maxWidth } from "@mui/system";
 
 export default function Dashboard() {
-    const queryClient = new QueryClient();
-    const queryClient2 = new QueryClient(); //TOCHANGE
     return (
         <Box sx={{ mx: 3 }}>
             <Grid container spacing={3}>
                 <Grid item lg={3}>
-                    <QueryClientProvider client={queryClient2}>
-                        <StudentProfile />
-                    </QueryClientProvider>
+                    <StudentProfile />
                 </Grid>
                 <Grid item lg={9}>
-                    <QueryClientProvider client={queryClient}>
-                        <UserCurriculum />
-                    </QueryClientProvider>
+                    <UserCurriculum />
                 </Grid>
                 <Grid item lg={3}>
                     <Box sx={{
