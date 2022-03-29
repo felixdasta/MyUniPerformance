@@ -36,7 +36,7 @@ class StudentRepository:
 
     @staticmethod
     def get_student_by_email(email):
-        student = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department').get(institutional_email=email)
+        student = Student.objects.get(institutional_email=email)
         return student
 
     @staticmethod

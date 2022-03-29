@@ -8,7 +8,7 @@ import './Login.scss'
 
 export default function Login() {
   let navigate = useNavigate();
-  let loggedInUser = localStorage.getItem("user");
+  let loggedInUser = localStorage.getItem("user_id");
   
   const [loading, setLoading] = useState();
   const [error, setError] = useState();
@@ -47,7 +47,7 @@ export default function Login() {
                 setLoading(true);
                 login(userData).then( response => {
                   setLoading(false);
-                  localStorage.setItem("user", JSON.stringify(response.data));
+                  localStorage.setItem("user_id", response.data.user_id);
                   navigate("/dashboard");
               }).catch((error) => {
                 let message = error.response.data.error

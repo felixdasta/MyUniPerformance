@@ -8,7 +8,7 @@ import { Avatar, Box, Button, ButtonGroup, Tooltip, IconButton, Menu, MenuItem, 
 import "./Navbar.scss"
 
 const Navbar = () => {
-    let loggedInUser = localStorage.getItem("user");
+    let loggedInUser = localStorage.getItem("user_id");
     let navigate = useNavigate();
     const [accountSettingsToggle, setAccountSettingsToggle] = useState();
 
@@ -55,7 +55,7 @@ const Navbar = () => {
                       <MenuItem key="account" onClick={handleCloseUserMenu}>
                       <Typography textAlign="center">Account</Typography>
                       </MenuItem>
-                      <MenuItem key="setting" onClick={()=>{ localStorage.removeItem("user"); navigate("/"); }}> <Typography textAlign="center">Logout</Typography>
+                      <MenuItem key="setting" onClick={()=>{ localStorage.removeItem("user_id"); navigate("/"); }}> <Typography textAlign="center">Logout</Typography>
                       </MenuItem>
                     </Menu>
                   </Box>

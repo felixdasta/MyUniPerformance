@@ -99,11 +99,10 @@ class StudentLogin(APIView):
     def post(self, request, format=None):
         try:
             student = StudentRepository.get_student_by_email(request.data['institutional_email'])
-            serializer = StudentSerializer(student)
 
             if Authentication.verify_passwords(request.data['password'], student.password):
                 if student.is_email_verified:
-                    return Response(serializer.data)
+                    return Response({"user_id": student.user_id}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_401_UNAUTHORIZED)
             else:
