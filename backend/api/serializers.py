@@ -43,7 +43,7 @@ class StudentSerializer(ModelSerializer):
 
     class Meta:
         model = models.student.Student
-        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'is_email_verified', 'password', 'curriculums']
+        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'curriculums']
 
 class SectionSerializer(ModelSerializer):
     instructors = StaffMemberSerializer(many=True, read_only=True)
