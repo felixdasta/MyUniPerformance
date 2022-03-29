@@ -20,7 +20,7 @@ const Navbar = () => {
         setAccountSettingsToggle(false);
     };
     
-    if(window.location.pathname != "/login"){
+    if(window.location.pathname != "/login" && window.location.pathname != "/create-account"){
         if(loggedInUser){
             return (
                 <AppBar position='static' elevation={0}>

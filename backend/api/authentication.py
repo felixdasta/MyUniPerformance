@@ -19,7 +19,7 @@ class Authentication:
         email_body = render_to_string('activate.html',{
             'user':user,
             'domain':current_site,
-            'uid':urlsafe_base64_encode(force_bytes(user['user_id'])),
+            'uid':urlsafe_base64_encode(force_bytes(user.user_id)),
             'token':generate_token.make_token(user)
         })
 
@@ -27,7 +27,7 @@ class Authentication:
             subject=email_subject,
             body=email_body,
             from_email=settings.EMAIL_HOST_USER,
-            to=[user['institutional_email']]
+            to=[user.institutional_email]
             )
 
         email.attach_alternative(email_body, "text/html")
@@ -63,7 +63,7 @@ class Authentication:
         dot_index = request.data['institutional_email'].rindex('.')
             
         try:
-            object_exists = StudentRepository.get_student_by_email(request.data['institutional_email']).data
+            object_exists = StudentRepository.get_student_by_email(request.data['institutional_email'])
         except Student.DoesNotExist:
             object_exists = None
 
@@ -71,7 +71,7 @@ class Authentication:
             errors.append((1, "The email provided is invalid."))
         if request.data['institutional_email'][dot_index + 1:] != "edu":
             errors.append((1, "Email must belong to .edu domain."))
-        if object_exists and object_exists['user_id'] != pk:
+        if object_exists and object_exists.user_id != pk:
             errors.append((1, "This email address is already registered in our database."))
 
         return errors

@@ -8,11 +8,7 @@
   transform: translate(-50%, -50%);
 }
 
-a:hover{
-  cursor: pointer;
-}
-
-.login-page {
+.create-account-page {
   width: 360px;
   padding: 8% 0 0;
   margin: auto;
@@ -56,38 +52,21 @@ a:hover{
   background: #43A047;
 }
 
-
-.form{
-  .message {
-    margin: 15px 0 0;
-    color: #b3b3b3;
-    font-size: 12px;
-    a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
-  }
-
-  .error-message{
-    margin: 0 0 15px;
-    color: red;
-    font-size: 12px;
-    text-align: justify;
-  }
-
-  .activation-message{
-    margin: 0 0 15px;
-    color: #b3b3b3;
-    font-size: 12px;
-    a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
-  }
-
+.form .error-message{
+  margin: 0 0 15px;
+  color: red;
+  font-size: 12px;
 }
 
-
+.form .message {
+  margin: 15px 0 0;
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
 
 .container {
   position: relative;

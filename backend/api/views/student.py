@@ -2,6 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.decorators import api_view
 from api.repositories.student import StudentRepository
 from api.models.student import Student
 from api.models.curriculum import Curriculum
@@ -10,6 +11,7 @@ from api.authentication import Authentication
 from api.utils import paginate_result
 from django.urls import reverse
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 
 class StudentList(APIView):
     """
@@ -32,13 +34,14 @@ class StudentList(APIView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         Authentication.hash_password(request)
-        serialized_student = StudentRepository.create_student(request)
-            
-        if serialized_student.is_valid():
-            Authentication.send_activation_email(serialized_student.data, request)
-            return Response(serialized_student.data, status = status.HTTP_201_CREATED)
+        student = StudentRepository.create_student(request)
+        serializer = StudentSerializer(student)
+
+        if student:
+            Authentication.send_activation_email(student, request)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         else:
-            return Response(serialized_student._errors, status = status.HTTP_400_BAD_REQUEST)
+            return Response(serializer._errors, status = status.HTTP_400_BAD_REQUEST)
 
 class StudentDetail(APIView):
     """
@@ -102,7 +105,7 @@ class StudentLogin(APIView):
                 if student.is_email_verified:
                     return Response(serializer.data)
                 else:
-                    return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_404_NOT_FOUND)
+                    return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response({"error": "The password you entered is incorrect."}, status=status.HTTP_404_NOT_FOUND)
         except Student.DoesNotExist:
@@ -111,7 +114,16 @@ class StudentLogin(APIView):
 
 def activate_student(request, uidb64, token):
     student = StudentRepository.activate_student(request, uidb64, token)
-    return (redirect(reverse('login')) 
+    return (HttpResponseRedirect('//localhost:3000/login') 
     if student.is_email_verified 
     else render(request, 'authentication/activate-failed.html', 
     {"student": student}))
+
+@api_view(['POST'])
+def send_activation_email(request):
+    institutional_email = request.data['institutional_email']
+    student = StudentRepository.get_student_by_email(institutional_email)
+    if student:
+        Authentication.send_activation_email(student, request)
+        return Response({"message": "Email sent!"}, status=status.HTTP_200_OK)
+    return Response({"error": "The email was not found"}, status=status.HTTP_404_NOT_FOUND)

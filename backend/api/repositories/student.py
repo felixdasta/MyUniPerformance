@@ -26,10 +26,8 @@ class StudentRepository:
 
     @staticmethod
     def create_student(request):
-        serializer = StudentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer
+        student = Student.objects.create(**request.data)
+        return student
 
     @staticmethod
     def get_student_by_id(pk):
@@ -56,11 +54,10 @@ class StudentRepository:
         try:
             uid=force_str(urlsafe_b64decode(uidb64))
             student = Student.objects.get(pk=uid)
-            serializer = StudentSerializer(student)
         except Exception as e:
             student = None
 
-        if student and generate_token.check_token(serializer.data,token):
+        if student and generate_token.check_token(student,token):
             student.is_email_verified = True
             student.save()
 
