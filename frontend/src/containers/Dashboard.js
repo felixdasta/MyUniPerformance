@@ -2,10 +2,10 @@ import { Typography, Container, Grid } from "@mui/material";
 import { Box, maxWidth } from "@mui/system";
 import {get_student_by_id} from '../actions/user.js'
 import {useEffect, useState} from 'react';
-import { useNavigate} from 'react-router-dom';
-import * as Loader from "react-loader-spinner";
+import {useNavigate} from 'react-router-dom';
 import StudentProfile from "../components/StudentProfile";
 import StudentCurriculum from "../components/StudentCurriculum";
+import * as Loader from "react-loader-spinner";
 
 export default function Dashboard() {
     const [student, setStudent] = useState();
@@ -20,8 +20,8 @@ export default function Dashboard() {
                 console.log(error.response.data)
                 localStorage.removeItem("user_id"); 
                 navigate("/"); 
-        })
-    }, [])
+        });
+    }, []);
     
     return (     
         <Box sx={{ mx: 3 }}> {student ? <Grid container spacing={3}>
