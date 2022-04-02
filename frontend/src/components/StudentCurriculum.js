@@ -1,7 +1,6 @@
 import * as React from 'react';
-import Table from '@mui/material/Table'
 import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Paper } from '@mui/material';
+import { Paper, Table } from '@mui/material';
 
 function StudentCurriculum(props) {
     let student = props.student;
@@ -11,7 +10,7 @@ function StudentCurriculum(props) {
         let result = []
         for(let i = 0; i < student.curriculums.length; i++){
             result.push(
-                <TableContainer component={Paper} sx={{maxHeight: 350}}>
+                <TableContainer component={Paper} height="100vh">
                     <Table sx={{ minWidth: 350}} aria-label="simple table" stickyHeader>
                         <TableHead>
                             <TableRow>

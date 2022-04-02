@@ -14,7 +14,7 @@ class FeedbackList(APIView):
         queryprms = request.GET
         feedback = FeedbackRepository.get_feedback_by_params(section_id)
         page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-        feedback = paginate_result(feedback, FeedbackSerializer, 'feedbacks', page)
+        feedback = paginate_result(feedback, FeedbackSerializer, 'feedbacks', page, 25)
         return Response(feedback)
 
     def post(self, request, section_id=None, format=None):
