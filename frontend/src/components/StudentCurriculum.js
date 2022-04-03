@@ -24,7 +24,7 @@ function StudentCurriculum(props) {
                             {(student.curriculums[i].courses).map((courseData) => (
                                 <TableRow
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    key={courseData.course.course_name}
+                                    key={courseData.course.course_id}
                                 >
                                     <TableCell component="th" scope='row'>
                                         {courseData.course.course_name}

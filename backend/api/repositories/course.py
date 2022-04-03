@@ -25,8 +25,8 @@ class CourseRepository:
             section_condition &= Q(course__course_code = queryprms.get('course_code'))
             course_condition &= Q(course_code = queryprms.get('course_code'))
         if queryprms.get('section_term'):
-            section_condition &= Q(section_term = queryprms.get('section_term'))
-            course_condition &= Q(section__section_term = queryprms.get('section_term'))
+            section_condition &= Q(section_term__icontains = queryprms.get('section_term'))
+            course_condition &= Q(section__section_term__icontains = queryprms.get('section_term'))
         if queryprms.get('section_code'):
             section_condition &= Q(section_code = queryprms.get('section_code'))
             course_condition &= Q(section__section_code = queryprms.get('section_code'))
