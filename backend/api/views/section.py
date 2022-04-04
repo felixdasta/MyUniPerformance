@@ -1,8 +1,9 @@
+from urllib import request
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.section import SectionRepository
-from api.serializers import SectionSerializer
+from api.serializers import SectionSerializer, SectionStudentSerializer
 from api.models.section import Section
 from api.models.student import Student
 from api.utils import paginate_result
@@ -20,6 +21,21 @@ class SectionList(APIView):
             return Response(sections)
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class SectionStudentsList(APIView):
+    """
+    List sections in which a student is found and can filter by section term
+    """
+    def get(self, request, format=None):
+        try:
+            queryprms = request.GET
+            sections = SectionRepository.get_sections_by_student(queryprms)
+            page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
+            sections = paginate_result(sections, SectionStudentSerializer, 'sections', page)
+            return Response(sections)
+        except Section.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class SectionDetail(APIView):
     """

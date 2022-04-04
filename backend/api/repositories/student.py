@@ -1,6 +1,7 @@
 from django.utils.encoding import force_str
 from django.contrib import messages
 from api.models.student import Student
+from api.models.section import Section_Students
 from api.serializers import StudentSerializer
 from api.utils import generate_token
 from base64 import urlsafe_b64decode
