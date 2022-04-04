@@ -5,7 +5,6 @@ import {
     Typography
 } from '@mui/material'
 import './CoursesCategories.scss'
-import { green } from "@mui/material/colors";
 
 let availableTerms = {};
 
@@ -17,7 +16,6 @@ const semesters = {
 }
 
 function CoursesCategories(props) {
-
     const [filteredData, setFilteredData] = useState({
         section_term: "",
         department_id: "",
@@ -28,14 +26,14 @@ function CoursesCategories(props) {
     const [year, setYear] = useState("All");
     const [semester, setSemester] = useState("All");
 
-    useEffect(()=> {
-        for(let i = 0; i < props.terms.length; i++){
+    useEffect(() => {
+        for (let i = 0; i < props.terms.length; i++) {
             let term = props.terms[i];
             let year = parseInt(term.substring(0, 4));
             let semester = term.substring(4, 6);
-            
+
             //Example: 2016S2 in reality means spring semester of 2017
-            if(semester == "S2"){
+            if (semester == "S2") {
                 year = year + 1;
             }
 
@@ -49,13 +47,13 @@ function CoursesCategories(props) {
         }
 
         //Sort the semesters in the following order: spring, first summer, second summer, fall
-        for(let year in availableTerms){
+        for (let year in availableTerms) {
             //Get available semesters of a given year
             let currentSemesters = availableTerms[year];
             let result = []
-            for(let semester in semesters){
+            for (let semester in semesters) {
                 //Does the available semesters of a given year includes this semester?
-                if(currentSemesters.includes(semester)){
+                if (currentSemesters.includes(semester)) {
                     result.push(<MenuItem value={semester}>{semesters[semester]}</MenuItem>)
                 }
             }
@@ -75,11 +73,16 @@ function CoursesCategories(props) {
 
     return (
         <div class="slide-right">
-            <Box height="100vh" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65}}> {props.terms && 
+            <Box height="100vh" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65}}>
+                 {props.terms &&
                 <div class="term-container">
                     <FormControl sx={form_sx}>
                         <label>Year</label>
-                        <Select style={term_dropdown_style} value={year} displayEmpty name="year" onChange={ (e) => { setYear(e.target.value) }} inputProps={{ 'aria-label': 'Without label' }}>
+                        <Select style={term_dropdown_style} 
+                                value={year} displayEmpty 
+                                name="year" 
+                                onChange={(e) => { setYear(e.target.value) }} 
+                                inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">
                                 <em>All</em>
                             </MenuItem> {(Object.keys(availableTerms)).map((year) => (
@@ -88,19 +91,27 @@ function CoursesCategories(props) {
                     </FormControl>
                     <FormControl sx={form_sx}>
                         <label>Semester</label>
-                        <Select style={term_dropdown_style} value={semester} displayEmpty name="semester" onChange={ (e) => { setSemester(e.target.value) }} inputProps={{ 'aria-label': 'Without label' }}>
+                        <Select style={term_dropdown_style} 
+                                value={semester} 
+                                displayEmpty name="semester" 
+                                onChange={(e) => { setSemester(e.target.value) }}
+                                inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">
                                 <em>All</em>
-                            </MenuItem> 
-                            {year != "All" ? availableTerms[year] : 
+                            </MenuItem>
+                            {year != "All" ? availableTerms[year] :
                                 (Object.keys(semesters)).map((key) => (
-                                <MenuItem value={key}>{semesters[key]}</MenuItem>))}
+                                    <MenuItem value={key}>{semesters[key]}</MenuItem>))}
                         </Select>
                     </FormControl>
                 </div>
-                } {props.departments && <FormControl sx={form_sx}>
+            } {props.departments && <FormControl sx={form_sx}>
                 <label>Department</label>
-                <Select style={dropdown_style} value={filteredData.department_id} displayEmpty name="department_id" onChange={inputChange} inputProps={{ 'aria-label': 'Without label' }}>
+                <Select style={dropdown_style} 
+                        value={filteredData.department_id} 
+                        displayEmpty name="department_id" 
+                        onChange={inputChange} 
+                        inputProps={{ 'aria-label': 'Without label' }}>
                     <MenuItem value="">
                         <em>All</em>
                     </MenuItem>
@@ -114,20 +125,32 @@ function CoursesCategories(props) {
                     }
                 </Select>
             </FormControl>} <FormControl sx={form_sx}>
-                    <label>Instructor Name</label>
-                    <TextField name="instructor_name" onChange={inputChange} size="small" style={input_style} label="Type desired instructor name" variant="outlined" />
+                    <TextField label="Instructor name"
+                        InputLabelProps={{ shrink: true }}  
+                        variant="outlined"
+                        name="instructor_name"
+                        size="small"
+                        style={input_style}
+                        onChange={inputChange} />
                 </FormControl>
                 <FormControl sx={form_sx}>
-                    <label>Course Code</label>
-                    <TextField name="course_code" onChange={inputChange} size="small" style={input_style} label="Type desired course code" variant="outlined" />
+                    <TextField label="Course code"
+                        InputLabelProps={{ shrink: true }}  
+                        variant="outlined"
+                        name="course_code"
+                        size="small"
+                        style={input_style}
+                        onChange={inputChange} />
                 </FormControl>
-                <Typography align="center" sx={{ m: 5, color: green }}>
-                    <Button onClick={() => { 
-                            let fixed_year = semester == "S2" ? year - 1: year;
-                            let section_term = (year == "All" ? "": fixed_year)+(semester == "All" ? "" : semester);
-                            filteredData.section_term = section_term;
-                            props.setFilteredData(Object.assign({}, filteredData))}} 
-                            align='center' variant="contained">Apply Filters</Button>
+                <Typography align="center" sx={{ m: 5 }}>
+                    <Button onClick={() => {
+                        let fixed_year = semester == "S2" ? year - 1 : year;
+                        let section_term = (year == "All" ? "" : fixed_year) + (semester == "All" ? "" : semester);
+                        filteredData.section_term = section_term;
+                        filteredData.page = 1;
+                        props.setFilteredData(Object.assign({}, filteredData))
+                    }}
+                        align='center' variant="contained">Apply Filters</Button>
                 </Typography>
             </Box>
         </div>

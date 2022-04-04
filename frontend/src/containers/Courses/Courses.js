@@ -6,8 +6,8 @@ import { get_departments_by_university } from '../../actions/departments';
 import { useNavigate } from 'react-router-dom';
 import CoursesCategories from "../../components/CoursesCategories/CoursesCategories";
 import UniversityCourses from "../../components/UniversityCourses/UniversityCourses";
-import './Courses.scss'
 import * as Loader from "react-loader-spinner";
+import './Courses.scss'
 
 export default function Courses() {
 
@@ -16,12 +16,27 @@ export default function Courses() {
     const [departments, setDepartments] = useState();
     const [terms, setTerms] = useState();
     const [selectedUniversity, setSelectedUniversity] = useState();
-    const [page, setPage] = useState();
+    const [filteredData, setFilteredData] = useState();
+    const [lastPage, setLastPage] = useState();
 
     let navigate = useNavigate();
+
+    const setUniversityCourses = (setCourses, filteredData) => {
+        //get university courses
+        get_courses_by_university(selectedUniversity, filteredData).then(
+            response => {
+                setLastPage(response.data.last_page);
+                setCourses(response.data.courses);
+            }
+        ).catch((error) => {
+            console.log(error);
+        });
+    }
     
     useEffect(() => {
         
+        setFilteredData({page: 1});
+
         get_student_by_id(localStorage.getItem("user_id")).then(
             response => {
                 let curriculums = response.data.curriculums;
@@ -45,7 +60,7 @@ export default function Courses() {
             //initialize components
             setUniversitySectionsTerms(selectedUniversity, setTerms);
             setUniversityDepartments(selectedUniversity, setDepartments);
-            setUniversityCourses(selectedUniversity, setPage, setCourses);
+            setUniversityCourses(setCourses, filteredData);
         }
     }, [selectedUniversity]);
 
@@ -59,13 +74,18 @@ export default function Courses() {
                         }
                     }
                     setCourses(null);
-                    setUniversityCourses(selectedUniversity, setPage, setCourses, filteredData);
+                    setFilteredData(filteredData);
+                    setUniversityCourses(setCourses, filteredData);
                 }}
 
                 departments={departments}
                 terms={terms} />}
 
-            {courses ? <UniversityCourses courses={courses} />:
+            {courses ? <UniversityCourses courses={courses} 
+                                          filteredData={filteredData} 
+                                          setCourses={setUniversityCourses}
+                                          lastPage={lastPage}
+                                          />:
                 <div className = {terms && departments ? "custom-loader" : "loader"} >
                     <Loader.ThreeDots color="black" height={120} width={120} />
                 </div>}
@@ -101,17 +121,5 @@ function setUniversityDepartments(selectedUniversity, setDepartments){
         }
     ).catch((error) => {
         console.log(error)
-    });
-}
-
-function setUniversityCourses(selectedUniversity, setPage, setCourses, filteredData=null){
-    //get university courses
-    get_courses_by_university(selectedUniversity, filteredData).then(
-        response => {
-            setPage(response.data.current_page);
-            setCourses(response.data.courses);
-        }
-    ).catch((error) => {
-        console.log(error);
     });
 }
