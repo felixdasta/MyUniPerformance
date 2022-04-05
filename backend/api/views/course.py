@@ -2,14 +2,23 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.course import CourseRepository
+from api.models.course import Course
+from api.serializers import CourseSerializer
+from api.utils import paginate_result
 
 class CourseList(APIView):
     """
     List all courses or create a new one
     """
-    def get(self, request, format=None):
-        courses = CourseRepository.get_all_courses()
-        return Response(courses.data)
+    def get(self, request, university_id=None, format=None):
+        try:
+            queryprms = request.GET
+            courses = CourseRepository.get_courses_by_params(queryprms, university_id)
+            page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
+            courses = paginate_result(courses, CourseSerializer, 'courses', page, 25)
+            return Response(courses)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     
     def post(self, request, format=None):
         course = CourseRepository.create_course(request)

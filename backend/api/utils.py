@@ -2,8 +2,8 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import six
 
-def paginate_result(query_input, serializer_class, entity_name, page_number):
-    paginator = Paginator(query_input, 50)
+def paginate_result(query_input, serializer_class, entity_name, page_number, page_size):
+    paginator = Paginator(query_input, page_size)
 
     try:
         query_input = paginator.page(page_number)

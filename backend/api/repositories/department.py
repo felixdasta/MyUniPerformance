@@ -16,6 +16,12 @@ class DepartmentRepository:
         return serializer
     
     @staticmethod
+    def get_departments_by_university(university_id):
+        department = Department.objects.filter(university=university_id)
+        serializer = DepartmentSerializer(department, many=True)
+        return serializer
+
+    @staticmethod
     def create_department(request):
         serializer = DepartmentSerializer(data=request.data)
         if serializer.is_valid():

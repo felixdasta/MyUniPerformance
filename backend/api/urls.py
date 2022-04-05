@@ -2,7 +2,8 @@ from django.urls import path
 from api.views \
 import student, curriculum, \
 course, university, section, \
-grade_stats, feedback, grade_stats
+grade_stats, feedback, grade_stats, \
+department
 
 
 urlpatterns = [
@@ -12,11 +13,14 @@ urlpatterns = [
     path('students/<user_id>/sections/<section_id>', section.EnrollStudent.as_view()),
     path('sectionstudents', section.SectionStudentsList.as_view()),
     path('send-activation-email', student.send_activation_email),
-
+    path('departments', department.DepartmentList.as_view()),
+    
     path('universities', university.UniversityList.as_view()),
     path('universities/<pk>', university.UniversityDetail.as_view()),
     path('universities/<university_id>/curriculums', curriculum.CurriculumList.as_view()),
-    path('universities/<university_id>/sections', section.SectionList.as_view()),
+    path('universities/<university_id>/courses', course.CourseList.as_view()),
+    path('universities/<university_id>/sections-terms', section.get_sections_terms_by_university),
+    path('universities/<university_id>/departments', department.get_departments_by_university),
 
     path('courses', course.CourseList.as_view()),
     path('courses/<pk>', course.CourseDetail.as_view()),

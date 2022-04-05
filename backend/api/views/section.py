@@ -2,22 +2,23 @@ from urllib import request
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from api.repositories.section import SectionRepository
 from api.serializers import SectionSerializer, SectionStudentSerializer
 from api.models.section import Section
-from api.models.student import Student
 from api.utils import paginate_result
+from django.core import serializers
 
 class SectionList(APIView):
     """
     List all sections, or create a new one.
     """
-    def get(self, request, university_id=None, format=None):
+    def get(self, request, format=None):
         try:
             queryprms = request.GET
-            sections = SectionRepository.get_sections_by_params(queryprms, university_id)
+            sections = SectionRepository.get_all_sections()
             page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-            sections = paginate_result(sections, SectionSerializer, 'sections', page)
+            sections = paginate_result(sections, SectionSerializer, 'sections', page, 50)
             return Response(sections)
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -31,7 +32,7 @@ class SectionStudentsList(APIView):
             queryprms = request.GET
             sections = SectionRepository.get_sections_by_student(queryprms)
             page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-            sections = paginate_result(sections, SectionStudentSerializer, 'sections', page)
+            sections = paginate_result(sections, SectionStudentSerializer, 'sections', page, 50)
             return Response(sections)
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -71,3 +72,13 @@ class EnrollStudent(APIView):
             return Response({'section': section, 'message' : 'Student is no longer enrolled in this section!'})
         except Exception as err:
             return Response({'error': str(err)},status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_sections_terms_by_university(request, university_id):
+    sections = SectionRepository.get_sections_terms_by_university(university_id)
+    if sections:
+        response = []
+        for section in sections:
+            response.append(section.section_term)
+        return Response({'sections_terms' : response}, status=status.HTTP_200_OK)
+    return Response({"error": "This university doesn't have any section terms!"}, status=status.HTTP_404_NOT_FOUND)
