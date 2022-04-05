@@ -1,24 +1,31 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Paper, Table } from '@mui/material';
 import InfiniteScroll from 'react-infinite-scroller';
 import * as Loader from "react-loader-spinner";
-import './UniversityCourses.scss'
+import './FilteredCoursesList.scss'
 
-function UniversityCourses(props) {
+function FilteredCoursesList(props) {
   let [courses, setCourses] = useState();
   const [fetchedCourses, setFetchedCourses] = useState();
-  let [filteredData, setFilteredData] = useState();
+  let [filters, setFilters] = useState();
   const [lastPage, setLastPage] = useState();
 
+  let navigate = useNavigate();
+
   const fetchData = () => {
-    filteredData.page = filteredData.page + 1;
-    props.setCourses(setFetchedCourses, filteredData)
+    filters.page = filters.page + 1;
+    props.setCourses(setFetchedCourses, filters)
+  }
+
+  const viewCourseDetails = (index) => {
+    navigate('details', {state: {course: courses[index], filters: filters}});
   }
 
   useEffect(() => {
     setLastPage(props.lastPage);
-    setFilteredData(props.filteredData);
+    setFilters(props.filteredData);
     setCourses(props.courses);
   }, []);
 
@@ -33,11 +40,12 @@ function UniversityCourses(props) {
 
   //Defining styles for table
   if (courses) {
-    return (<TableContainer component={Paper}>
+    return (
+    <TableContainer component={Paper}>
       <InfiniteScroll
         pageStart={1}
         loadMore={fetchData}
-        hasMore={filteredData.page < lastPage}
+        hasMore={filters.page < lastPage}
         loader={
           <div className='infinite-loader'>
           <Loader.RotatingLines style={{display: "inline-block"}} color="black" height={40} width={40} />
@@ -55,7 +63,10 @@ function UniversityCourses(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {(courses).map((course) => (<TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} key={course.course_id}>
+            {(courses).map((course, index) => (<TableRow class="historical-courses" 
+                                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                         key={course.course_id}
+                                                         onClick={ () => {viewCourseDetails(index)}}>
               <TableCell component="th" scope='row'> {course.course_name} </TableCell>
               <TableCell align='right'>{course.course_code}</TableCell>
               <TableCell align='right'>{course.course_credits}</TableCell>
@@ -70,4 +81,4 @@ function UniversityCourses(props) {
     return null;
   }
 
-} export default (UniversityCourses);
+} export default (FilteredCoursesList);

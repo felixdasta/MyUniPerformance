@@ -5,7 +5,7 @@ import { get_sections_terms_by_university } from '../../actions/sections';
 import { get_departments_by_university } from '../../actions/departments';
 import { useNavigate } from 'react-router-dom';
 import CoursesCategories from "../../components/CoursesCategories/CoursesCategories";
-import UniversityCourses from "../../components/UniversityCourses/UniversityCourses";
+import FilteredCoursesList from "../../components/FilteredCoursesList/FilteredCoursesList";
 import * as Loader from "react-loader-spinner";
 import './Courses.scss'
 
@@ -81,7 +81,7 @@ export default function Courses() {
                 departments={departments}
                 terms={terms} />}
 
-            {courses ? <UniversityCourses courses={courses} 
+            {courses ? <FilteredCoursesList courses={courses} 
                                           filteredData={filteredData} 
                                           setCourses={setUniversityCourses}
                                           lastPage={lastPage}

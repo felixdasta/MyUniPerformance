@@ -7,7 +7,7 @@ class SectionRepository:
 
     def get_all_sections():
         sections = Section.objects.prefetch_related('instructors', 'likes') \
-        .order_by('section_term', 'course__course_code')
+        .select_related('grade_stats').order_by('section_term', 'course__course_code')
 
         return sections
     

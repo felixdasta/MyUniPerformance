@@ -73,7 +73,7 @@ function CoursesCategories(props) {
 
     return (
         <div class="slide-right">
-            <Box height="100vh" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65}}>
+            <Box height="100vh" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65, fontSize: 14}}>
                  {props.terms &&
                 <div class="term-container">
                     <FormControl sx={form_sx}>
