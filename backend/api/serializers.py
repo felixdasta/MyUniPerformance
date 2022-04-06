@@ -1,3 +1,4 @@
+from api.models.course import Course
 from rest_framework.serializers import ModelSerializer
 from api import models
 
@@ -53,12 +54,37 @@ class CurriculumSerializer(ModelSerializer):
         model = models.curriculum.Curriculum
         fields = ['curriculum_id', 'curriculum_name', 'curriculum_year', 'department', 'courses']
 
+
+class CustomSectionSerializer(ModelSerializer):
+    course = CustomCourseSerializer(read_only=True)
+    
+    class Meta:
+        model = models.section.Section
+        fields = ['section_id', 'section_code', 'section_term', 'course']
+
+class SectionStudentSerializer(ModelSerializer):
+    section = CustomSectionSerializer(read_only=True)
+
+    class Meta:
+        model = models.section.Section_Students
+        fields = ['section', 'grade_obtained']
+
 class StudentSerializer(ModelSerializer):
     curriculums = CurriculumSerializer(many=True, read_only=True)
+    enrolled_sections = SectionStudentSerializer(source='section_students_set', many=True, read_only=True)
 
     class Meta:
         model = models.student.Student
-        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'curriculums']
+        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'curriculums', 'enrolled_sections']
+
+class SectionSerializer(ModelSerializer):
+    instructors = StaffMemberSerializer(many=True, read_only=True)
+    #course = CourseSerializer(read_only=True)
+    #student = StudentSerializer(read_only=True)
+    
+    class Meta:
+        model = models.section.Section
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'instructors', 'likes']
 
 class GradeStatsSerializer(ModelSerializer):
     class Meta:
