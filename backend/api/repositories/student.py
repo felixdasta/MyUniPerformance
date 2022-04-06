@@ -23,8 +23,9 @@ class StudentRepository:
             students = students.filter(institutional_email = queryprms.get('institutional_email'))
         if queryprms.get('year_of_admission') != None:
             students = students.filter(year_of_admission = queryprms.get('year_of_admission'))
+        if queryprms.get('user_id') != None:
+            students = students.filter(user_id = queryprms.get('user_id'))
 
-        
         return students
 
     @staticmethod
