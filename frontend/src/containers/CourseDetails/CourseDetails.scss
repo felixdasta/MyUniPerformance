@@ -1,10 +1,11 @@
 .course-insights{
     display: flex;
+    align-items: center;
 }
 
 .instructor-container{
-    text-align: center;
     display: block;
+    text-align: center;
 }
 
 .instructor-avatar{
@@ -15,4 +16,5 @@
 .graph-container{
     text-align: center;
 }
+
 
