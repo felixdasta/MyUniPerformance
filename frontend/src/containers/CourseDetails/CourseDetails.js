@@ -2,113 +2,42 @@ import { React, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import * as Loader from "react-loader-spinner";
-import './CourseDetails.scss'
+import './CourseDetails.scss';
 import {
     AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Text,
     PieChart, Pie, Cell
 } from "recharts";
 import { get_courses_by_id } from '../../actions/courses';
+import {
+    get_available_sections_filters,
+    get_filtered_sections,
+    get_stats,
+    year_contains_academic_semester,
+    evaluate_and_apply,
+    instructor_teached_year
+} from "../../actions/sections";
+import {
+    Box, MenuItem, FormControl,
+    Select, TextField, Button,
+    Typography
+} from '@mui/material';
+import { randomColor } from '../../actions/utilities';
 
-const semesters = {
-    "S2": "Spring",
-    "V1": "First Summer",
-    "V2": "Second Summer",
-    "S1": "Fall",
-}
-
-const COLORS = {"A's count": "#10E900", 
-                "B's count": "#00FFBB", 
-                "C's count": "#FFCD00", 
-                "D's count": "#FF9A00", 
-                "F's count": "#FF0000", 
-                "P's count": "#009AFF", 
-                "W's count": "#B5B5B5"};
+const COLORS = {
+    "A's count": "#10E900",
+    "B's count": "#2FDECC",
+    "C's count": "#FFCD00",
+    "D's count": "#FF9A00",
+    "F's count": "#FF0000",
+    "P's count": "#009AFF",
+    "W's count": "#B5B5B5"
+};
 const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({ percent }) => {
     return (`${(percent * 100).toFixed(0)}%`);
 };
-
-const formatTerm = value => {
-    let year = parseInt(value.substring(0, 4));
-    let semester = value.substring(4);
-    year = semester == "S2" ? year + 1 : year;
-    semester = semesters[semester];
-    return semester + " " + year;
-};
-
-function getFilteredSections(sections, filters) {
-    const capitalizeWords = (string) => {
-        return string.replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); });
-    };
-
-    let matched_sections = []
-    for (let section of sections) {
-        let section_to_add = true;
-        for (let key in filters) {
-            if (key == 'page' || key == 'department_id' || key == 'course_code') {
-                continue;
-            }
-            else if (key == 'section_term' && section.section_term.includes(filters[key])) {
-                continue;
-            }
-            else if (key == 'instructor_name') {
-                let includes_instructor = false;
-                for (let instructor of section.instructors) {
-                    if (capitalizeWords(instructor.name).includes(capitalizeWords(filters[key]))) {
-                        includes_instructor = true;
-                        break
-                    }
-                }
-                section_to_add = includes_instructor;
-            }
-            else {
-                section_to_add = false;
-                break;
-            }
-        }
-
-        if (section_to_add) {
-            matched_sections.push(section);
-        }
-    }
-    return matched_sections;
-}
-
-function getStats(sections) {
-    let sections_student_count = []
-    let sections_grade_stats = []
-    let term_count_mapping = {}
-    let grade_stats_mapping = {}
-    for (let section of sections) {
-        let student_count = term_count_mapping[section.section_term] ? term_count_mapping[section.section_term] : 0;
-        for (let key in section.grades) {
-            grade_stats_mapping[key] = grade_stats_mapping[key] ? grade_stats_mapping[key] + section.grades[key] : section.grades[key];
-            student_count += section.grades[key]
-        }
-        if (student_count == 0) {
-            delete term_count_mapping[section.section_term];
-        }
-        else {
-            term_count_mapping[section.section_term] = student_count;
-        }
-    }
-    for (let key in term_count_mapping) {
-        sections_student_count.push({ name: formatTerm(key), "Enrolled students": term_count_mapping[key] });
-    }
-
-    let unnecesary_values = ['ib_count', 'ic_count', 'id_count', 'if_count'];
-
-    for (let key in grade_stats_mapping) {
-        let grade = key[0].toUpperCase();
-        let count = grade_stats_mapping[key];
-        if (!unnecesary_values.includes(key) && count > 0) {
-            sections_grade_stats.push({ name: `${grade}'s count`, value: grade_stats_mapping[key] });
-        }
-    }
-    return { grade_count: sections_grade_stats, student_count: sections_student_count };
-}
 
 export default function CourseDetails() {
     const CustomizedAxisTick = (props) => {
@@ -124,21 +53,44 @@ export default function CourseDetails() {
         </Text>
     }
 
-    const randomColor = () => {
-        let hex = Math.floor(Math.random() * 0xFFFFFF);
-        let color = "#" + hex.toString(16);
-        return color;
-    }
-
     const location = useLocation();
     const [course, setCourse] = useState();
     const [sections, setSections] = useState();
-    const [filteredSections, setFilteredSections] = useState();
-    const [filters, setFilters] = useState();
-    const [studentsCount, setStudentsCount] = useState();
+    const [studentsCountByTerm, setStudentsCountByTerm] = useState();
+    const [studentsCountByInstructor, setStudentsCountByInstructor] = useState();
     const [gradesCount, setGradesCount] = useState();
-    //for sections that have more than one instructor:
-    const [selectedInstructor, setSelectedInstructor] = useState();
+    let [filters, setFilters] = useState();
+
+    //criterias that will be used to filter sections
+    const [instructor, setInstructor] = useState("All");
+    const [academicYear, setAcademicYear] = useState("All");
+    const [semester, setSemester] = useState("All");
+    const [selectedSection, setSelectedSection] = useState("All");
+    const [sectionsByInstructor, setSectionsByInstructor] = useState({});
+
+    const filterSections = () => {
+        let filtered_sections = get_filtered_sections(sections, filters);
+        let stats = get_stats(filtered_sections);
+        setStudentsCountByTerm(stats.student_count_by_term);
+        setStudentsCountByInstructor(stats.student_count_by_instructor);
+        setGradesCount(stats.grade_count);
+
+        if(filtered_sections.length == 1){
+            setSelectedSection(filtered_sections[0]);
+        }
+        if (filters.instructor_name) {
+            setInstructor(() => {
+                for(let section of filtered_sections){
+                    for(let instructor of section.instructors){
+                        if(instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1){
+                            return instructor.name;
+                        }
+                    }
+                }
+                return "All";
+            });
+        }
+    }
 
     useEffect(() => {
         let course = location.state.course;
@@ -146,22 +98,39 @@ export default function CourseDetails() {
 
         //accomodate the sections that corresponds to the current course
         get_courses_by_id(course.course_id).then(response => {
+            let selection_filters = get_available_sections_filters(response.data.sections);
+            setSectionsByInstructor(selection_filters)
             setSections(response.data.sections);
             setFilters(filters);
+
+            //example: if section_term == 2020S2 or section_term == 2020, then year = 2020
+            let academic_year = filters.section_term
+                && filters.section_term.length >= 4
+                ? filters.section_term.substring(0, 4) : "All";
+
+            //but the academic year will be 2020-2021
+            academic_year = academic_year == "All" ? academic_year : academic_year + "-" + (parseInt(academic_year) + 1);
+            setAcademicYear(academic_year);
+
+            //example: if section_term == 2020S2 or section_term == S2, then semester = S2
+            setSemester((filters.section_term
+                && filters.section_term.length == 6)
+                ? filters.section_term.substring(4, 6) :
+                (filters.section_term
+                    && filters.section_term.length == 2)
+                    ? filters.section_term :
+                    "All");
+
             setCourse(course);
         }).catch((error) => console.log(error));
     }, []);
 
     //retrieve sections that match criteria
     useEffect(() => {
-        if (sections) {
-            let filtered_sections = getFilteredSections(sections, filters);
-            let stats = getStats(filtered_sections);
-            setFilteredSections(filtered_sections);
-            setStudentsCount(stats.student_count);
-            setGradesCount(stats.grade_count);
-            setSelectedInstructor(filtered_sections[0].instructors[0]);
+        if (sections && instructor) {
+            filterSections();
         }
+
     }, [filters]);
 
     let avatar_style = {
@@ -171,23 +140,33 @@ export default function CourseDetails() {
         fontSize: 60,
     };
 
+    let form_sx = { m: 1, width: 295 }
+    let term_dropdown_style = { backgroundColor: "white", height: 35, width: 140, fontSize: 14 }
+
     if (course && sections) {
         return (
             <div>
                 <div class='course-insights'>
-                        <div class='instructor-container'>
-                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
-                            <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                            <div>{selectedInstructor.name}</div>
-                        </div>
 
+                    {instructor && instructor != "All" ?
+                        <div class='instructor-container'>
+                            <Avatar className='instructor-avatar' sx={avatar_style}>{instructor[0]}</Avatar>
+                            <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
+                            <div>{instructor}</div>
+                        </div> : selectedSection && selectedSection != "All" 
+                        &&  <div class='instructor-container'>
+                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedSection.instructors[0].name[0]}</Avatar>
+                            <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
+                            <div>{selectedSection.instructors[0].name}</div>
+                        </div>
+                    }
 
                     <div class='graph-container'>
                         <div style={{ fontWeight: 'bold' }}>{course.course_code}: {course.course_name}</div>
-                        {studentsCount.length > 1 && <AreaChart
+                        {(studentsCountByTerm.length > 1 || studentsCountByInstructor.length > 1) && <AreaChart
                             width={575}
                             height={400}
-                            data={studentsCount}
+                            data={(academicYear != "All" && semester != "All") ? studentsCountByInstructor : studentsCountByTerm}
                             margin={{
                                 top: 25,
                                 right: 0,
@@ -222,6 +201,117 @@ export default function CourseDetails() {
                         </PieChart>
                     </div>
                 </div>
+                <div class="term-container">
+                    <FormControl sx={form_sx}>
+                        <label>Instructor name</label>
+                        <Select style={term_dropdown_style}
+                            value={instructor} displayEmpty
+                            name="instructor"
+                            onChange={(e) => {
+                                let instructor = e.target.value;
+                                setInstructor(instructor);
+                                setSelectedSection("All");
+
+                                //did the instructor teached at the currently selected year?
+                                //if not, set academic year to "All"
+                                let teached_year = instructor_teached_year(academicYear, sectionsByInstructor[instructor]);
+                                let fixed_year = teached_year ? academicYear : "All";
+                                setAcademicYear(fixed_year);
+
+                                //did the instructor teached at the currently selected semester at the given year?
+                                let contains_semester = year_contains_academic_semester(fixed_year,
+                                    semester,
+                                    sectionsByInstructor[instructor]);
+
+                                let section_term = (fixed_year == "All" ? ""
+                                    : fixed_year.substring(0, 4)) +
+                                    (semester == "All" || !contains_semester ? ""
+                                        : semester);
+
+                                setSemester(contains_semester ? semester : "All");
+
+                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
+
+                                filterSections();
+                            }
+                            }
+                            inputProps={{ 'aria-label': 'Without label' }}>
+                            {(Object.keys(sectionsByInstructor)).map((instructor) => (
+                                <MenuItem value={instructor}>{instructor}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={form_sx}>
+                        <label>Academic Year</label>
+                        <Select style={term_dropdown_style}
+                            value={academicYear} displayEmpty
+                            name="year"
+                            onChange={(e) => {
+                                let academic_year = e.target.value;
+                                setSelectedSection("All");
+                                setAcademicYear(academic_year);
+                                let contains_semester = year_contains_academic_semester(
+                                    academic_year,
+                                    semester,
+                                    sectionsByInstructor[instructor]);
+                                let section_term = (academic_year == "All" ? ""
+                                    : academic_year.substring(0, 4)) +
+                                    (semester == "All" || !contains_semester ? ""
+                                        : semester);
+                                setSemester(contains_semester ? semester : "All");
+                                //section term is the academic year + the semester, example = 2020 + S2
+                                //if empty, then academic year and semester selected value = All
+                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                //section code must be reseted
+                                delete filters["section_code"];
+                                filterSections();
+                            }
+                            }
+                            inputProps={{ 'aria-label': 'Without label' }}>
+                            {(Object.keys(sectionsByInstructor[instructor].filtered_semesters)).map((year) => (
+                                <MenuItem value={year}>{year}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={form_sx}>
+                        <label>Semester</label>
+                        <Select style={term_dropdown_style}
+                            value={semester}
+                            displayEmpty name="semester"
+                            onChange={(e) => {
+                                setSelectedSection("All");
+                                setSemester(e.target.value);
+                                let section_term = (academicYear == "All" ? "" : academicYear.substring(0, 4)) + (e.target.value == "All" ? "" : e.target.value);
+                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                delete filters["section_code"];
+                                filterSections();
+                            }}
+                            inputProps={{ 'aria-label': 'Without label' }}>
+                            <MenuItem value="All">All</MenuItem>
+                            {sectionsByInstructor[instructor]
+                                .filtered_semesters[academicYear].map((entry) => (
+                                    <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                                ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl disabled = {academicYear == "All" || semester == "All"} sx={form_sx}>
+                        <label>Section</label>
+                        <Select style={term_dropdown_style}
+                            value={selectedSection}
+                            onChange={(e) => {
+                                let section = e.target.value; 
+                                setSelectedSection(section);
+                                evaluate_and_apply(filters, section != "All", "section_code", section.section_code);
+                                filterSections();
+                            }}
+                            inputProps={{ 'aria-label': 'Without label' }}>
+                            <MenuItem value="All">All</MenuItem>
+                            {sectionsByInstructor[instructor].filtered_sections[filters.section_term]
+                                && sectionsByInstructor[instructor].filtered_sections[filters.section_term].map((value) =>
+                                    (<MenuItem value={value}>{value.section_code}</MenuItem>)
+                                )}
+                        </Select>
+                    </FormControl>
+                </div>
             </div>
         )
     }
@@ -230,5 +320,4 @@ export default function CourseDetails() {
             <Loader.ThreeDots color="black" height={120} width={120} />
         </div>);
     }
-
 }

@@ -5,65 +5,28 @@ import {
     Typography
 } from '@mui/material'
 import './CoursesCategories.scss'
-
-let availableTerms = {};
-
-const semesters = {
-    "S2": "Spring Semester",
-    "V1": "First Summer",
-    "V2": "Second Summer",
-    "S1": "Fall Semester",
-}
+import { get_available_semesters_by_academic_year, semesters } from "../../actions/sections";
 
 function CoursesCategories(props) {
-    const [filteredData, setFilteredData] = useState({
+    let [filters, setFilters] = useState({
         section_term: "",
         department_id: "",
         instructor_name: "",
         course_code: ""
     });
 
-    const [year, setYear] = useState("All");
+    const [academicYear, setAcademicYear] = useState("All");
     const [semester, setSemester] = useState("All");
+    const [academicSemesters, setAvailableAcademicSemesters] = useState([]);
 
     useEffect(() => {
-        for (let i = 0; i < props.terms.length; i++) {
-            let term = props.terms[i];
-            let year = parseInt(term.substring(0, 4));
-            let semester = term.substring(4, 6);
-
-            //Example: 2016S2 in reality means spring semester of 2017
-            if (semester == "S2") {
-                year = year + 1;
-            }
-
-            //Example: does 2016 already have some semesters available?
-            //push the newly found semester in the available ones!
-            //otherwise, create a new array of available semesters
-            //and add the only semester that is currently available
-            let availableSemesters = availableTerms[year] ? availableTerms[year] : [];
-            availableSemesters.push(semester);
-            availableTerms[year] = availableSemesters;
+        let academic_semesters = get_available_semesters_by_academic_year(props.terms)
+        setAvailableAcademicSemesters(academic_semesters);
         }
-
-        //Sort the semesters in the following order: spring, first summer, second summer, fall
-        for (let year in availableTerms) {
-            //Get available semesters of a given year
-            let currentSemesters = availableTerms[year];
-            let result = []
-            for (let semester in semesters) {
-                //Does the available semesters of a given year includes this semester?
-                if (currentSemesters.includes(semester)) {
-                    result.push(<MenuItem value={semester}>{semesters[semester]}</MenuItem>)
-                }
-            }
-            availableTerms[year] = result;
-        }
-
-    }, []);
+    , []);
 
     const inputChange = (e) => {
-        setFilteredData({ ...filteredData, [e.target.name]: e.target.value });
+        setFilters({ ...filters, [e.target.name]: e.target.value });
     };
 
     let form_sx = { m: 1, width: 295 }
@@ -77,15 +40,24 @@ function CoursesCategories(props) {
                  {props.terms &&
                 <div class="term-container">
                     <FormControl sx={form_sx}>
-                        <label>Year</label>
+                        <label>Academic Year</label>
                         <Select style={term_dropdown_style} 
-                                value={year} displayEmpty 
+                                value={academicYear} displayEmpty 
                                 name="year" 
-                                onChange={(e) => { setYear(e.target.value) }} 
+                                onChange={(e) => { 
+                                    setAcademicYear(e.target.value); 
+                                    //assume that the selected year doesn't contains the selected academic semester
+                                    let contains_semester = false;
+                                    {
+                                        academicSemesters[e.target.value] && 
+                                        academicSemesters[e.target.value].map((entry) => contains_semester = entry.key == semester ? true: contains_semester)
+                                    }
+                                    setSemester(contains_semester ? semester : 'All') }
+                                } 
                                 inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">
                                 <em>All</em>
-                            </MenuItem> {(Object.keys(availableTerms)).map((year) => (
+                            </MenuItem> {(Object.keys(academicSemesters)).map((year) => (
                                 <MenuItem value={year}>{year}</MenuItem>))}
                         </Select>
                     </FormControl>
@@ -99,7 +71,9 @@ function CoursesCategories(props) {
                             <MenuItem value="All">
                                 <em>All</em>
                             </MenuItem>
-                            {year != "All" ? availableTerms[year] :
+                            {academicYear != "All" ? academicSemesters[academicYear].map((entry) => (
+                                <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                            )) :
                                 (Object.keys(semesters)).map((key) => (
                                     <MenuItem value={key}>{semesters[key]}</MenuItem>))}
                         </Select>
@@ -108,7 +82,7 @@ function CoursesCategories(props) {
             } {props.departments && <FormControl sx={form_sx}>
                 <label>Department</label>
                 <Select style={dropdown_style} 
-                        value={filteredData.department_id} 
+                        value={filters.department_id} 
                         displayEmpty name="department_id" 
                         onChange={inputChange} 
                         inputProps={{ 'aria-label': 'Without label' }}>
@@ -144,11 +118,11 @@ function CoursesCategories(props) {
                 </FormControl>
                 <Typography align="center" sx={{ m: 5 }}>
                     <Button onClick={() => {
-                        let fixed_year = semester == "S2" ? year - 1 : year;
-                        let section_term = (year == "All" ? "" : fixed_year) + (semester == "All" ? "" : semester);
-                        filteredData.section_term = section_term;
-                        filteredData.page = 1;
-                        props.setFilteredData(Object.assign({}, filteredData))
+                        let year = academicYear.substring(0,4);
+                        let section_term = (year == "All" ? "" : year) + (semester == "All" ? "" : semester);
+                        filters.section_term = section_term;
+                        filters.page = 1;
+                        props.setFilteredData(Object.assign({}, filters))
                     }}
                         align='center' variant="contained">Apply Filters</Button>
                 </Typography>
