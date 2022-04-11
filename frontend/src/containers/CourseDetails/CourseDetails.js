@@ -210,8 +210,6 @@ export default function CourseDetails() {
                             onChange={(e) => {
                                 let instructor = e.target.value;
                                 setInstructor(instructor);
-                                setSelectedSection("All");
-
                                 //did the instructor teached at the currently selected year?
                                 //if not, set academic year to "All"
                                 let teached_year = instructor_teached_year(academicYear, sectionsByInstructor[instructor]);
@@ -229,11 +227,11 @@ export default function CourseDetails() {
                                         : semester);
 
                                 setSemester(contains_semester ? semester : "All");
-
                                 evaluate_and_apply(filters, section_term, "section_term", section_term);
                                 evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
-
                                 filterSections();
+                                setSelectedSection("All");
+
                             }
                             }
                             inputProps={{ 'aria-label': 'Without label' }}>
@@ -248,7 +246,6 @@ export default function CourseDetails() {
                             name="year"
                             onChange={(e) => {
                                 let academic_year = e.target.value;
-                                setSelectedSection("All");
                                 setAcademicYear(academic_year);
                                 let contains_semester = year_contains_academic_semester(
                                     academic_year,
@@ -265,6 +262,7 @@ export default function CourseDetails() {
                                 //section code must be reseted
                                 delete filters["section_code"];
                                 filterSections();
+                                setSelectedSection("All");
                             }
                             }
                             inputProps={{ 'aria-label': 'Without label' }}>
@@ -278,12 +276,12 @@ export default function CourseDetails() {
                             value={semester}
                             displayEmpty name="semester"
                             onChange={(e) => {
-                                setSelectedSection("All");
                                 setSemester(e.target.value);
                                 let section_term = (academicYear == "All" ? "" : academicYear.substring(0, 4)) + (e.target.value == "All" ? "" : e.target.value);
                                 evaluate_and_apply(filters, section_term, "section_term", section_term);
                                 delete filters["section_code"];
                                 filterSections();
+                                setSelectedSection("All");
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">All</MenuItem>
