@@ -5,7 +5,7 @@ import axios from 'axios';
 
 function StudentCurriculum(props) {
     let student = props.student;
-    console.log(student.enrolled_sections[0].section.course.course_id)
+
     //Defining styles for table
     if(student.enrolled_sections) {
         let result = []

@@ -5,6 +5,7 @@ import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import StudentProfile from "../components/StudentProfile";
 import StudentCurriculum from "../components/StudentCurriculum";
+import StudentStatistics from "../components/StudentStatistics/StudentStatistics.js";
 import * as Loader from "react-loader-spinner";
 
 export default function Dashboard() {
@@ -37,7 +38,8 @@ export default function Dashboard() {
                         height: 350,
                         width: 350,
                     }}>
-                <Typography align="center"> Student Stats </Typography>
+                <Typography align="center"> Student Statistics </Typography>
+                <StudentStatistics student={student}/>
               </Box>
             </Grid>
             <Grid item container lg={9} spacing={0}>
