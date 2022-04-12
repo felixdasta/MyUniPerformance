@@ -26,36 +26,53 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <Box sx={{ mx: 3 }}> {student ? <Grid container spacing={3}>
-      <Grid item lg={3}>
-        <div className="wrapper">
-          <StudentProfile student={student} />
-        </div>
+    <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
+      {/* Container for student information */}
+      <Grid
+        item
+        container
+        direction="row"
+        justifyContent="center"
+        lg={3}
+        rowGap={3}>
+        <Grid
+          item
+          component={StudentProfile}
+          student={student}
+          lg={12} />
+        <Grid
+          item
+          component={StudentStats}
+          student={student}
+          lg={12} />
       </Grid>
-      <Grid item lg={9}>
-        <div className="wrapper">
-          <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
-            Spring Semester 2022 {/* will be dynamic, just placeholder for styling */}
-          </Typography>
-          <StudentCurriculum student={student} />
-        </div>
-      </Grid>
-      <Grid item lg={3}>
-        <Typography align="center"> Student Stats </Typography>
-        <StudentStats student={student} />
-      </Grid>
-      <Grid item container lg={9} spacing={0}>
-        <Grid item lg={6}>
-          <div className="placeholder">
+
+      {/* Container for curriculum information */}
+      <Grid
+        item
+        container
+        direction="row"
+        justifyContent="center"
+        lg={9}
+        rowGap={3}>
+        <Grid
+          item
+          component={StudentCurriculum}
+          student={student}
+          lg={12} />
+        <Grid
+          item
+          container
+          lg={12}>
+          <Grid className="placeholder" item lg={6}>
             <Typography align="center"> Selected Course </Typography>
-          </div>
-        </Grid>
-        <Grid item lg={6}>
-          <div className="placeholder">
+          </Grid>
+          <Grid className="placeholder" item lg={6}>
             <Typography align="center"> Professor </Typography>
-          </div>
+          </Grid>
         </Grid>
       </Grid>
+
     </Grid> : <div className="loader">
       <Loader.ThreeDots color="black" height={120} width={120} />
     </div>}</Box>
