@@ -20,47 +20,50 @@ const Navbar = () => {
     setAccountSettingsToggle(false);
   };
 
-  if (window.location.pathname != "/login" && window.location.pathname != "/create-account") {
+  if (window.location.pathname !== "/login" && window.location.pathname !== "/create-account") {
     if (loggedInUser) {
       return (
-        <AppBar position='static' elevation={0}>
-          <Toolbar>
-            <img className="left-logo" src={logo} /> {/* Page Routes Navbar */} <ButtonGroup variant="contained" size='large' color='primary' sx={{
-              display: 'flex',
-              flex: 1,
-              justifyContent: 'center',
-              boxShadow: 'none',
-            }}>
-              <Button onClick={() => { navigate("/dashboard") }}> Dashboard </Button>
-              <Button onClick={() => { navigate("/professors") }}> Professors </Button>
-              <Button onClick={() => { navigate("/courses") }}> Courses </Button>
-              <Button onClick={() => { navigate("/curriculum") }}> Curriculum </Button>
-            </ButtonGroup> {/* Account Settings */} <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} style={{
-                  position: "absolute",
-                  top: 15,
-                  right: 15,
-                }} sx={{ p: 0 }}>
-                  <Avatar />
-                </IconButton>
-              </Tooltip>
-              <Menu sx={{ mt: '45px' }} id="menu-appbar" anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }} keepMounted transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }} open={accountSettingsToggle} onClose={handleCloseUserMenu}>
-                <MenuItem key="account" onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">Account</Typography>
-                </MenuItem>
-                <MenuItem key="setting" onClick={() => { localStorage.removeItem("user_id"); navigate("/"); }}> <Typography textAlign="center">Logout</Typography>
-                </MenuItem>
-              </Menu>
-            </Box>
-          </Toolbar>
-        </AppBar>)
+        <div class="nav">
+          <AppBar position='static' elevation={0}>
+            <Toolbar>
+              <img className="left-logo" src={logo} /> {/* Page Routes Navbar */} <ButtonGroup variant="contained" size='large' color='primary' sx={{
+                display: 'flex',
+                flex: 1,
+                justifyContent: 'center',
+                boxShadow: 'none',
+              }}>
+                <Button onClick={() => { navigate("/dashboard") }}> Dashboard </Button>
+                <Button onClick={() => { navigate("/professors") }}> Professors </Button>
+                <Button onClick={() => { navigate("/courses") }}> Courses </Button>
+                <Button onClick={() => { navigate("/curriculum") }}> Curriculum </Button>
+              </ButtonGroup> {/* Account Settings */} <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} style={{
+                    position: "absolute",
+                    top: 15,
+                    right: 15,
+                  }} sx={{ p: 0 }}>
+                    <Avatar />
+                  </IconButton>
+                </Tooltip>
+                <Menu sx={{ mt: '45px' }} id="menu-appbar" anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }} keepMounted transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }} open={accountSettingsToggle} onClose={handleCloseUserMenu}>
+                  <MenuItem key="account" onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">Account</Typography>
+                  </MenuItem>
+                  <MenuItem key="setting" onClick={() => { localStorage.removeItem("user_id"); navigate("/"); }}> <Typography textAlign="center">Logout</Typography>
+                  </MenuItem>
+                </Menu>
+              </Box>
+            </Toolbar>
+          </AppBar>
+        </div>
+      )
     }
     else {
       return (

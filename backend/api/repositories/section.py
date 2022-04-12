@@ -5,37 +5,22 @@ from api.models.section import Section_Students
 
 class SectionRepository:
 
-    def get_sections_by_params(queryprms, university_id):
-        sections = Section.objects.select_related('course__department') \
-        .prefetch_related('instructors', 'likes') \
+    def get_all_sections():
+        sections = Section.objects.prefetch_related('instructors', 'likes') \
         .order_by('section_term', 'course__course_code')
 
-        if university_id != None:
-            sections = sections.filter(course__department__university = university_id)
+        return sections
 
-        modality = queryprms.get('modality')
-
-        if queryprms.get('course_code'):
-            sections = sections.filter(course__course_code = queryprms.get('course_code'))
+    def get_sections_by_student(queryprms):
+        sections = Section_Students.objects.select_related('section__course__department')
+        
+        if queryprms.get('student_id'):
+            sections = sections.filter(student = queryprms.get('student_id'))
         if queryprms.get('section_term'):
             sections = sections.filter(section_term = queryprms.get('section_term'))
-        if queryprms.get('section_code'):
-            sections = sections.filter(section_code = queryprms.get('section_code'))
-        if queryprms.get('department_id'):
-            sections = sections.filter(course__department = queryprms.get('department_id'))
-        if queryprms.get('instructor_name'):
-            sections = sections.filter(instructors__name__icontains = queryprms.get('instructor_name'))
-        if queryprms.get('student_id'):
-            sections = sections.filter(enrolled_students = queryprms.get('student_id'))
-        if modality:
-            if (modality == 'D' or modality == 'H' or modality == 'E'):
-                sections = sections.filter(section_code__endswith = modality)
-            if (modality == 'P'):
-                modalities_to_exclude = ['D', 'H', 'E']
-                for current_modality in modalities_to_exclude:
-                    sections = sections.exclude(section_code__endswith = current_modality)
 
         return sections
+
     
     @staticmethod
     def create_section(request):
@@ -46,9 +31,18 @@ class SectionRepository:
 
     @staticmethod
     def get_section_by_id(pk):
-        section = Section.objects.select_related('course__department').get(pk=pk)
+        section = Section.objects.prefetch_related('instructors', 'likes').get(pk=pk)
         serializer = SectionSerializer(section)
         return serializer
+
+    @staticmethod
+    def get_sections_terms_by_university(university_id):
+        sections = Section.objects.prefetch_related('instructors', 'likes') \
+        .select_related('course__department') \
+        .filter(course__department__university = university_id) \
+        .distinct('section_term')
+
+        return sections
 
     @staticmethod
     def enroll_student_or_update_grade(request):
@@ -63,6 +57,7 @@ class SectionRepository:
 
         serializer = SectionSerializer(section)
         return serializer
+
 
     @staticmethod
     def drop_student(request):

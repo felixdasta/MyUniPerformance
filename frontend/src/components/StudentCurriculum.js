@@ -1,17 +1,16 @@
 import * as React from 'react';
-import Table from '@mui/material/Table'
 import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Paper } from '@mui/material';
+import { Paper, Table } from '@mui/material';
+import axios from 'axios';
 
 function StudentCurriculum(props) {
     let student = props.student;
-
+    console.log(student.enrolled_sections[0].section.course.course_id)
     //Defining styles for table
-    if(student.curriculums) {
+    if(student.enrolled_sections) {
         let result = []
-        for(let i = 0; i < student.curriculums.length; i++){
             result.push(
-                <TableContainer component={Paper} sx={{maxHeight: 350}}>
+                <TableContainer component={Paper} height="100vh">
                     <Table sx={{ minWidth: 350}} aria-label="simple table" stickyHeader>
                         <TableHead>
                             <TableRow>
@@ -22,25 +21,24 @@ function StudentCurriculum(props) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {(student.curriculums[i].courses).map((courseData) => (
+                            {(student.enrolled_sections).map((courseData) => (
+                                
                                 <TableRow
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    key={courseData.course.course_name}
+                                    key={courseData.section.course.course_name}
                                 >
                                     <TableCell component="th" scope='row'>
-                                        {courseData.course.course_name}
+                                        {courseData.section.course.course_name}
                                     </TableCell>
-                                    <TableCell align='right'>{courseData.course.course_code}</TableCell>
-                                    <TableCell align='right'>{courseData.course.course_credits}</TableCell>
-                                    <TableCell align='right'>{courseData.course.department.department_name}</TableCell>
+                                    <TableCell align='right'>{courseData.section.course.course_code}</TableCell>
+                                    <TableCell align='right'>{courseData.section.course.course_credits}</TableCell>
+                                    <TableCell align='right'>{courseData.section.course.department.department_name}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             );
-        }
-
         return result;
     }
 

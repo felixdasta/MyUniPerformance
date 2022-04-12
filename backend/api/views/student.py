@@ -9,8 +9,7 @@ from api.models.curriculum import Curriculum
 from api.serializers import StudentSerializer
 from api.authentication import Authentication 
 from api.utils import paginate_result
-from django.urls import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 class StudentList(APIView):
@@ -21,7 +20,7 @@ class StudentList(APIView):
         queryprms = request.GET
         student = StudentRepository.get_students_by_params(queryprms)
         page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-        student = paginate_result(student, StudentSerializer, 'students', page)
+        student = paginate_result(student, StudentSerializer, 'students', page, 25)
         return Response(student)
 
     def post(self, request, format=None):
