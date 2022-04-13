@@ -6,7 +6,9 @@ import {
 } from "recharts";
 import "./StudentStatistics.scss"
 
+
 function StudentStatistics(props) {
+
     let student = props.student;
     let totalCredits = 0
     let takenCredits = 0
@@ -41,11 +43,11 @@ function StudentStatistics(props) {
 
         return (
             <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-            {`${(percent * 100).toFixed(0)}%`}
+            {`${(percent * 100).toFixed(0)}`}
+            {data01[index].name}
             </text>
         );
     };
-    
 
     return (
         <div>
@@ -59,13 +61,13 @@ function StudentStatistics(props) {
                         label={renderCustomizedLabel}
                     >
                         {data01.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                            <Cell key={`cell-${index}`} fill={COLORS[index]}>
+                            </Cell>
                         ))}
+                        <Tooltip />
                     </Pie>
                 </PieChart>
         </div>
     )
-
-
 
 } export default (StudentStatistics);
