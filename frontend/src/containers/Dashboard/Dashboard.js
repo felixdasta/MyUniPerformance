@@ -7,12 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import * as Loader from "react-loader-spinner";
 import StudentProfile from "../../components/StudentProfile";
 import StudentCurriculum from "../../components/StudentCurriculum";
-import StudentStats from "../../components/StudentStats/StudentStats.js"
+import StudentStats from "../../components/StudentStats/StudentStats";
+import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
+import SectionProfInfo from "../../components/SectionInfo/SectionProfInfo";
 import "./Dashboard.scss"
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
-  const [section, setSection] = useState(false);
+  const [section, setSection] = useState();
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +30,6 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    console.log(section)
   }, [section])
 
   const changeSectionHandler = (data) => {
@@ -74,13 +75,19 @@ export default function Dashboard() {
         <Grid
           item
           container
+          direction="row"
+          justifyContent="center"
           lg={12}>
-          <Grid className="placeholder" item lg={6}>
-            <Typography align="center">  </Typography>
-          </Grid>
-          <Grid className="placeholder" item lg={6}>
-            <Typography align="center"> Professor </Typography>
-          </Grid>
+          <Grid
+            item
+            component={SectionCourseInfo}
+            section={section}
+            lg={6} />
+          <Grid
+            item
+            component={SectionProfInfo}
+            section={section}
+            lg={6} />
         </Grid>
       </Grid>
 
