@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { React, useCallback } from 'react';
+import { Button, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Paper, Table, Typography } from '@mui/material';
 import axios from 'axios';
 
@@ -7,6 +7,14 @@ function StudentCurriculum(props) {
     let student = props.student;
     //console.log(student.enrolled_sections[0].section.course.course_id)
     //Defining styles for table
+
+    const sectionClickHandler = useCallback((section) => {
+        return async (e) => {
+            e.preventDefault()
+            props.changeSection(section)
+        }
+    }, [props.changeSection])
+
     if (student.enrolled_sections) {
         let result = []
         result.push(
@@ -14,7 +22,7 @@ function StudentCurriculum(props) {
                 <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
                     Spring Semester 2022 {/* will be dynamic, just placeholder for styling */}
                 </Typography>
-                <Table sx={{ minWidth: 350 }} aria-label="simple table" stickyHeader>
+                <Table sx={{ minWidth: 350 }} aria-label="enrolled courses" stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell>Course Name</TableCell>
@@ -29,6 +37,8 @@ function StudentCurriculum(props) {
                             <TableRow
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 key={courseData.section.course.course_name}
+                                onClick={sectionClickHandler(courseData)}
+                                hover={true}
                             >
                                 <TableCell component="th" scope='row'>
                                     {courseData.section.course.course_name}

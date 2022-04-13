@@ -1,4 +1,5 @@
-import { Typography, Container, Grid } from "@mui/material";
+import React from "react";
+import { Typography, Modal, Grid } from "@mui/material";
 import { Box, maxWidth } from "@mui/system";
 import { get_student_by_id } from '../../actions/user.js'
 import { useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import "./Dashboard.scss"
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
+  const [section, setSection] = useState(false);
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +26,14 @@ export default function Dashboard() {
       navigate("/");
     })
   }, [])
+
+  useEffect(() => {
+    console.log(section)
+  }, [section])
+
+  const changeSectionHandler = (data) => {
+    setSection(data)
+  }
 
   return (
     <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
@@ -59,13 +69,14 @@ export default function Dashboard() {
           item
           component={StudentCurriculum}
           student={student}
+          changeSection={changeSectionHandler}
           lg={12} />
         <Grid
           item
           container
           lg={12}>
           <Grid className="placeholder" item lg={6}>
-            <Typography align="center"> Selected Course </Typography>
+            <Typography align="center">  </Typography>
           </Grid>
           <Grid className="placeholder" item lg={6}>
             <Typography align="center"> Professor </Typography>
@@ -75,6 +86,7 @@ export default function Dashboard() {
 
     </Grid> : <div className="loader">
       <Loader.ThreeDots color="black" height={120} width={120} />
+
     </div>}</Box>
   );
 }
