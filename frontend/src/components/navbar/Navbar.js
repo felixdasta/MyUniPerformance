@@ -91,30 +91,3 @@ const Navbar = () => {
 
 };
 export default Navbar;
-
-/*<BottomNavigation>
-    <BottomNavigationAction
-        component={NavLink}
-        to="/dashboard"
-        label='Dashboard-Navbar'
-        value='Dashboard'
-        icon={<HomeIcon />} />
-    <BottomNavigationAction
-        component={NavLink}
-        to="/courses"
-        label='Courses-Navbar'
-        value='Courses'
-        icon={<AnalyticsIcon />} />
-    <BottomNavigationAction
-        component={NavLink}
-        to="/professors"
-        label='Professors-Navbar'
-        value='Professors'
-        icon={<WorkIcon />} />
-    <BottomNavigationAction
-        component={NavLink}
-        to="/curriculum"
-        label='Curriculum-Navbar'
-        value='Curriculum'
-        icon={<EventNoteIcon />} />
-</BottomNavigation> */
