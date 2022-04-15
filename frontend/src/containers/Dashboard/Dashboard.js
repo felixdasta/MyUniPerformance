@@ -44,7 +44,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (section) {
       setSectionCourseInfo(section, setCourse);
-      setSectionInstructor(section, setInstructor);
+      setInstructor(section.section.instructors)
     }
   }, [section])
 
@@ -120,14 +120,4 @@ export default function Dashboard() {
 
 function setSectionCourseInfo(selectedUniversity, section, setCourse) {
 
-}
-
-function setSectionInstructor(section, setInstructor) {
-  get_section_info_by_id(section.section.section_id).then(
-    response => {
-      setInstructor(response.data.instructors)
-    }
-  ).catch((error) => {
-    console.log(error);
-  });
 }
