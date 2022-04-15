@@ -26,14 +26,14 @@ const Navbar = () => {
         <div class="nav">
           <AppBar position='static' elevation={0}>
             <Toolbar>
-              <img className="left-logo" src={logo} /> {/* Page Routes Navbar */} <ButtonGroup variant="contained" size='large' color='primary' sx={{
+              <img className="left-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */} <ButtonGroup variant="contained" size='large' color='primary' sx={{
                 display: 'flex',
                 flex: 1,
                 justifyContent: 'center',
                 boxShadow: 'none',
               }}>
                 <Button onClick={() => { navigate("/dashboard") }}> Dashboard </Button>
-                <Button onClick={() => { navigate("/professors") }}> Professors </Button>
+                <Button onClick={() => { navigate("/instructors") }}> Instructors </Button>
                 <Button onClick={() => { navigate("/courses") }}> Courses </Button>
                 <Button onClick={() => { navigate("/curriculum") }}> Curriculum </Button>
               </ButtonGroup> {/* Account Settings */} <Box sx={{ flexGrow: 0 }}>
@@ -69,7 +69,7 @@ const Navbar = () => {
       return (
         <AppBar position='static' elevation={0}>
           <Toolbar>
-            <img className="center-logo" src={logo} /> {/* Page Routes Navbar */}
+            <img className="center-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */}
             <Button style={{
               border: '1px solid',
               borderColor: "white",

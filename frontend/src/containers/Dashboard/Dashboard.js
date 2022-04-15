@@ -1,6 +1,6 @@
 import React from "react";
-import { Typography, Modal, Grid } from "@mui/material";
-import { Box, maxWidth } from "@mui/system";
+import { Grid } from "@mui/material";
+import { Box } from "@mui/system";
 import { get_student_by_id } from '../../actions/user.js'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,8 @@ import "./Dashboard.scss"
 export default function Dashboard() {
   const [student, setStudent] = useState();
   const [section, setSection] = useState();
+  const [course, setCourse] = useState();
+  const [Instructor, setInstructor] = useState();
   let navigate = useNavigate();
 
   useEffect(() => {
