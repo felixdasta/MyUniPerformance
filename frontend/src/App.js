@@ -3,7 +3,7 @@ import Dashboard from './containers/Dashboard/Dashboard';
 import Courses from './containers/Courses/Courses'
 import CourseDetails from "./containers/CourseDetails/CourseDetails";
 import Curriculum from './containers/Curriculum'
-import Navbar from "./components/navbar/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Home from "./containers/Home";
 import Login from "./containers/Login/Login";
 import SignUp from "./containers/Sign Up/SignUp";
