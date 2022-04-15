@@ -1,6 +1,9 @@
 from django.utils.encoding import force_str
 from django.contrib import messages
 from api.models.student import Student
+from api.models.section import Section_Students
+from api.serializers import StudentSerializer
+from api.repositories.section import SectionRepository
 from api.utils import generate_token
 from base64 import urlsafe_b64decode
 
@@ -8,7 +11,7 @@ class StudentRepository:
     
     @staticmethod
     def get_students_by_params(queryprms):        
-        students = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department')
+        students = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department', 'section_students_set__section__course__department')
 
         if queryprms.get('university_id') != None:
             students = students.filter(curriculums__department__university = queryprms.get('university_id'))
@@ -20,6 +23,8 @@ class StudentRepository:
             students = students.filter(institutional_email = queryprms.get('institutional_email'))
         if queryprms.get('year_of_admission') != None:
             students = students.filter(year_of_admission = queryprms.get('year_of_admission'))
+        if queryprms.get('user_id') != None:
+            students = students.filter(user_id = queryprms.get('user_id'))
 
         return students
 

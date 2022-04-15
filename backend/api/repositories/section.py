@@ -10,6 +10,17 @@ class SectionRepository:
         .select_related('grade_stats').order_by('section_term', 'course__course_code')
 
         return sections
+
+    def get_sections_by_student(queryprms):
+        sections = Section_Students.objects.select_related('section__course__department')
+        
+        if queryprms.get('student_id'):
+            sections = sections.filter(student = queryprms.get('student_id'))
+        if queryprms.get('section_term'):
+            sections = sections.filter(section_term = queryprms.get('section_term'))
+
+        return sections
+
     
     @staticmethod
     def create_section(request):
@@ -46,6 +57,7 @@ class SectionRepository:
 
         serializer = SectionSerializer(section)
         return serializer
+
 
     @staticmethod
     def drop_student(request):

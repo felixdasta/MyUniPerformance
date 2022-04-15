@@ -11,6 +11,7 @@ urlpatterns = [
     path('students', student.StudentList.as_view()),
     path('students/<pk>', student.StudentDetail.as_view()),
     path('students/<user_id>/sections/<section_id>', section.EnrollStudent.as_view()),
+    path('sectionstudents', section.SectionStudentsList.as_view()),
     path('send-activation-email', student.send_activation_email),
     path('departments', department.DepartmentList.as_view()),
     
