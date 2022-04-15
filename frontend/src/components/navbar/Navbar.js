@@ -26,7 +26,8 @@ const Navbar = () => {
         <div class="nav">
           <AppBar position='static' elevation={0}>
             <Toolbar>
-              <img className="left-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */} <ButtonGroup variant="contained" size='large' color='primary' sx={{
+              <img className="left-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */}
+              <ButtonGroup variant="contained" size='large' color='primary' sx={{
                 display: 'flex',
                 flex: 1,
                 justifyContent: 'center',

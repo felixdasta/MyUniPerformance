@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@mui/material";
+import { Card, CardContent, CardHeader, CardActions, Button, Typography } from "@mui/material";
 import React from "react";
 
 export default function SectionCourseInfo(props) {
@@ -16,16 +16,28 @@ export default function SectionCourseInfo(props) {
     if (props.section) {
         section = {
             "name": props.section.section.course.course_name,
-            "code": props.section.section.course.course_code,
-            "section": props.section.section.code,
+            "course_code": props.section.section.course.course_code,
+            "code": props.section.section.section_code,
         }
     }
 
     return (
-        <Card sx={{ backgroundColor: "powderblue", width: 500, height: 350 }}>
+        <Card sx={{ backgroundColor: "white", width: 500, height: 350 }}>
             <CardHeader title={section.name} />
             <CardContent>
+                <Typography variant="body2">
+                    {section.course_code} {section.code}
+                </Typography>
             </CardContent>
+            <CardActions>
+                <Button
+                    variant="contained"
+                    size="small"
+                    color="info"
+                    disableElevation="true" >
+                    Course Page
+                </Button>
+            </CardActions>
         </Card>
     );
 }

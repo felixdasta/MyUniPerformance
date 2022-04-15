@@ -1,28 +1,38 @@
-import React from "react";
 import { Grid } from "@mui/material";
 import { Box } from "@mui/system";
-import { get_student_by_id } from '../../actions/user.js'
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
 import * as Loader from "react-loader-spinner";
-import StudentProfile from "../../components/StudentProfile";
-import StudentCurriculum from "../../components/StudentCurriculum";
-import StudentStats from "../../components/StudentStats/StudentStats";
+import { useNavigate } from 'react-router-dom';
+import { get_student_by_id } from '../../actions/user.js';
+import { get_section_info_by_id } from "../../actions/sections.js";
 import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
-import SectionProfInfo from "../../components/SectionInfo/SectionProfInfo";
-import "./Dashboard.scss"
+import SectionInstructorInfo from "../../components/SectionInfo/SectionInstructorInfo";
+import StudentCurriculum from "../../components/StudentCurriculum";
+import StudentProfile from "../../components/StudentProfile";
+import StudentStats from "../../components/StudentStats/StudentStats";
+import "./Dashboard.scss";
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
+  const [universities, setUniversities] = useState();
+  const [selectedUniversity, setSelectedUniversity] = useState();
   const [section, setSection] = useState();
   const [course, setCourse] = useState();
-  const [Instructor, setInstructor] = useState();
+  const [instructor, setInstructor] = useState();
   let navigate = useNavigate();
 
   useEffect(() => {
     get_student_by_id(localStorage.getItem("user_id")).then(
       response => {
         setStudent(response.data);
+        let curriculums = response.data.curriculums;
+        let universities = [];
+        for (let i = 0; i < curriculums.length; i++) {
+          let curriculum = curriculums[i];
+          universities.push(curriculum.department.university);
+        }
+        setSelectedUniversity(universities[0]);
+        setUniversities(universities);
       }
     ).catch((error) => {
       console.log(error.response.data)
@@ -32,10 +42,14 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
+    if (section) {
+      setSectionCourseInfo(section, setCourse);
+      setSectionInstructor(section, setInstructor);
+    }
   }, [section])
 
-  const changeSectionHandler = (data) => {
-    setSection(data)
+  const changeSectionHandler = (newSection) => {
+    setSection(newSection)
   }
 
   return (
@@ -73,24 +87,28 @@ export default function Dashboard() {
           component={StudentCurriculum}
           student={student}
           changeSection={changeSectionHandler}
-          lg={12} />
-        <Grid
-          item
-          container
-          direction="row"
-          justifyContent="center"
-          lg={12}>
-          <Grid
-            item
-            component={SectionCourseInfo}
-            section={section}
-            lg={6} />
-          <Grid
-            item
-            component={SectionProfInfo}
-            section={section}
-            lg={6} />
-        </Grid>
+          lg={12} /> {section ?
+            <Grid
+              item
+              container
+              direction="row"
+              justifyContent="center"
+              lg={12}>
+              <Grid
+                item
+                component={SectionCourseInfo}
+                section={section}
+                course={course}
+                lg={6} />
+              <Grid
+                item
+                component={SectionInstructorInfo}
+                section={section}
+                instructor={instructor}
+                lg={6} />
+            </Grid> :
+            <h1>poop</h1>}
+
       </Grid>
 
     </Grid> : <div className="loader">
@@ -98,4 +116,18 @@ export default function Dashboard() {
 
     </div>}</Box>
   );
+}
+
+function setSectionCourseInfo(selectedUniversity, section, setCourse) {
+
+}
+
+function setSectionInstructor(section, setInstructor) {
+  get_section_info_by_id(section.section.section_id).then(
+    response => {
+      setInstructor(response.data.instructors)
+    }
+  ).catch((error) => {
+    console.log(error);
+  });
 }

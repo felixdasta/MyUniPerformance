@@ -1,19 +1,19 @@
 import { Card, CardContent, CardHeader } from "@mui/material";
 import React from "react";
 
-export default function SectionProfInfo(props) {
-    let section = {
-        "name": "None",
+export default function SectionInstructorInfo(props) {
+    let instructor = {
+        "name": "none",
     }
-    if (props.section) {
-        section = {
-            "name": props.section.section.course.course_name,
+    if (props.instructor) {
+        instructor = {
+            "name": props.instructor[0].name,
         }
     }
 
     return (
         <Card sx={{ backgroundColor: "powderblue", width: 500, height: 350 }}>
-            <CardHeader title={section.name} />
+            <CardHeader title={instructor.name} />
             <CardContent>
             </CardContent>
         </Card>

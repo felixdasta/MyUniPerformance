@@ -13,7 +13,7 @@ function StudentCurriculum(props) {
             e.preventDefault()
             props.changeSection(section)
         }
-    }, [props.changeSection])
+    }, [])
 
     if (student.enrolled_sections) {
         let result = []
