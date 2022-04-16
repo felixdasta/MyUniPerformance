@@ -24,6 +24,7 @@ function StudentStatistics(props) {
   let student = props.student;
   let totalCredits = 0;
   let takenCredits = 0;
+  let totalSemesters = 0;
   let aCount = 0;
   let bCount = 0;
   let cCount = 0;
@@ -35,7 +36,14 @@ function StudentStatistics(props) {
     for (let i = 0; i < student.curriculums.length; i++) {
       {
         student.curriculums[i].courses.map(
-          (courseData) => (totalCredits += courseData.course.course_credits)
+          (courseData) => {
+            totalCredits += courseData.course.course_credits
+            if(courseData.semester){
+                if(totalSemesters < courseData.semester){
+                    totalSemesters = courseData.semester
+                }
+            }
+          }
         );
       }
     }
@@ -71,6 +79,8 @@ function StudentStatistics(props) {
   }
 
   let remainingCredits = totalCredits - takenCredits;
+  let creditProgress = Math.ceil(totalCredits/totalSemesters)
+  let remainingSemester = Math.ceil(remainingCredits/creditProgress)
 
   const COLORS = ["#FF8042", "#00C49F"];
 
@@ -80,12 +90,12 @@ function StudentStatistics(props) {
   ];
 
   const data02 = [
-    { name: "A", value: aCount },
-    { name: "B", value: bCount },
-    { name: "C", value: cCount },
-    { name: "D", value: dCount },
-    { name: "F", value: fCount },
-    { name: "W", value: wCount },
+    { name: "A", grade: aCount },
+    { name: "B", grade: bCount },
+    { name: "C", grade: cCount },
+    { name: "D", grade: dCount },
+    { name: "F", grade: fCount },
+    { name: "W", grade: wCount },
   ];
 
   const RADIAN = Math.PI / 180;
@@ -122,12 +132,10 @@ function StudentStatistics(props) {
         {" "}
         Student Statistics{" "}
       </Typography>
-      <Box height={700}>
+      <Box height={700} alignContent="center">
         <PieChart width={300} height={250}>
           <Pie
             data={data01}
-            cx="50%"
-            cy="50%"
             fill="#8884d8"
             dataKey="value"
             isAnimationActive={false}
@@ -139,24 +147,35 @@ function StudentStatistics(props) {
           </Pie>
           <Tooltip />
         </PieChart>
-        <Typography align="center" sx={{ my: 0.5 }}>
+        <Typography align="center" sx={{ my: 0.1 }}>
+          Curriculum Progress
         </Typography>
-        <Typography sx={{ fontSize: 28, my: 5 }} align="center">
+        <Typography sx={{ fontSize: 28, my: 5 }} align="center"></Typography>
+        <div className="rechartsWrapper">
+          <BarChart width={250} height={250} data={data02}>
+            <XAxis
+              dataKey="name"
+              scale="point"
+              padding={{ left: 20, right: 30 }}
+            />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Bar
+              dataKey="grade"
+              fill="#8884d8"
+              background={{ fill: "#eee" }}
+              cx="50%"
+            />
+          </BarChart>
+          <Typography align="center" sx={{ my: 1.0 }}>
+            Grade Distribution
+          </Typography>
+        </div>
+        <Typography align="center" sx={{ my: 3.5 }}>
+          You have approximately {remainingSemester} semesters left if you progress at a rate of {creditProgress} credits per semester.
         </Typography>
-        <BarChart width={300} height={250} data={data02}>
-          <XAxis
-            dataKey="name"
-            scale="point"
-            padding={{ left: 10, right: 10 }}
-            cx="50%"
-            cy="50%"
-          />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Bar dataKey="value" fill="#8884d8" background={{ fill: "#eee" }} />
-        </BarChart>
       </Box>
     </Container>
   );
