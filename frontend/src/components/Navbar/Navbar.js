@@ -34,8 +34,8 @@ const Navbar = () => {
                 boxShadow: 'none',
               }}>
                 <Button onClick={() => { navigate("/dashboard") }}> Dashboard </Button>
-                <Button onClick={() => { navigate("/instructors") }}> Instructors </Button>
                 <Button onClick={() => { navigate("/courses") }}> Courses </Button>
+                <Button onClick={() => { navigate("/instructors") }}> Instructors </Button>
                 <Button onClick={() => { navigate("/curriculum") }}> Curriculum </Button>
               </ButtonGroup> {/* Account Settings */} <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">

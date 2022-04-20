@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Grid, Card } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import * as Loader from "react-loader-spinner";
@@ -14,8 +14,6 @@ import "./Dashboard.scss";
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
-  const [universities, setUniversities] = useState();
-  const [selectedUniversity, setSelectedUniversity] = useState();
   const [section, setSection] = useState();
   const [course, setCourse] = useState();
   const [instructor, setInstructor] = useState();
@@ -25,14 +23,6 @@ export default function Dashboard() {
     get_student_by_id(localStorage.getItem("user_id")).then(
       response => {
         setStudent(response.data);
-        let curriculums = response.data.curriculums;
-        let universities = [];
-        for (let i = 0; i < curriculums.length; i++) {
-          let curriculum = curriculums[i];
-          universities.push(curriculum.department.university);
-        }
-        setSelectedUniversity(universities[0]);
-        setUniversities(universities);
       }
     ).catch((error) => {
       console.log(error.response.data)
@@ -43,7 +33,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (section) {
-      setSectionCourseInfo(section, setCourse);
       setInstructor(section.section.instructors)
     }
   }, [section])
@@ -107,7 +96,11 @@ export default function Dashboard() {
                 instructor={instructor}
                 lg={6} />
             </Grid> :
-            <h1>poop</h1>}
+            <Grid
+              item
+              lg={12}>
+              <Card sx={{ backgroundColor: "white", width: "100%", height: 350, boxShadow: "none" }} />
+            </Grid>}
 
       </Grid>
 
@@ -116,8 +109,4 @@ export default function Dashboard() {
 
     </div>}</Box>
   );
-}
-
-function setSectionCourseInfo(selectedUniversity, section, setCourse) {
-
 }
