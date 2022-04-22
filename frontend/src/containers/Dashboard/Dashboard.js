@@ -10,7 +10,10 @@ import SectionInstructorInfo from "../../components/SectionInfo/SectionInstructo
 import StudentCurriculum from "../../components/StudentCurriculum";
 import StudentProfile from "../../components/StudentProfile";
 import StudentStats from "../../components/StudentStats/StudentStats";
-import "./Dashboard.scss";
+import StudentStatistics from "../../components/StudentStatistics/StudentStatistics"
+import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
+import SectionProfInfo from "../../components/SectionInfo/SectionProfInfo";
+import "./Dashboard.scss"
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
@@ -58,7 +61,7 @@ export default function Dashboard() {
           lg={12} />
         <Grid
           item
-          component={StudentStats}
+          component={StudentStatistics}
           student={student}
           lg={12} />
       </Grid>

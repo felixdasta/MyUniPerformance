@@ -5,7 +5,6 @@ import axios from 'axios';
 
 function StudentCurriculum(props) {
     let student = props.student;
-    //console.log(student.enrolled_sections[0].section.course.course_id)
     //Defining styles for table
 
     const sectionClickHandler = useCallback((section) => {
@@ -22,7 +21,7 @@ function StudentCurriculum(props) {
                 <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
                     Spring Semester 2022 {/* will be dynamic, just placeholder for styling */}
                 </Typography>
-                <Table sx={{ minWidth: 350 }} aria-label="enrolled courses" stickyHeader>
+                <Table sx={{ minWidth: 250 }} aria-label="enrolled courses" stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell>Course Name</TableCell>
