@@ -1,19 +1,15 @@
-import { Grid, Card } from "@mui/material";
+import { Card, Grid } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import * as Loader from "react-loader-spinner";
 import { useNavigate } from 'react-router-dom';
 import { get_student_by_id } from '../../actions/user.js';
-import { get_section_info_by_id } from "../../actions/sections.js";
 import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
 import SectionInstructorInfo from "../../components/SectionInfo/SectionInstructorInfo";
 import StudentCurriculum from "../../components/StudentCurriculum";
 import StudentProfile from "../../components/StudentProfile";
-import StudentStats from "../../components/StudentStats/StudentStats";
-import StudentStatistics from "../../components/StudentStatistics/StudentStatistics"
-import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
-import SectionProfInfo from "../../components/SectionInfo/SectionProfInfo";
-import "./Dashboard.scss"
+import StudentStatistics from "../../components/StudentStatistics/StudentStatistics";
+import "./Dashboard.scss";
 
 export default function Dashboard() {
   const [student, setStudent] = useState();
