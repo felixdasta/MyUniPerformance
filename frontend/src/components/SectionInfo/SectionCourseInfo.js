@@ -9,9 +9,10 @@ import { Tooltip as Rechtool } from "recharts";
 import { get_courses_by_id } from '../../actions/courses';
 import { get_stats, get_filtered_sections } from "../../actions/sections";
 import { useNavigate } from "react-router-dom";
+import * as Loader from "react-loader-spinner";
 
 export default function SectionCourseInfo(props) {
-    const [sections, setSections] = useState([props.section.section]);
+    const [course, setCourse] = useState();
     const [studentsCountByTerm, setStudentsCountByTerm] = useState();
     let navigate = useNavigate();
 
@@ -40,17 +41,12 @@ export default function SectionCourseInfo(props) {
     }
 
     const viewCourseDetails = () => {
-        navigate('details', {
+        navigate('../courses/details', {
             state: {
-                course: {
-                    course_id: props.section.section.course.course_id,
-                    course_name: props.section.section.course.course_name,
-                    course_code: props.section.section.course.course_code,
-                },
+                course: course,
                 filters: {
                     instructor_name: props.section.section.instructors[0].name,
                     department_id: props.section.section.course.department.department_id,
-                    section_term: "all",
                     course_code: props.section.section.course.course_code,
                 },
             }
@@ -59,15 +55,18 @@ export default function SectionCourseInfo(props) {
 
     useEffect(() => {
         get_courses_by_id(props.section.section.course.course_id).then(response => {
-            setSections(response.data.sections)
+            setCourse(response.data);
         })
     }, [props.section])
 
     useEffect(() => {
-        let filtered_sections = get_filtered_sections(sections, { 'instructor_name': props.section.section.instructors[0].name });
-        let stats = get_stats(filtered_sections);
-        setStudentsCountByTerm(stats.student_count_by_term);
-    }, [sections])
+        if(course){
+            let filtered_sections = get_filtered_sections(course.sections, { 'instructor_name': props.section.section.instructors[0].name });
+            let stats = get_stats(filtered_sections);
+            setStudentsCountByTerm(stats.student_count_by_term);
+        }
+
+    }, [course])
 
     return (
         <Card sx={{ backgroundColor: "white", width: 500, height: 350 }}>
@@ -99,19 +98,26 @@ export default function SectionCourseInfo(props) {
                 }
             />
             <CardContent>
-                <ResponsiveContainer width='100%' height={200}>
-                    <AreaChart
-                        data={studentsCountByTerm}
-                        margin={{
-                            top: 0, right: 30, left: 0, bottom: 20
-                        }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
-                        <YAxis />
-                        <Rechtool />
-                        <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
-                    </AreaChart>
-                </ResponsiveContainer>
+                {!course ? 
+                <div className='infinite-loader'>
+                    <Loader.RotatingLines style={{display: "inline-block"}} color="black" height={40} width={40} />
+                </div>:
+                                <ResponsiveContainer width='100%' height={200}>
+                                <AreaChart
+                                    data={studentsCountByTerm}
+                                    margin={{
+                                        top: 0, right: 30, left: 0, bottom: 20
+                                    }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
+                                    <YAxis />
+                                    <Rechtool />
+                                    <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                }
+            
+
             </CardContent>
         </Card>
     );
