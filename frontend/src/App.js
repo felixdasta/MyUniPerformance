@@ -8,6 +8,7 @@ import Home from "./containers/Home";
 import Login from "./containers/Login/Login";
 import SignUp from "./containers/Sign Up/SignUp";
 import Instructors from "./containers/Instructors/Instructors";
+import InstructorDetails from "./containers/InstructorDetails/InstructorDetails";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/instructors" element={<Instructors />} />
+        <Route path="/instructors/details" element={<InstructorDetails />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/details" element={<CourseDetails />} />
         <Route path="/curriculum" element={<Curriculum />} />
