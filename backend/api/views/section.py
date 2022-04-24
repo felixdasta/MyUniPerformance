@@ -1,4 +1,3 @@
-from urllib import request
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,7 +6,6 @@ from api.repositories.section import SectionRepository
 from api.serializers import SectionSerializer, SectionStudentSerializer
 from api.models.section import Section
 from api.utils import paginate_result
-from django.core import serializers
 
 class SectionList(APIView):
     """
@@ -45,7 +43,8 @@ class SectionDetail(APIView):
     def get(self, request, pk, format=None):
         try:
             section = SectionRepository.get_section_by_id(pk)
-            return Response(section.data)
+            serializer = SectionSerializer(section)
+            return Response(serializer.data)
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -54,14 +53,14 @@ class EnrollStudent(APIView):
     Enroll a student to section instance
     """
     def put(self, request, user_id, section_id, format=None):
-        request.data['student_id'] = user_id
-        request.data['section_id'] = section_id
-        section = SectionRepository.enroll_student_or_update_grade(request)
-
         try:
-            return Response({'section': section.data, 'message' : 'Student has been successfully enrolled in this section'})
-        except:
-            return Response(status = status.HTTP_400_BAD_REQUEST)
+            request.data['student_id'] = user_id
+            request.data['section_id'] = section_id
+            section = SectionRepository.enroll_student_or_update_grade(request)
+            serializer = SectionSerializer(section)
+            return Response({'section': serializer.data, 'message' : 'Student has been successfully enrolled in this section'})
+        except Section.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, user_id, section_id, format=None):
         request.data['student_id'] = user_id

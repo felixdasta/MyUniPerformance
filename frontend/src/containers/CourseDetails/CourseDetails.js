@@ -23,6 +23,7 @@ import {
     Typography
 } from '@mui/material';
 import { randomColor } from '../../actions/utilities';
+import CourseFeedback from "../../components/CourseFeedback/CourseFeedback";
 
 const COLORS = {
     "A's count": "#10E900",
@@ -68,12 +69,16 @@ export default function CourseDetails() {
     const [selectedSection, setSelectedSection] = useState("All");
     const [sectionsByInstructor, setSectionsByInstructor] = useState({});
 
+    //for course feedback
+    const [filteredSections, setFilteredSections] = useState();
+
     const filterSections = () => {
         let filtered_sections = get_filtered_sections(sections, filters);
         let stats = get_stats(filtered_sections);
         setStudentsCountByTerm(stats.student_count_by_term);
         setStudentsCountByInstructor(stats.student_count_by_instructor);
         setGradesCount(stats.grade_count);
+        setFilteredSections(filtered_sections);
 
         if(filtered_sections.length == 1){
             setSelectedSection(filtered_sections[0]);
@@ -310,6 +315,7 @@ export default function CourseDetails() {
                         </Select>
                     </FormControl>
                 </div>
+                <CourseFeedback sections={filteredSections}/>
             </div>
         )
     }

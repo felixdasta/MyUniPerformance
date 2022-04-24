@@ -1,0 +1,26 @@
+.feedbackContainer{
+    padding: 10px 30px 10px 30px;
+    text-align: justify;
+    margin-top: 15px
+}
+
+.feedbackCommentType{
+    font-weight: 200;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.feedbackTitle{
+    font-weight: bold;
+}
+
+.feedbackFilterButton{
+    display: flex;
+    position: absolute;
+    right: 25vw;
+    font-weight: bolder;
+}
+
+.feedbackFilterButton:hover{
+    cursor: pointer;
+}
