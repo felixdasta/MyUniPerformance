@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Home from "./containers/Home";
 import Login from "./containers/Login/Login";
 import SignUp from "./containers/Sign Up/SignUp";
-import Instructors from "./containers/Instructors";
+import Instructors from "./containers/Instructors/Instructors";
 
 function App() {
   return (
