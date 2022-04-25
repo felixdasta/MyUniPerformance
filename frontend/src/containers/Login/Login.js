@@ -53,12 +53,7 @@ export default function Login() {
                 let message = error.response.data.error
                 setError(message)
                 setLoading(false);
-                if(message.includes("verify")){
-                  setActivation(true);
-                }
-                else{
-                  setActivation(false);
-                }
+                setActivation(message.includes("verify"));
               });
 
             }}>Sign In</Button>

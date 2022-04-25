@@ -17,7 +17,7 @@ export const update_feedback = async (feedback_id, updated_feedback) => {
 }
 
 export const create_feedback = async (section_id, feedback) => {
-    const response = await axios.put(url+'sections/' + section_id + "/feedbacks", feedback);
+    const response = await axios.post(url+'sections/' + section_id + "/feedbacks", feedback);
     return response;
 }
 

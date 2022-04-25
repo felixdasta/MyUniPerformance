@@ -1,39 +1,40 @@
-import { Avatar, Box } from '@mui/material';
-import { React, useEffect, useState } from "react";
+import { Box, Menu, MenuItem } from '@mui/material';
+import { useEffect, useState } from "react";
 import { department_logos } from '../../config.js';
 import { VscTriangleDown } from 'react-icons/vsc';
-import { AiOutlineLike, AiFillLike } from 'react-icons/ai';
-import { like_feedback, unlike_feedback } from "../../actions/feedback";
+import NewFeedback from "./subcomponents/NewFeedback";
+import FeedbackList from "./subcomponents/FeedbackList";
 import './CourseFeedback.scss';
+
+const filterTypes = {
+    1: "Most recent",
+    2: "Most relevant"
+}
 
 function CourseFeedback(props) {
     let user_id = localStorage.getItem("user_id");
 
     const [feedbacks, setFeedbacks] = useState();
+    const [filterType, setFilterType] = useState(filterTypes[1]);
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const getStudentDepartmentName = (student) => student.curriculums[0].department.department_name + " Department";
     const getStudentDepartmentId = (student) => student.curriculums[0].department.department_id;
 
-    const addFeedbackLike = (feedback, index) => {
-        feedback.likes.push(user_id);
-        let feedbacks_copy = feedbacks.slice();
-        feedbacks_copy[index] = feedback;
-        setFeedbacks(feedbacks_copy);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
 
-        like_feedback(feedback.feedback_id,user_id);
-    }
-
-    const removeFeedbackLike = (feedback, index) => {
-        for(let i = 0; i < feedback.likes.length; i++){ 
-            if (feedback.likes[i] === user_id) { 
-                feedback.likes.splice(i, 1); 
-                break;
-            }
+    const filterFeedbacks = (sortType, feedbacks) => {
+        setFilterType(filterTypes[sortType]);
+        if (sortType == 1) {
+            feedbacks.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
         }
-        let feedbacks_copy = feedbacks.slice();
-        feedbacks_copy[index] = feedback;
-        setFeedbacks(feedbacks_copy);
-
-        unlike_feedback(feedback.feedback_id,user_id);
+        if (sortType == 2) {
+            feedbacks.sort((a, b) => b.likes.length - a.likes.length);
+        }
+        setFeedbacks(feedbacks);
+        handleClose();
     }
 
     const populateFeedbacks = (sections) => {
@@ -46,7 +47,9 @@ function CourseFeedback(props) {
 
     useEffect(() => {
         if (props.sections) {
-            setFeedbacks(populateFeedbacks(props.sections));
+            let feedbacks = populateFeedbacks(props.sections);
+            filterFeedbacks(1, feedbacks);
+            setFeedbacks(feedbacks);
         }
     }, [props.sections]);
 
@@ -69,49 +72,45 @@ function CourseFeedback(props) {
         <Box bgcolor="#e5e5e5" sx={sx}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ fontWeight: 600 }}>Feedbacks</div>
-                <div class="feedbackFilterButton">
-                    <div style={{ marginRight: 2.5 }}>Most recent</div>
+                <div class="feedbackFilterButton" onClick={handleClick}>
+                    <div style={{ marginRight: 2.5 }}>{filterType}</div>
                     <VscTriangleDown style={{ marginTop: 2 }} />
                 </div>
+                <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                    }}
+                >
+                    <MenuItem onClick={() => filterFeedbacks(1, feedbacks.slice())}>{filterTypes[1]}</MenuItem>
+                    <MenuItem onClick={() => filterFeedbacks(2, feedbacks.slice())}>{filterTypes[2]}</MenuItem>
+                </Menu>
             </div>
 
-            {feedbacks &&
-                (feedbacks).map((feedback, index) => (
-                    <div style={{ display: 'flex' }}>
-                        <Avatar style={avatar_style} src={department_logos[getStudentDepartmentId(feedback.student)]}></Avatar>
-                        <div>
-                            <Box bgcolor="white" className="feedbackContainer" sx={{ borderRadius: 10 }}>
-                                <div>
-                                    <div class="feedbackTitle">Student from {getStudentDepartmentName(feedback.student)}</div>
-                                    <div>
-                                        <div class="feedbackCommentType">Praises</div>
-                                        <div>{feedback.praises}</div>
-                                        <div class="feedbackCommentType">Criticism</div>
-                                        <div>{feedback.criticism}</div>
-                                    </div>
-                                </div>
-                            </Box>
-                            <div style={{
-                                display: 'flex',
-                                marginTop: 5,
-                                marginLeft: 30
-                            }}>
-                                {feedback.likes.includes(user_id)
-                                    ? <AiFillLike
-                                        size={18}
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => removeFeedbackLike(feedback, index)}/> :
-                                    <AiOutlineLike
-                                        size={18}
-                                        style={{ cursor: 'pointer' }} 
-                                        onClick={ () => addFeedbackLike(feedback)}/>}
-                                <div style={{ fontSize: 15 }}>{feedback.likes.length}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                ))}
-
+            {props.section != "All" && props.instructor_id != "All" &&
+                <div>
+                    <NewFeedback
+                        section_id={props.section.section_id}
+                        instructor_id={props.instructor_id}
+                        user_id={user_id}
+                        department_logos={department_logos}
+                        avatar_style={avatar_style}
+                        getStudentDepartmentId={getStudentDepartmentId} />
+                    <hr />
+                </div>
+            }
+            <FeedbackList
+                user_id={user_id}
+                department_logos={department_logos}
+                avatar_style={avatar_style}
+                getStudentDepartmentId={getStudentDepartmentId}
+                getStudentDepartmentName={getStudentDepartmentName}
+                setFeedbacks={setFeedbacks}
+                feedbacks={feedbacks}
+            />
         </Box>)
 }
 
