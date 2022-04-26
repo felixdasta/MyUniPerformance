@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import * as Loader from "react-loader-spinner";
-import './CourseDetails.scss';
+import './CourseInsights.scss';
 import {
     AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Text,
@@ -40,7 +40,7 @@ const renderCustomizedLabel = ({ percent }) => {
     return (`${(percent * 100).toFixed(0)}%`);
 };
 
-export default function CourseDetails() {
+export default function CourseInsights() {
     const CustomizedAxisTick = (props) => {
         const { x, y, payload } = props;
 
@@ -63,8 +63,7 @@ export default function CourseDetails() {
     let [filters, setFilters] = useState();
 
     //criterias that will be used to filter sections
-    const [instructorName, setInstructorName] = useState("All");
-    const [instructorId, setInstructorId]= useState("All");
+    const [selectedInstructor, setSelectedInstructor] = useState("All");
     const [academicYear, setAcademicYear] = useState("All");
     const [semester, setSemester] = useState("All");
     const [selectedSection, setSelectedSection] = useState("All");
@@ -85,20 +84,20 @@ export default function CourseDetails() {
             setSelectedSection(filtered_sections[0]);
         }
         if (filters.instructor_name) {
-            setInstructorName(() => {
+            setSelectedInstructor(() => {
                 for(let section of filtered_sections){
                     for(let instructor of section.instructors){
                         if(instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1){
-                            setInstructorId(instructor.member_id);
-                            return instructor.name;
+                            return instructor;
                         }
                     }
                 }
-                setInstructorId("All");
                 return "All";
             });
         }
     }
+
+    const getInstructorName = () => selectedInstructor != "All" ? selectedInstructor.name : selectedInstructor; 
 
     useEffect(() => {
         let course = location.state.course;
@@ -135,7 +134,7 @@ export default function CourseDetails() {
 
     //retrieve sections that match criteria
     useEffect(() => {
-        if (sections && instructorName) {
+        if (sections) {
             filterSections();
         }
 
@@ -156,11 +155,11 @@ export default function CourseDetails() {
             <div>
                 <div class='course-insights'>
 
-                    {instructorName && instructorName != "All" ?
+                    {selectedInstructor && selectedInstructor != "All" ?
                         <div class='instructor-container'>
-                            <Avatar className='instructor-avatar' sx={avatar_style}>{instructorName[0]}</Avatar>
+                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
                             <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                            <div>{instructorName}</div>
+                            <div>{selectedInstructor.name}</div>
                         </div> : selectedSection && selectedSection != "All" 
                         &&  <div class='instructor-container'>
                             <Avatar className='instructor-avatar' sx={avatar_style}>{selectedSection.instructors[0].name[0]}</Avatar>
@@ -213,11 +212,11 @@ export default function CourseDetails() {
                     <FormControl sx={form_sx}>
                         <label>Instructor name</label>
                         <Select style={term_dropdown_style}
-                            value={instructorName} displayEmpty
+                            value={getInstructorName()} displayEmpty
                             name="instructor"
                             onChange={(e) => {
                                 let instructor = e.target.value;
-                                setInstructorName(instructor);
+                                setSelectedInstructor(instructor);
                                 //did the instructor teached at the currently selected year?
                                 //if not, set academic year to "All"
                                 let teached_year = instructor_teached_year(academicYear, sectionsByInstructor[instructor]);
@@ -258,7 +257,7 @@ export default function CourseDetails() {
                                 let contains_semester = year_contains_academic_semester(
                                     academic_year,
                                     semester,
-                                    sectionsByInstructor[instructorName]);
+                                    sectionsByInstructor[getInstructorName()]);
                                 let section_term = (academic_year == "All" ? ""
                                     : academic_year.substring(0, 4)) +
                                     (semester == "All" || !contains_semester ? ""
@@ -274,7 +273,7 @@ export default function CourseDetails() {
                             }
                             }
                             inputProps={{ 'aria-label': 'Without label' }}>
-                            {(Object.keys(sectionsByInstructor[instructorName].filtered_semesters)).map((year) => (
+                            {(Object.keys(sectionsByInstructor[getInstructorName()].filtered_semesters)).map((year) => (
                                 <MenuItem value={year}>{year}</MenuItem>))}
                         </Select>
                     </FormControl>
@@ -293,7 +292,7 @@ export default function CourseDetails() {
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[instructorName]
+                            {sectionsByInstructor[getInstructorName()]
                                 .filtered_semesters[academicYear].map((entry) => (
                                     <MenuItem value={entry.key}>{entry.value}</MenuItem>
                                 ))}
@@ -311,14 +310,16 @@ export default function CourseDetails() {
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[instructorName].filtered_sections[filters.section_term]
-                                && sectionsByInstructor[instructorName].filtered_sections[filters.section_term].map((value) =>
+                            {sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term]
+                                && sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term].map((value) =>
                                     (<MenuItem value={value}>{value.section_code}</MenuItem>)
                                 )}
                         </Select>
                     </FormControl>
                 </div>
-                <CourseFeedback sections={filteredSections} section={selectedSection} instructor_id={instructorId}/>
+                <CourseFeedback sections={filteredSections} 
+                                section={selectedSection} 
+                                instructor={selectedInstructor}/>
             </div>
         )
     }

@@ -14,7 +14,7 @@ const filterTypes = {
 function CourseFeedback(props) {
     let user_id = localStorage.getItem("user_id");
 
-    const [feedbacks, setFeedbacks] = useState();
+    const [feedbacks, setFeedbacks] = useState([]);
     const [filterType, setFilterType] = useState(filterTypes[1]);
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -40,7 +40,14 @@ function CourseFeedback(props) {
     const populateFeedbacks = (sections) => {
         let feedbacks = [];
         for (let section of sections) {
-            feedbacks = feedbacks.concat(section.feedbacks);
+            let section_feedbacks = []
+            for(let feedback of section.feedbacks){
+                let merged_value = {...feedback, ...section}
+                merged_value['likes'] = feedback.likes;
+                delete merged_value.feedbacks
+                section_feedbacks.push(merged_value);
+            }
+            feedbacks = feedbacks.concat(section_feedbacks);
         }
         return feedbacks;
     }
@@ -63,7 +70,7 @@ function CourseFeedback(props) {
 
     let avatar_style = {
         backgroundColor: '#F6F6F6',
-        margin: "15px 10px 0px 0px",
+        margin: "55px 10px 0px 0px",
         width: 75,
         height: 75,
     }
@@ -90,16 +97,25 @@ function CourseFeedback(props) {
                 </Menu>
             </div>
 
-            {props.section != "All" && props.instructor_id != "All" &&
+            {props.section != "All" && props.instructor != "All" &&
                 <div>
+                    <hr />
                     <NewFeedback
                         section_id={props.section.section_id}
-                        instructor_id={props.instructor_id}
+                        instructor_id={props.instructor.member_id}
                         user_id={user_id}
                         department_logos={department_logos}
                         avatar_style={avatar_style}
-                        getStudentDepartmentId={getStudentDepartmentId} />
-                    <hr />
+                        getStudentDepartmentId={getStudentDepartmentId}
+                        pushNewFeedback={ (feedback) => {
+                            props.section.feedbacks.push(feedback);
+                            let merged_value = {...feedback, ...props.section};
+                            delete merged_value.feedbacks;
+                            let feedbacks_copy = feedbacks.slice();
+                            feedbacks_copy.unshift(merged_value);
+                            setFeedbacks(feedbacks_copy);
+                        } }
+                        />
                 </div>
             }
             <FeedbackList
@@ -108,8 +124,26 @@ function CourseFeedback(props) {
                 avatar_style={avatar_style}
                 getStudentDepartmentId={getStudentDepartmentId}
                 getStudentDepartmentName={getStudentDepartmentName}
-                setFeedbacks={setFeedbacks}
                 feedbacks={feedbacks}
+                setFeedbacks={setFeedbacks}
+                section = {props.section}
+                instructor = {props.instructor}
+                deleteFeedback ={ (feedback, index) => {
+                    let feedbacks_copy = feedbacks.slice();
+                    feedbacks_copy.splice(index, 1);       
+
+                    for(let section of props.sections){
+                        for(let i = 0; i < section.feedbacks.length; i++){
+                            let other_feedback = section.feedbacks[i];
+                            if(other_feedback.feedback_id == feedback.feedback_id){
+                                section.feedbacks.splice(i, 1);       
+                                break;
+                            }
+                        }
+                    }
+
+                    setFeedbacks(feedbacks_copy);
+                } }
             />
         </Box>)
 }
