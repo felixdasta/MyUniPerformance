@@ -153,7 +153,7 @@ export default function CourseInsights() {
     if (course && sections) {
         return (
             <div>
-                <div class='course-insights'>
+                <div className='course-insights'>
 
                     {selectedInstructor && selectedInstructor != "All" ?
                         <div class='instructor-container'>
@@ -208,7 +208,7 @@ export default function CourseInsights() {
                         </PieChart>
                     </div>
                 </div>
-                <div class="term-container">
+                <div className="course-insights">
                     <FormControl sx={form_sx}>
                         <label>Instructor name</label>
                         <Select style={term_dropdown_style}
