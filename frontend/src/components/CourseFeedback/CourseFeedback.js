@@ -118,7 +118,7 @@ function CourseFeedback(props) {
                         />
                 </div>
             }
-            <FeedbackList
+            {feedbacks && feedbacks.length > 0 ?<FeedbackList
                 user_id={user_id}
                 department_logos={department_logos}
                 avatar_style={avatar_style}
@@ -144,7 +144,7 @@ function CourseFeedback(props) {
 
                     setFeedbacks(feedbacks_copy);
                 } }
-            />
+            /> : <div style={{textAlign: 'center'}}>No feedbacks available.</div>}
         </Box>)
 }
 
