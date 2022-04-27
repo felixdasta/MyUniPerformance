@@ -1,7 +1,9 @@
 import { React, useState, useEffect } from "react";
 import { Container, Box, Typography, Paper } from "@mui/material";
+import Carousel from "react-material-ui-carousel";
 import { useLocation } from "react-router-dom";
 import * as Loader from "react-loader-spinner";
+import { fontWeight } from "@mui/system";
 import {
   PieChart,
   Pie,
@@ -25,6 +27,8 @@ function StudentStatistics(props) {
   let totalCredits = 0;
   let takenCredits = 0;
   let totalSemesters = 0;
+  let honorPoints = 0;
+  let gpa = 0.0;
   let aCount = 0;
   let bCount = 0;
   let cCount = 0;
@@ -35,16 +39,14 @@ function StudentStatistics(props) {
   if (student.curriculums) {
     for (let i = 0; i < student.curriculums.length; i++) {
       {
-        student.curriculums[i].courses.map(
-          (courseData) => {
-            totalCredits += courseData.course.course_credits
-            if(courseData.semester){
-                if(totalSemesters < courseData.semester){
-                    totalSemesters = courseData.semester
-                }
+        student.curriculums[i].courses.map((courseData) => {
+          totalCredits += courseData.course.course_credits;
+          if (courseData.semester) {
+            if (totalSemesters < courseData.semester) {
+              totalSemesters = courseData.semester;
             }
           }
-        );
+        });
       }
     }
   }
@@ -55,18 +57,28 @@ function StudentStatistics(props) {
         switch (courseData.grade_obtained) {
           case "A":
             aCount += 1;
+            honorPoints =
+              honorPoints + 4 * courseData.section.course.course_credits;
             break;
           case "B":
             bCount += 1;
+            honorPoints =
+              honorPoints + 3 * courseData.section.course.course_credits;
             break;
           case "C":
             cCount += 1;
+            honorPoints =
+              honorPoints + 2 * courseData.section.course.course_credits;
             break;
           case "D":
             dCount += 1;
+            honorPoints =
+              honorPoints + 1 * courseData.section.course.course_credits;
             break;
           case "F":
             fCount += 1;
+            honorPoints =
+              honorPoints + 0 * courseData.section.course.course_credits;
             break;
           case "W":
             wCount += 1;
@@ -74,15 +86,19 @@ function StudentStatistics(props) {
           default:
             break;
         }
+        gpa = honorPoints / takenCredits;
+        gpa = gpa.toPrecision(2);
       });
     }
   }
 
   let remainingCredits = totalCredits - takenCredits;
-  let creditProgress = Math.ceil(totalCredits/totalSemesters)
-  let remainingSemester = Math.ceil(remainingCredits/creditProgress)
+  let creditProgress = Math.ceil(totalCredits / totalSemesters);
+  let remainingSemester = Math.ceil(remainingCredits / creditProgress);
 
   const COLORS = ["#FF8042", "#00C49F"];
+  const GRAPHS = [];
+  const TITLES = [];
 
   const data01 = [
     { name: "Remaining Credits", value: remainingCredits },
@@ -126,55 +142,95 @@ function StudentStatistics(props) {
     );
   };
 
+  GRAPHS.push(
+    <ResponsiveContainer width="100%" height={250}>
+      <PieChart
+        width={250}
+        height={250}
+        margin={{
+          top: 20,
+          right: 0,
+          left: 0,
+          bottom: 5,
+        }}
+      >
+        <Pie
+          data={data01}
+          fill="#8884d8"
+          dataKey="value"
+          isAnimationActive={false}
+          label={renderCustomizedLabel}
+        >
+          {data01.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index]}></Cell>
+          ))}
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+
+  TITLES.push(
+      <Typography align="center" sx={{ my: 0.75, fontWeight: 500 }}>
+      Degree Completion Breakdown
+      </Typography>
+  )
+  
+
+  GRAPHS.push(
+    <ResponsiveContainer width="100%" height={250}>
+      <BarChart
+        width={250}
+        height={250}
+        data={data02}
+        margin={{
+          top: 20,
+          right: 45,
+          left: 0,
+          bottom: 5,
+        }}
+      >
+        <XAxis dataKey="name" scale="point" padding={{ left: 20, right: 30 }} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <CartesianGrid strokeDasharray="3 3" />
+        <Bar
+          dataKey="grade"
+          fill="#8884d8"
+          background={{ fill: "#eee" }}
+          cx="50%"
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+
+  TITLES.push(
+    <Typography align="center" sx={{ my: 0.75, fontWeight: 500 }}>
+    Grade Distribution
+    </Typography>
+  )
+
   return (
     <Container component={Paper} sx={{ backgroundColor: "white" }}>
       <Typography sx={{ fontSize: 28 }} align="center">
-        {" "}
-        Student Statistics{" "}
+        Student Statistics
       </Typography>
-      <Box height={700} alignContent="center">
-        <PieChart width={300} height={250}>
-          <Pie
-            data={data01}
-            fill="#8884d8"
-            dataKey="value"
-            isAnimationActive={false}
-            label={renderCustomizedLabel}
-          >
-            {data01.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index]}></Cell>
-            ))}
-          </Pie>
-          <Tooltip />
-        </PieChart>
-        <Typography align="center" sx={{ my: 0.1 }}>
-          Curriculum Progress
-        </Typography>
-        <Typography sx={{ fontSize: 28, my: 5 }} align="center"></Typography>
-        <div className="rechartsWrapper">
-          <BarChart width={250} height={250} data={data02}>
-            <XAxis
-              dataKey="name"
-              scale="point"
-              padding={{ left: 20, right: 30 }}
-            />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Bar
-              dataKey="grade"
-              fill="#8884d8"
-              background={{ fill: "#eee" }}
-              cx="50%"
-            />
-          </BarChart>
-          <Typography align="center" sx={{ my: 1.0 }}>
-            Grade Distribution
-          </Typography>
-        </div>
+      <Box height={475} alignContent="center">
+        <Carousel>
+          {GRAPHS.map((GRAPH, index) => {
+            return (<Box>
+                {GRAPH}
+                {TITLES[index]}
+                </Box>);
+          })}
+        </Carousel>
         <Typography align="center" sx={{ my: 3.5 }}>
-          You have approximately {remainingSemester} semesters left if you progress at a rate of {creditProgress} credits per semester.
+          You have approximately {remainingSemester} semesters left if you
+          progress at a rate of {creditProgress} credits per semester.
+        </Typography>
+        <Typography align="center" sx={{ my: 3.5 }}>
+          Your current GPA is: {gpa}
         </Typography>
       </Box>
     </Container>
