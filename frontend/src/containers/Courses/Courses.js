@@ -32,10 +32,10 @@ export default function Courses() {
             console.log(error);
         });
     }
-    
+
     useEffect(() => {
-        
-        setFilteredData({page: 1});
+
+        setFilteredData({ page: 1 });
 
         get_student_by_id(localStorage.getItem("user_id")).then(
             response => {
@@ -65,36 +65,36 @@ export default function Courses() {
     }, [selectedUniversity]);
 
     return (
-        <div style={{ display: "flex"}}>
-            {terms && departments && <CoursesCategories
-                setFilteredData={(filteredData) => {
-                    for (let key in filteredData) {
-                        if (filteredData[key] == "") {
-                            delete filteredData[key];
-                        }
-                    }
-                    setCourses(null);
-                    setFilteredData(filteredData);
-                    setUniversityCourses(setCourses, filteredData);
-                }}
+            courses && terms && departments ?
+                <div style={{ display: "flex" }}>
+                    <CoursesCategories
+                        setFilteredData={(filteredData) => {
+                            for (let key in filteredData) {
+                                if (filteredData[key] == "") {
+                                    delete filteredData[key];
+                                }
+                            }
+                            setCourses(null);
+                            setFilteredData(filteredData);
+                            setUniversityCourses(setCourses, filteredData);
+                        }}
 
-                departments={departments}
-                terms={terms} />}
+                        departments={departments}
+                        terms={terms} />
 
-            {courses ? <FilteredCoursesList courses={courses} 
-                                          filteredData={filteredData} 
-                                          setCourses={setUniversityCourses}
-                                          lastPage={lastPage}
-                                          />:
-                <div className = {terms && departments ? "custom-loader" : "loader"} >
+                    <FilteredCoursesList courses={courses}
+                        filteredData={filteredData}
+                        setCourses={setUniversityCourses}
+                        lastPage={lastPage}
+                    />
+                </div> :
+                <div className="loader">
                     <Loader.ThreeDots color="black" height={120} width={120} />
-                </div>}
-        </div>
-
+                </div>
     )
 }
 
-function setUniversitySectionsTerms(selectedUniversity, setTerms){
+function setUniversitySectionsTerms(selectedUniversity, setTerms) {
     //get university sections terms
     get_sections_terms_by_university(selectedUniversity).then(
         response => {
@@ -106,7 +106,7 @@ function setUniversitySectionsTerms(selectedUniversity, setTerms){
     });
 }
 
-function setUniversityDepartments(selectedUniversity, setDepartments){
+function setUniversityDepartments(selectedUniversity, setDepartments) {
     //get university departments
     get_departments_by_university(selectedUniversity).then(
         response => {

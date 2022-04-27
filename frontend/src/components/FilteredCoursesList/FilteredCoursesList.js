@@ -41,7 +41,7 @@ function FilteredCoursesList(props) {
   //Defining styles for table
   if (courses) {
     return (
-    <TableContainer component={Paper}>
+    <TableContainer style={{overflowY: "hidden"}} component={Paper}>
       <InfiniteScroll
         pageStart={1}
         loadMore={fetchData}
