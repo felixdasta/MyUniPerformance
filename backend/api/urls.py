@@ -30,6 +30,9 @@ urlpatterns = [
     path('sections/<section_id>/feedbacks', feedback.FeedbackList.as_view()),
     path('sections/<pk>/grade-stats', grade_stats.GradeStatsDetail.as_view()),
 
+    path('feedbacks/<pk>', feedback.FeedbackDetail.as_view()),
+    path('students/<user_id>/feedbacks/<feedback_id>', feedback.FeedbackLike.as_view()),
+
     path('curriculums/<pk>', curriculum.CurriculumDetail.as_view()),
     path('curriculums', curriculum.CurriculumList.as_view()),
     path('activate-user/<uidb64>/<token>', student.activate_student, name='activate')

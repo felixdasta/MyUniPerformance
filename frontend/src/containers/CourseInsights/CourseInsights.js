@@ -2,7 +2,7 @@ import { React, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Avatar from "@mui/material/Avatar";
 import * as Loader from "react-loader-spinner";
-import './CourseDetails.scss';
+import './CourseInsights.scss';
 import {
     AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Text,
@@ -23,6 +23,7 @@ import {
     Typography
 } from '@mui/material';
 import { randomColor } from '../../actions/utilities';
+import CourseFeedback from "../../components/CourseFeedback/CourseFeedback";
 
 const COLORS = {
     "A's count": "#10E900",
@@ -39,7 +40,7 @@ const renderCustomizedLabel = ({ percent }) => {
     return (`${(percent * 100).toFixed(0)}%`);
 };
 
-export default function CourseDetails() {
+export default function CourseInsights() {
     const CustomizedAxisTick = (props) => {
         const { x, y, payload } = props;
 
@@ -62,11 +63,14 @@ export default function CourseDetails() {
     let [filters, setFilters] = useState();
 
     //criterias that will be used to filter sections
-    const [instructor, setInstructor] = useState("All");
+    const [selectedInstructor, setSelectedInstructor] = useState("All");
     const [academicYear, setAcademicYear] = useState("All");
     const [semester, setSemester] = useState("All");
     const [selectedSection, setSelectedSection] = useState("All");
     const [sectionsByInstructor, setSectionsByInstructor] = useState({});
+
+    //for course feedback
+    const [filteredSections, setFilteredSections] = useState();
 
     const filterSections = () => {
         let filtered_sections = get_filtered_sections(sections, filters);
@@ -74,16 +78,17 @@ export default function CourseDetails() {
         setStudentsCountByTerm(stats.student_count_by_term);
         setStudentsCountByInstructor(stats.student_count_by_instructor);
         setGradesCount(stats.grade_count);
+        setFilteredSections(filtered_sections);
 
         if(filtered_sections.length == 1){
             setSelectedSection(filtered_sections[0]);
         }
         if (filters.instructor_name) {
-            setInstructor(() => {
+            setSelectedInstructor(() => {
                 for(let section of filtered_sections){
                     for(let instructor of section.instructors){
                         if(instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1){
-                            return instructor.name;
+                            return instructor;
                         }
                     }
                 }
@@ -91,6 +96,8 @@ export default function CourseDetails() {
             });
         }
     }
+
+    const getInstructorName = () => selectedInstructor != "All" ? selectedInstructor.name : selectedInstructor; 
 
     useEffect(() => {
         let course = location.state.course;
@@ -127,7 +134,7 @@ export default function CourseDetails() {
 
     //retrieve sections that match criteria
     useEffect(() => {
-        if (sections && instructor) {
+        if (sections) {
             filterSections();
         }
 
@@ -146,13 +153,13 @@ export default function CourseDetails() {
     if (course && sections) {
         return (
             <div>
-                <div class='course-insights'>
+                <div className='course-insights'>
 
-                    {instructor && instructor != "All" ?
+                    {selectedInstructor && selectedInstructor != "All" ?
                         <div class='instructor-container'>
-                            <Avatar className='instructor-avatar' sx={avatar_style}>{instructor[0]}</Avatar>
+                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
                             <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                            <div>{instructor}</div>
+                            <div>{selectedInstructor.name}</div>
                         </div> : selectedSection && selectedSection != "All" 
                         &&  <div class='instructor-container'>
                             <Avatar className='instructor-avatar' sx={avatar_style}>{selectedSection.instructors[0].name[0]}</Avatar>
@@ -201,15 +208,15 @@ export default function CourseDetails() {
                         </PieChart>
                     </div>
                 </div>
-                <div class="term-container">
+                <div className="course-insights">
                     <FormControl sx={form_sx}>
                         <label>Instructor name</label>
                         <Select style={term_dropdown_style}
-                            value={instructor} displayEmpty
+                            value={getInstructorName()} displayEmpty
                             name="instructor"
                             onChange={(e) => {
                                 let instructor = e.target.value;
-                                setInstructor(instructor);
+                                setSelectedInstructor(instructor);
                                 //did the instructor teached at the currently selected year?
                                 //if not, set academic year to "All"
                                 let teached_year = instructor_teached_year(academicYear, sectionsByInstructor[instructor]);
@@ -250,7 +257,7 @@ export default function CourseDetails() {
                                 let contains_semester = year_contains_academic_semester(
                                     academic_year,
                                     semester,
-                                    sectionsByInstructor[instructor]);
+                                    sectionsByInstructor[getInstructorName()]);
                                 let section_term = (academic_year == "All" ? ""
                                     : academic_year.substring(0, 4)) +
                                     (semester == "All" || !contains_semester ? ""
@@ -266,7 +273,7 @@ export default function CourseDetails() {
                             }
                             }
                             inputProps={{ 'aria-label': 'Without label' }}>
-                            {(Object.keys(sectionsByInstructor[instructor].filtered_semesters)).map((year) => (
+                            {(Object.keys(sectionsByInstructor[getInstructorName()].filtered_semesters)).map((year) => (
                                 <MenuItem value={year}>{year}</MenuItem>))}
                         </Select>
                     </FormControl>
@@ -285,7 +292,7 @@ export default function CourseDetails() {
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[instructor]
+                            {sectionsByInstructor[getInstructorName()]
                                 .filtered_semesters[academicYear].map((entry) => (
                                     <MenuItem value={entry.key}>{entry.value}</MenuItem>
                                 ))}
@@ -303,13 +310,16 @@ export default function CourseDetails() {
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
                             <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[instructor].filtered_sections[filters.section_term]
-                                && sectionsByInstructor[instructor].filtered_sections[filters.section_term].map((value) =>
+                            {sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term]
+                                && sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term].map((value) =>
                                     (<MenuItem value={value}>{value.section_code}</MenuItem>)
                                 )}
                         </Select>
                     </FormControl>
                 </div>
+                <CourseFeedback sections={filteredSections} 
+                                section={selectedSection} 
+                                instructor={selectedInstructor}/>
             </div>
         )
     }
