@@ -17,18 +17,16 @@ class FeedbackList(APIView):
         feedback = paginate_result(feedback, FeedbackSerializer, 'feedbacks', page, 25)
         return Response(feedback)
 
-    def post(self, request, section_id=None, format=None):
-        #section id may be passed on url parameter
-        if section_id != None:
-            request.data['section_id'] = section_id
+    def post(self, request, section_id, format=None):
+        #section id will be passed from url parameter
+        request.data['section_id'] = section_id
         feedback = FeedbackRepository.create_feedback(request)
+        serializer = FeedbackSerializer(feedback)
 
-        return Response(feedback.data 
-        if feedback.is_valid() 
-        else feedback._errors, 
-        status = status.HTTP_201_CREATED 
-        if feedback.is_valid() 
-        else status.HTTP_400_BAD_REQUEST)
+        if feedback:
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(serializer._errors, status = status.HTTP_400_BAD_REQUEST)
 
 class FeedbackDetail(APIView):
     """
@@ -37,20 +35,40 @@ class FeedbackDetail(APIView):
     def get(self, request, pk, format=None):
         try:
             feedback = FeedbackRepository.get_feedback_by_id(pk)
-            return Response(feedback.data)
+            serializer = FeedbackSerializer(feedback)
+            return Response(serializer.data, status.HTTP_200_OK)
         except Feedback.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     
     def put(self, request, pk, format=None):
-        feedback = FeedbackRepository.update_feedback(request, pk)
-
-        return Response(feedback.data 
-        if feedback.is_valid() 
-        else feedback._errors, 
-        status = status.HTTP_201_CREATED 
-        if feedback.is_valid() 
-        else status.HTTP_400_BAD_REQUEST)
+        try:
+            feedback = FeedbackRepository.update_feedback(request, pk)
+            serializer = FeedbackSerializer(feedback)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        except Feedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk, format=None):
         FeedbackRepository.delete_feedback(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class FeedbackLike(APIView):
+    """
+    Like, or unlike a feedback
+    """
+    
+    def put(self, request, user_id, feedback_id, format=None):
+        try:
+            feedback = FeedbackRepository.like_feedback(user_id, feedback_id)
+            serializer = FeedbackSerializer(feedback)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        except Feedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, user_id, feedback_id, format=None):
+        try:
+            feedback = FeedbackRepository.unlike_feedback(user_id, feedback_id)
+            serializer = FeedbackSerializer(feedback)
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        except Feedback.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

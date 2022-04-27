@@ -1,13 +1,16 @@
-from api.serializers import SectionSerializer
 from api.models.section import Section
 from api.models.section import Student
 from api.models.section import Section_Students
+from api.repositories.feedback import FeedbackRepository
+from django.db.models import Prefetch
 
 class SectionRepository:
 
     def get_all_sections():
-        sections = Section.objects.prefetch_related('instructors', 'likes') \
-        .select_related('grade_stats').order_by('section_term', 'course__course_code')
+        feedbacks = FeedbackRepository.get_feedback_by_params()
+        sections = Section.objects.prefetch_related(Prefetch('feedback_set', queryset=feedbacks),
+                    'instructors', 'likes') \
+                    .select_related('grade_stats')
 
         return sections
 
@@ -21,23 +24,14 @@ class SectionRepository:
 
         return sections
 
-    
-    @staticmethod
-    def create_section(request):
-        serializer = SectionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer
-
     @staticmethod
     def get_section_by_id(pk):
-        section = Section.objects.prefetch_related('instructors', 'likes').get(pk=pk)
-        serializer = SectionSerializer(section)
-        return serializer
+        section = Section.objects.prefetch_related('instructors', 'likes', 'feedback_set').get(pk=pk)
+        return section
 
     @staticmethod
     def get_sections_terms_by_university(university_id):
-        sections = Section.objects.prefetch_related('instructors', 'likes') \
+        sections = Section.objects.prefetch_related('instructors', 'likes', 'feedback_set') \
         .select_related('course__department') \
         .filter(course__department__university = university_id) \
         .distinct('section_term')
@@ -55,9 +49,7 @@ class SectionRepository:
             else: 
                 student = Section_Students.objects.update(**request.data)
 
-        serializer = SectionSerializer(section)
-        return serializer
-
+        return section
 
     @staticmethod
     def drop_student(request):

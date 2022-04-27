@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from './containers/Dashboard/Dashboard';
 import Courses from './containers/Courses/Courses'
-import CourseDetails from "./containers/CourseDetails/CourseDetails";
+import CourseInsights from "./containers/CourseInsights/CourseInsights";
 import Curriculum from './containers/Curriculum'
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./containers/Home";
@@ -20,7 +20,7 @@ function App() {
         <Route path="/instructors" element={<Instructors />} />
         <Route path="/instructors/details" element={<InstructorDetails />} />
         <Route path="/courses" element={<Courses />} />
-        <Route path="/courses/details" element={<CourseDetails />} />
+        <Route path="/courses/details" element={<CourseInsights />} />
         <Route path="/curriculum" element={<Curriculum />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<SignUp />} />
