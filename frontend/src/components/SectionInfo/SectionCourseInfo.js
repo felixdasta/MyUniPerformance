@@ -60,7 +60,7 @@ export default function SectionCourseInfo(props) {
     }, [props.section])
 
     useEffect(() => {
-        if(course){
+        if (course) {
             let filtered_sections = get_filtered_sections(course.sections, { 'instructor_name': props.section.section.instructors[0].name });
             let stats = get_stats(filtered_sections);
             setStudentsCountByTerm(stats.student_count_by_term);
@@ -98,25 +98,25 @@ export default function SectionCourseInfo(props) {
                 }
             />
             <CardContent>
-                {!course ? 
-                <div className='infinite-loader'>
-                    <Loader.RotatingLines style={{display: "inline-block"}} color="black" height={40} width={40} />
-                </div>:
-                                <ResponsiveContainer width='100%' height={200}>
-                                <AreaChart
-                                    data={studentsCountByTerm}
-                                    margin={{
-                                        top: 0, right: 30, left: 0, bottom: 20
-                                    }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
-                                    <YAxis />
-                                    <Rechtool />
-                                    <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                {!course ?
+                    <div className='infinite-loader'>
+                        <Loader.RotatingLines style={{ display: "inline-block" }} color="black" height={40} width={40} />
+                    </div> :
+                    <ResponsiveContainer width='100%' height={200}>
+                        <AreaChart
+                            data={studentsCountByTerm}
+                            margin={{
+                                top: 0, right: 30, left: 0, bottom: 20
+                            }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
+                            <YAxis />
+                            <Rechtool />
+                            <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
+                        </AreaChart>
+                    </ResponsiveContainer>
                 }
-            
+
 
             </CardContent>
         </Card>
