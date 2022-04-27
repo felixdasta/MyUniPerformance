@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from './containers/Dashboard/Dashboard';
 import Courses from './containers/Courses/Courses'
 import CourseInsights from "./containers/CourseInsights/CourseInsights";
-import Curriculum from './containers/Curriculum'
+import Curriculum from './containers/Curriculum/Curriculum';
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./containers/Home";
 import Login from "./containers/Login/Login";
