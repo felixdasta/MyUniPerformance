@@ -12,6 +12,7 @@ class DepartmentSerializer(ModelSerializer):
         fields = ['department_id','department_name','university']
 
 class StaffMemberSerializer(ModelSerializer):
+    department = DepartmentSerializer(read_only=True)
     class Meta:
         model = models.staff_member.Staff_Member
         fields = ['member_id', 'name', 'institutional_email', 'department']

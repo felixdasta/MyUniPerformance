@@ -245,3 +245,15 @@ export const get_section_info_by_id = async (section_id) => {
     const response = await axios.get(url + 'sections/' + section_id);
     return response;
 }
+
+export const setUniversitySectionsTerms = (selectedUniversity, setTerms) => {
+    //get university sections terms
+    get_sections_terms_by_university(selectedUniversity).then(
+        response => {
+            let sections_terms = response.data.sections_terms;
+            setTerms(sections_terms);
+        }
+    ).catch((error) => {
+        console.log(error)
+    });
+}

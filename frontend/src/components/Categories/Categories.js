@@ -4,11 +4,10 @@ import {
     Select, TextField, Button,
     Typography
 } from '@mui/material'
-import './CoursesCategories.scss'
+import './Categories.scss'
 import { get_available_semesters_by_academic_year, semesters } from "../../actions/sections";
-import * as Loader from "react-loader-spinner";
 
-function CoursesCategories(props) {
+function Categories(props) {
     let [filters, setFilters] = useState({
         section_term: "",
         department_id: "",
@@ -35,7 +34,7 @@ function CoursesCategories(props) {
     let input_style = { backgroundColor: "white", fontSize: 14 }
 
     return (
-        <Box height="100vh" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65, fontSize: 14 }}>
+        <Box height="100vh" className="slide-right" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 65, fontSize: 14 }}>
             {academicSemesters
                 && <div>
                     <div class="term-container">
@@ -106,6 +105,9 @@ function CoursesCategories(props) {
                             variant="outlined"
                             name="instructor_name"
                             size="small"
+                            placeholder={
+                                props.searchType == 1 ? "Search courses by instructor name" : 
+                                props.searchType == 2 ? "Search instructor by name" : ""}
                             style={input_style}
                             onChange={inputChange} />
                     </FormControl>
@@ -115,6 +117,9 @@ function CoursesCategories(props) {
                             variant="outlined"
                             name="course_code"
                             size="small"
+                            placeholder={
+                                props.searchType == 1 ? "Search courses by code" : 
+                                props.searchType == 2 ? "Search instructors by course code" : ""}
                             style={input_style}
                             onChange={inputChange} />
                     </FormControl>
@@ -133,4 +138,4 @@ function CoursesCategories(props) {
     );
 
 }
-export default CoursesCategories;
+export default Categories;

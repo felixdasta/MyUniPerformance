@@ -16,7 +16,7 @@ class StaffMemberRespository:
             instructors = instructors.filter(department__university = university_id)
         
         if queryprms.get('course_code'):
-            instructor_condition &= Q(course_code = queryprms.get('course_code'))
+            instructor_condition &= Q(section__course__course_code = queryprms.get('course_code'))
         if queryprms.get('section_term'):
             instructor_condition &= Q(section__section_term__icontains = queryprms.get('section_term'))
         if queryprms.get('department_id'):

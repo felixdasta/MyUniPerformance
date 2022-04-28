@@ -28,6 +28,27 @@ class StaffMemberDetail(APIView):
         try:
             instructor = StaffMemberRespository.get_instructor_by_id(pk)
             serializer = CustomStaffMemberSerializer(instructor)
-            return Response(serializer.data, status.HTTP_200_OK)
+
+            #lets convert the serializer to our desired field
+            result = {
+            'member_id': serializer.data['member_id'],
+            'name': serializer.data['name'],
+            'institutional_email': serializer.data['institutional_email'],
+            'department': serializer.data['department'],
+            'sections': serializer.data['sections']
+            }
+
+            unique_courses = {}
+            for section in result['sections']:
+                course = section.pop('course', None)
+                unique_course = course['course_id']
+                if(unique_course not in unique_courses):
+                    unique_courses[unique_course] = course
+                    unique_courses[unique_course]['sections'] = []
+                unique_courses[unique_course]['sections'].append(section)
+
+            result.pop('sections', None)
+            result['courses'] = unique_courses.values()
+            return Response(result, status.HTTP_200_OK)
         except Staff_Member.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

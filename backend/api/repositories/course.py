@@ -7,7 +7,7 @@ from django.db.models import Prefetch, CharField, Subquery, Q
 class CourseRepository:
 
     @staticmethod
-    def get_courses_by_params(queryprms, university_id):
+    def get_courses_by_params(queryprms, university_id=None):
         CharField.register_lookup(Length, 'length')
         courses = Course.objects.all()
 

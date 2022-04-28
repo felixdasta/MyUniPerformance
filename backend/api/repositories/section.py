@@ -9,7 +9,7 @@ class SectionRepository:
     def get_all_sections():
         feedbacks = FeedbackRepository.get_feedback_by_params()
         sections = Section.objects.prefetch_related(Prefetch('feedback_set', queryset=feedbacks),
-                    'instructors', 'likes') \
+                    'instructors__department', 'likes') \
                     .select_related('grade_stats')
 
         return sections
@@ -26,7 +26,7 @@ class SectionRepository:
 
     @staticmethod
     def get_section_by_id(pk):
-        section = Section.objects.prefetch_related('instructors', 'likes', 'feedback_set').get(pk=pk)
+        section = Section.objects.prefetch_related('instructors__department', 'likes', 'feedback_set').get(pk=pk)
         return section
 
     @staticmethod
