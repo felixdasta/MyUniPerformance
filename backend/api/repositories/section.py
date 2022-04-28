@@ -31,9 +31,9 @@ class SectionRepository:
 
     @staticmethod
     def get_sections_terms_by_university(university_id):
-        sections = Section.objects.prefetch_related('instructors', 'likes', 'feedback_set') \
-        .select_related('course__department') \
+        sections = Section.objects \
         .filter(course__department__university = university_id) \
+        .values_list('section_term', flat=True) \
         .distinct('section_term')
 
         return sections

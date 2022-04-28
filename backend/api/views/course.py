@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.repositories.course import CourseRepository
 from api.models.course import Course
-from api.serializers import CourseSerializer, CustomCourseSerializer
+from api.serializers import CustomCourseSerializer, CourseSerializer
 from api.utils import paginate_result
 
 class CourseList(APIView):
@@ -15,7 +15,7 @@ class CourseList(APIView):
             queryprms = request.GET
             courses = CourseRepository.get_courses_by_params(queryprms, university_id)
             page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-            courses = paginate_result(courses, CustomCourseSerializer, 'courses', page, 25)
+            courses = paginate_result(courses, CourseSerializer, 'courses', page, 25)
             return Response(courses)
         except Course.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -36,8 +36,9 @@ class CourseDetail(APIView):
     def get(self, request, pk, format=None):
         try:
             course = CourseRepository.get_course_by_id(pk)
-            return Response(course.data)
-        except:
+            serializer = CustomCourseSerializer(course)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except Course.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk, format=None):
@@ -49,7 +50,7 @@ class CourseDetail(APIView):
             status = status.HTTP_201_CREATED 
             if course.is_valid() 
             else status.HTTP_400_BAD_REQUEST)
-        except:
+        except Course.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
     
     def delete(self, request, pk, format=None):
