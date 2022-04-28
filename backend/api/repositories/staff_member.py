@@ -22,7 +22,7 @@ class StaffMemberRespository:
         if queryprms.get('department_id'):
             instructor_condition &= Q(department = queryprms.get('department_id'))
         if queryprms.get('instructor_name'):
-            instructor_condition &= Q(section__instructors__name__icontains = queryprms.get('instructor_name'))
+            instructor_condition &= Q(section__instructors__name__icontains = queryprms.get('instructor_name')) & Q(name__icontains = queryprms.get('instructor_name'))
         if queryprms.get('student_id'):
             instructor_condition &= Q(section__enrolled_students = queryprms.get('student_id'))
                 
