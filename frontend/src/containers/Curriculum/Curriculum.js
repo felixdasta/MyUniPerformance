@@ -5,6 +5,7 @@ import * as Loader from "react-loader-spinner";
 import { useNavigate } from 'react-router-dom';
 import { get_student_by_id } from '../../actions/user.js';
 import CurriculumTable from "../../components/CurriculumTable/CurriculumTable.js";
+import CurriculumInfo from "../../components/CurriculumInfo/CurriculumInfo.js";
 
 export default function Curriculum() {
     const [student, setStudent] = useState();
@@ -29,9 +30,9 @@ export default function Curriculum() {
             <Grid item container lg={3} justifyContent="center">
                 <Grid item component={Box} lg={12} sx={{ backgroundColor: "peachpuff", height: "700px" }}> Course List </Grid>
             </Grid>
-            <Grid item container lg={9} justifyContent="center" rowGap={3}>
-                <Grid item component={CurriculumTable} student={student} lg={12} sx={{ backgroundColor: "salmon", height: "500px" }}> Curriculum </Grid>
-                <Grid item component={Box} lg={12} sx={{ backgroundColor: "burlywood", height: "350px" }}> Curriculum info </Grid>
+            <Grid item container lg={9} direction={"column"} rowGap={3}>
+                <Grid item component={CurriculumTable} student={student} lg={12} sx={{ backgroundColor: "salmon", height: "800px" }}> Curriculum </Grid>
+                <Grid item component={CurriculumInfo} student={student} lg={12} sx={{ backgroundColor: "burlywood", height: "350px" }}> Curriculum info </Grid>
             </Grid>
         </Grid> : <div className="loader">
             <Loader.ThreeDots color="black" height={120} width={120} />

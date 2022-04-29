@@ -12,22 +12,42 @@ import {
   Select,
   TextField,
   MenuItem,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
-import { makeStyles } from "@material-ui/styles";
-import CoursesCategories from "../../components/CoursesCategories/CoursesCategories";
-import {
-  get_available_semesters_by_academic_year,
-  semesters,
-} from "../../actions/sections";
-import axios from "axios";
-import { ResponsiveContainer } from "recharts";
-import { Box } from "@mui/system";
-
-function CurriculumInfo(props){
-    let student = props.student;
-    
 
 
+function CurriculumInfo(props) {
+  let student = props.student;
 
-} export default (CurriculumInfo);
+  if (student.curriculums) {
+    let result = [];
+    result.push(
+      <Card sx={{ backgroundColor: "white", width: "100%", height: 350 }}>
+        <CardContent>
+          <Container align="center">
+            <Typography sx={{ fontSize: 36 }} align="center">
+              Curriculum Information
+            </Typography>
+          </Container>
+          <Container>
+            <Card sx={{ maxWidth: 600, height: 150, my: 3 }}>
+              <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
+                Name: {student.curriculums[0].curriculum_name}
+              </Typography >
+              <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
+                Year: {student.curriculums[0].curriculum_year}
+              </Typography>
+              <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
+                Department: {student.curriculums[0].department.department_name}
+              </Typography>
+            </Card>
+          </Container>
+        </CardContent>
+      </Card>
+    );
+    return result;
+  }
+}
+export default CurriculumInfo;
