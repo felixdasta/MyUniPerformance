@@ -86,6 +86,10 @@ export default function CourseInsights() {
     const filterSections = () => {
         let filtered_sections = get_filtered_sections(sections, filters);
         let stats = get_stats(filtered_sections);
+
+        stats.student_count_by_term.sort((a,b) => a.term.localeCompare(b.term));
+        stats.student_count_by_instructor.sort((a,b) => a.name.localeCompare(b.name));
+
         setStudentsCountByTerm(stats.student_count_by_term);
         setStudentsCountByInstructor(stats.student_count_by_instructor);
         setGradesCount(stats.grade_count);

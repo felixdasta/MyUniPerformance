@@ -200,7 +200,7 @@ export const get_stats = (sections) => {
         }
     }
     for (let key in term_count_mapping) {
-        sections_student_count_by_term.push({ name: formatTerm(key), "Enrolled students": term_count_mapping[key] });
+        sections_student_count_by_term.push({ name: formatTerm(key), "Enrolled students": term_count_mapping[key], term: key });
     }
     for (let key in instructor_count_mapping) {
         sections_student_count_by_instructor.push({ name: key, "Enrolled students": instructor_count_mapping[key] });
