@@ -44,7 +44,7 @@ function FeedbackList(props) {
     }
 
     const getTagTheme = (backgroundColor) => {
-        return { borderRadius: 10, padding: 1, backgroundColor: backgroundColor, marginLeft: 1, color: 'white' };
+        return { borderRadius: 7.5, padding: 1, backgroundColor: backgroundColor, marginLeft: 1, color: 'white' };
     }
 
     return (
@@ -66,9 +66,9 @@ function FeedbackList(props) {
                                     <Avatar style={props.avatar_style} src={props.department_logos[props.getStudentDepartmentId(feedback.student)]}></Avatar>
                                     <div>
                                         <div style={{ display: 'flex' }}>
-                                            <Box bgcolor="white" sx={getTagTheme("Tomato")} className="feedbackTag">{"Term: " + feedback.section_term}</Box>
-                                            <Box bgcolor="white" sx={getTagTheme("Orange")} className="feedbackTag">{"Section: " + feedback.section_code}</Box>
-                                            <Box bgcolor="white" sx={getTagTheme("DodgerBlue")} className="feedbackTag">{"Instructor: " + feedback.instructor.name}</Box>
+                                            <Box bgcolor="white" sx={getTagTheme("Tomato")}>{"Term: " + feedback.section_term}</Box>
+                                            <Box bgcolor="white" sx={getTagTheme("Orange")}>{"Section: " + feedback.section_code}</Box>
+                                            <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Instructor: " + feedback.instructor.name}</Box>
                                         </div>
                                         <Box
                                             bgcolor="white"

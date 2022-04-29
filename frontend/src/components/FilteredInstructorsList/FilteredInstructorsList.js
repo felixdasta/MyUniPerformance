@@ -20,7 +20,7 @@ function FilteredInstructorsList(props) {
   }
 
   const viewInstructorDetails = (index) => {
-    //navigate('details', {state: {instructor: instructors[index], filters: filters}});
+    navigate('details', {state: {instructor: instructors[index]}});
   }
 
   useEffect(() => {

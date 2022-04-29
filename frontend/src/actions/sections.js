@@ -257,3 +257,16 @@ export const setUniversitySectionsTerms = (selectedUniversity, setTerms) => {
         console.log(error)
     });
 }
+
+export const get_specified_semester = (section_term) => {
+    return (section_term && section_term.length == 6) ? section_term.substring(4, 6) :
+        (section_term && section_term.length == 2) ? section_term : "All";
+}
+
+export const get_specified_year = (section_term) => {
+    return (section_term && section_term.length >= 4) ? section_term.substring(0, 4) : "All";
+}
+
+export const get_specified_academic_year = (year) => {
+    return year == "All" ? year : year + "-" + (parseInt(year) + 1);
+}

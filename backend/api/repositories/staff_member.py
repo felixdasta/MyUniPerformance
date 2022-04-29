@@ -36,7 +36,7 @@ class StaffMemberRespository:
     @staticmethod
     def get_instructor_by_id(pk):
         sections = SectionRepository.get_all_sections().select_related('course__department')
-        instructor = Staff_Member.objects.select_related('department') \
+        instructor = Staff_Member.objects.select_related('department__university') \
                     .prefetch_related(Prefetch('section_set', queryset=sections)) \
                     .filter(member_id__in = Subquery(sections.values("instructors"))) \
                     .distinct().get(pk=pk)

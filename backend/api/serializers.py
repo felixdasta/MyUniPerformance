@@ -11,6 +11,12 @@ class DepartmentSerializer(ModelSerializer):
         model = models.department.Department
         fields = ['department_id','department_name','university']
 
+class CustomDepartmentSerializer(ModelSerializer):
+    university = UniversitySerializer(read_only=True)
+    class Meta:
+        model = models.department.Department
+        fields = ['department_id','department_name','university']
+
 class StaffMemberSerializer(ModelSerializer):
     department = DepartmentSerializer(read_only=True)
     class Meta:
@@ -115,7 +121,7 @@ class InstructorSectionSerializer(ModelSerializer):
         fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'feedbacks', 'grades', 'likes', 'course']
 
 class CustomStaffMemberSerializer(ModelSerializer):
-    department = DepartmentSerializer(read_only=True)
+    department = CustomDepartmentSerializer(read_only=True)
     sections = InstructorSectionSerializer(source='section_set', many=True, read_only=True)
     class Meta:
         model = models.staff_member.Staff_Member

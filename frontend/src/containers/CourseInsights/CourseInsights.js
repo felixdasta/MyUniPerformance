@@ -1,6 +1,5 @@
 import { React, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Avatar from "@mui/material/Avatar";
 import * as Loader from "react-loader-spinner";
 import './CourseInsights.scss';
 import {
@@ -13,6 +12,9 @@ import {
     get_available_sections_filters,
     get_filtered_sections,
     get_stats,
+    get_specified_semester,
+    get_specified_year,
+    get_specified_academic_year,
     year_contains_academic_semester,
     evaluate_and_apply,
     instructor_teached_year
@@ -20,24 +22,22 @@ import {
 import {
     Box, MenuItem, FormControl,
     Select, TextField, Button,
-    Typography
+    Typography, Avatar
 } from '@mui/material';
 import { randomColor } from '../../actions/utilities';
 import CourseFeedback from "../../components/CourseFeedback/CourseFeedback";
+import {GRADE_COLORS} from '../../actions/utilities'
 
-const COLORS = {
-    "A's count": "#10E900",
-    "B's count": "#2FDECC",
-    "C's count": "#FFCD00",
-    "D's count": "#FF9A00",
-    "F's count": "#FF0000",
-    "P's count": "#009AFF",
-    "W's count": "#B5B5B5"
-};
-const RADIAN = Math.PI / 180;
 
 const renderCustomizedLabel = ({ percent }) => {
     return (`${(percent * 100).toFixed(0)}%`);
+};
+
+let avatar_style = {
+    bgcolor: randomColor(),
+    height: 150,
+    width: 150,
+    fontSize: 60,
 };
 
 export default function CourseInsights() {
@@ -88,6 +88,9 @@ export default function CourseInsights() {
                 for(let section of filtered_sections){
                     for(let instructor of section.instructors){
                         if(instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1){
+                            if(selectedInstructor != "All" && selectedInstructor.name != instructor.name){
+                                avatar_style.bgcolor = randomColor();
+                            }
                             return instructor;
                         }
                     }
@@ -109,24 +112,12 @@ export default function CourseInsights() {
             setSectionsByInstructor(selection_filters)
             setSections(response.data.sections);
             setFilters(filters);
-
-            //example: if section_term == 2020S2 or section_term == 2020, then year = 2020
-            let academic_year = filters.section_term
-                && filters.section_term.length >= 4
-                ? filters.section_term.substring(0, 4) : "All";
-
-            //but the academic year will be 2020-2021
-            academic_year = academic_year == "All" ? academic_year : academic_year + "-" + (parseInt(academic_year) + 1);
+            //example: if section_term == 2020S2 or section_term == 2020, 
+            //then year = 2020 but academic year is 2020-2021
+            let academic_year = get_specified_academic_year(get_specified_year(filters.section_term));
             setAcademicYear(academic_year);
-
             //example: if section_term == 2020S2 or section_term == S2, then semester = S2
-            setSemester((filters.section_term
-                && filters.section_term.length == 6)
-                ? filters.section_term.substring(4, 6) :
-                (filters.section_term
-                    && filters.section_term.length == 2)
-                    ? filters.section_term :
-                    "All");
+            setSemester(get_specified_semester(filters.section_term));
 
             setCourse(course);
         }).catch((error) => console.log(error));
@@ -139,13 +130,6 @@ export default function CourseInsights() {
         }
 
     }, [filters]);
-
-    let avatar_style = {
-        bgcolor: randomColor(),
-        height: 150,
-        width: 150,
-        fontSize: 60,
-    };
 
     let form_sx = { m: 1, width: 295 }
     let term_dropdown_style = { backgroundColor: "white", height: 35, width: 140, fontSize: 14 }
@@ -201,7 +185,7 @@ export default function CourseInsights() {
                                 outerRadius={80}
                             >
                                 {gradesCount.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
+                                    <Cell key={`cell-${index}`} fill={GRADE_COLORS[entry.name]} />
                                 ))}
                             </Pie>
                             <Tooltip />
@@ -321,7 +305,7 @@ export default function CourseInsights() {
                                 section={selectedSection} 
                                 instructor={selectedInstructor}/>
             </div>
-        )
+        );
     }
     else {
         return (<div className="loader" >
