@@ -16,17 +16,17 @@ import {
     get_specified_year,
     get_specified_academic_year,
     year_contains_academic_semester,
-    evaluate_and_apply,
-    instructor_teached_year
+    evaluate_and_apply
 } from "../../actions/sections";
 import {
     Box, MenuItem, FormControl,
     Select, TextField, Button,
-    Typography, Avatar
+    Typography, Avatar, Snackbar,
+    Alert
 } from '@mui/material';
 import { randomColor } from '../../actions/utilities';
 import CourseFeedback from "../../components/CourseFeedback/CourseFeedback";
-import {GRADE_COLORS} from '../../actions/utilities'
+import { GRADE_COLORS } from '../../actions/utilities'
 
 
 const renderCustomizedLabel = ({ percent }) => {
@@ -53,7 +53,6 @@ export default function CourseInsights() {
             verticalAnchor="start">{payload.value}
         </Text>
     }
-
     const location = useLocation();
     const [course, setCourse] = useState();
     const [sections, setSections] = useState();
@@ -72,6 +71,16 @@ export default function CourseInsights() {
     //for course feedback
     const [filteredSections, setFilteredSections] = useState();
 
+    //a warning that will be displayed when changing instructor
+    const [instructorDisplayWarning, setInstructorDisplayWarning] = useState();
+    const displayInstructorResetWarning = () => {
+        let shouldDisplay =
+           (academicYear != "All"
+            || semester != "All"
+            || selectedSection != "All");
+        setInstructorDisplayWarning(shouldDisplay);
+    }
+
     const filterSections = () => {
         let filtered_sections = get_filtered_sections(sections, filters);
         let stats = get_stats(filtered_sections);
@@ -80,15 +89,12 @@ export default function CourseInsights() {
         setGradesCount(stats.grade_count);
         setFilteredSections(filtered_sections);
 
-        if(filtered_sections.length == 1){
-            setSelectedSection(filtered_sections[0]);
-        }
         if (filters.instructor_name) {
             setSelectedInstructor(() => {
-                for(let section of filtered_sections){
-                    for(let instructor of section.instructors){
-                        if(instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1){
-                            if(selectedInstructor != "All" && selectedInstructor.name != instructor.name){
+                for (let section of filtered_sections) {
+                    for (let instructor of section.instructors) {
+                        if (instructor.name.toUpperCase().indexOf(filters.instructor_name.toUpperCase()) != -1) {
+                            if (selectedInstructor != "All" && selectedInstructor.name != instructor.name) {
                                 avatar_style.bgcolor = randomColor();
                             }
                             return instructor;
@@ -100,7 +106,7 @@ export default function CourseInsights() {
         }
     }
 
-    const getInstructorName = () => selectedInstructor != "All" ? selectedInstructor.name : selectedInstructor; 
+    const getInstructorName = () => selectedInstructor != "All" ? selectedInstructor.name : selectedInstructor;
 
     useEffect(() => {
         let course = location.state.course;
@@ -137,15 +143,15 @@ export default function CourseInsights() {
     if (course && sections) {
         return (
             <div>
-                <div className='course-insights'>
+                <div className='center-components'>
 
                     {selectedInstructor && selectedInstructor != "All" ?
                         <div class='instructor-container'>
                             <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
                             <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
                             <div>{selectedInstructor.name}</div>
-                        </div> : selectedSection && selectedSection != "All" 
-                        &&  <div class='instructor-container'>
+                        </div> : selectedSection && selectedSection != "All"
+                        && <div class='instructor-container'>
                             <Avatar className='instructor-avatar' sx={avatar_style}>{selectedSection.instructors[0].name[0]}</Avatar>
                             <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
                             <div>{selectedSection.instructors[0].name}</div>
@@ -192,37 +198,24 @@ export default function CourseInsights() {
                         </PieChart>
                     </div>
                 </div>
-                <div className="course-insights">
+                <div className="center-components">
                     <FormControl sx={form_sx}>
                         <label>Instructor name</label>
                         <Select style={term_dropdown_style}
                             value={getInstructorName()} displayEmpty
                             name="instructor"
                             onChange={(e) => {
+                                displayInstructorResetWarning();
+
                                 let instructor = e.target.value;
                                 setSelectedInstructor(instructor);
-                                //did the instructor teached at the currently selected year?
-                                //if not, set academic year to "All"
-                                let teached_year = instructor_teached_year(academicYear, sectionsByInstructor[instructor]);
-                                let fixed_year = teached_year ? academicYear : "All";
-                                setAcademicYear(fixed_year);
-
-                                //did the instructor teached at the currently selected semester at the given year?
-                                let contains_semester = year_contains_academic_semester(fixed_year,
-                                    semester,
-                                    sectionsByInstructor[instructor]);
-
-                                let section_term = (fixed_year == "All" ? ""
-                                    : fixed_year.substring(0, 4)) +
-                                    (semester == "All" || !contains_semester ? ""
-                                        : semester);
-
-                                setSemester(contains_semester ? semester : "All");
-                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                setAcademicYear("All");
+                                setSemester("All");
+                                setSelectedSection("All");
+                                //delete all section terms
+                                evaluate_and_apply(filters, false, "section_term", null);
                                 evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
                                 filterSections();
-                                setSelectedSection("All");
-
                             }
                             }
                             inputProps={{ 'aria-label': 'Without label' }}>
@@ -282,12 +275,12 @@ export default function CourseInsights() {
                                 ))}
                         </Select>
                     </FormControl>
-                    <FormControl disabled = {academicYear == "All" || semester == "All"} sx={form_sx}>
+                    <FormControl disabled={academicYear == "All" || semester == "All"} sx={form_sx}>
                         <label>Section</label>
                         <Select style={term_dropdown_style}
                             value={selectedSection}
                             onChange={(e) => {
-                                let section = e.target.value; 
+                                let section = e.target.value;
                                 setSelectedSection(section);
                                 evaluate_and_apply(filters, section != "All", "section_code", section.section_code);
                                 filterSections();
@@ -301,9 +294,14 @@ export default function CourseInsights() {
                         </Select>
                     </FormControl>
                 </div>
-                <CourseFeedback sections={filteredSections} 
-                                section={selectedSection} 
-                                instructor={selectedInstructor}/>
+                <CourseFeedback sections={filteredSections}
+                    section={selectedSection}
+                    instructor={selectedInstructor} />
+                <Snackbar open={instructorDisplayWarning} autoHideDuration={6000} onClose={() => setInstructorDisplayWarning(false)}>
+                    <Alert onClose={() => setInstructorDisplayWarning(false)} severity="warning" sx={{ width: '100%' }}>
+                        You just changed the instructor. Hence, the other applied filters have been cleared.
+                    </Alert>
+                </Snackbar>
             </div>
         );
     }

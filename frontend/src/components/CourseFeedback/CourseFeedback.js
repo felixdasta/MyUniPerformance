@@ -1,4 +1,4 @@
-import { Box, Menu, MenuItem, Grid, Card } from '@mui/material';
+import { Box, Menu, MenuItem, Grid } from '@mui/material';
 import { useEffect, useState } from "react";
 import { department_logos } from '../../config.js';
 import { VscTriangleDown } from 'react-icons/vsc';
@@ -76,7 +76,7 @@ function CourseFeedback(props) {
     }
 
     return (
-        <Card style={{backgroundColor: "#e5e5e5"}} sx={props.sx ? props.sx : default_sx}>
+        <Box style={{backgroundColor: "#e5e5e5"}} sx={props.sx ? props.sx : default_sx}>
             <Grid container spacing={0}>
                 <Grid container item xs={6}>
                     <div style={{ fontWeight: 600 }} >Feedbacks</div>
@@ -154,7 +154,7 @@ function CourseFeedback(props) {
                     setFeedbacks(feedbacks_copy);
                 }}
             /> : <div style={{ textAlign: 'center' }}><hr />No feedbacks available.</div>}
-        </Card>)
+        </Box>)
 }
 
 export default CourseFeedback;
