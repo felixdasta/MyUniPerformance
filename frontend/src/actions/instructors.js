@@ -10,3 +10,12 @@ export const get_instructors_by_id= async (instructor_id) => {
     const response = await axios.get(url+'instructors/' + instructor_id);
     return response;
 }
+
+export const contains_instructor = (instructors, value) =>{
+    for(let instructor of instructors){
+        if(value === instructor.name){
+            return true;
+        }
+    }
+    return false;
+}

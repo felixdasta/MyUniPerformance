@@ -99,7 +99,6 @@ export default function InstructorDetails() {
                     sx={{
                         height: "400px",
                         overflowY: "auto",
-                        padding: 0
                     }}
                     lg={4}
                     style={{ backgroundColor: "#e5e5e5" }}
@@ -111,7 +110,8 @@ export default function InstructorDetails() {
                             margin: "auto",
                             padding: 3,
                             alignItems: "center",
-                            fontSize: 12
+                            fontSize: 12,
+                            width: '100%'
                         }} />
                 </Grid>
             </Grid>

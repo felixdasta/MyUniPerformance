@@ -175,7 +175,7 @@ export default function CourseInsights() {
                                     <Tooltip />
                                     <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
                                 </AreaChart>}
-                    <div class='block-container'>
+                    {gradesCount.length > 0 && <div class='block-container'>
                         <PieChart 
                         width={275} 
                         height={275}>
@@ -195,7 +195,7 @@ export default function CourseInsights() {
                             <Tooltip />
                         </PieChart>
                         <div style={{ fontWeight: 'bold' }}>Grade Statistics</div>
-                    </div>
+                    </div>}
                 </div>
                 <div className="center-components">
                     <FormControl sx={form_sx}>
