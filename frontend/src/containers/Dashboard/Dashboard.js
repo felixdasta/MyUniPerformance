@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { get_student_by_id } from '../../actions/user.js';
 import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
 import SectionInstructorInfo from "../../components/SectionInfo/SectionInstructorInfo";
-import StudentCurriculum from "../../components/StudentCurriculum";
-import StudentProfile from "../../components/StudentProfile";
+import StudentCurriculum from "../../components/StudentCurriculum/StudentCurriculum";
+import StudentProfile from "../../components/StudentProfile/StudentProfile";
 import StudentStatistics from "../../components/StudentStatistics/StudentStatistics";
 import "./Dashboard.scss";
 
