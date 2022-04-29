@@ -1,5 +1,7 @@
 import { React, useCallback, useEffect, useState } from "react";
 import {
+  Container,
+  Grid,
   Button,
   TableBody,
   TableCell,
@@ -19,6 +21,8 @@ import {
   semesters,
 } from "../../actions/sections";
 import axios from "axios";
+import { ResponsiveContainer } from "recharts";
+import { Box } from "@mui/system";
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -41,6 +45,7 @@ function CurriculumTable(props) {
     height: 35,
     width: 140,
     fontSize: 14,
+    padding: 5,
   };
 
   const classes = useStyles();
@@ -70,15 +75,15 @@ function CurriculumTable(props) {
     if (student.enrolled_sections) {
       if (filters.section_term !== "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses)
+        console.log(filteredClasses);
         let payload = filteredClasses.filter(
           (payload) => payload.section.section_term === filters.section_term
         );
         setFilteredClasses(payload);
-        console.log(filteredClasses)
-      }else if(filters.section_term === ""){
+        console.log(filteredClasses);
+      } else if (filters.section_term === "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses)
+        console.log(filteredClasses);
       }
     }
   }
@@ -86,131 +91,142 @@ function CurriculumTable(props) {
   if (student.enrolled_sections) {
     let result = [];
     result.push(
-      <TableContainer
-        component={Paper}
-        className={classes.tableContainer}
-        style={{
-          maxHeight: 500,
-        }}
+      <Grid
+        item
       >
-        <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
-          {student.curriculums[0].curriculum_name}{" "}
-          {/* will be dynamic, just placeholder for styling */}
-        </Typography>
-        <Table
-          sx={{ minWidth: 250 }}
-          aria-label="enrolled courses"
-          className={classes.table}
-          stickyHeader
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>Course Name</TableCell>
-              <TableCell align="right">Course Code</TableCell>
-              <TableCell align="right">Credit Hours</TableCell>
-              <TableCell align="right">Department Name</TableCell>
-              <TableCell align="right">Grade Obtained</TableCell>
-              <TableCell align="right">Term Taken</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredClasses.map((courseData) => (
-              <TableRow
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                key={courseData.section.course.course_name}
-                hover={true}
-              >
-                <TableCell component="th" scope="row">
-                  {courseData.section.course.course_name}
-                </TableCell>
-                <TableCell align="right">
-                  {courseData.section.course.course_code}
-                </TableCell>
-                <TableCell align="right">
-                  {courseData.section.course.course_credits}
-                </TableCell>
-                <TableCell align="right">
-                  {courseData.section.course.department.department_name}
-                </TableCell>
-                <TableCell align="right">{courseData.grade_obtained}</TableCell>
-                <TableCell align="right">
-                  {courseData.section.section_term}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <FormControl>
-          <label>Year Taken</label>
-          <Select
-            style={term_dropdown_style}
-            value={academicYear}
-            displayEmpty
-            name="year"
-            onChange={(e) => {
-              setAcademicYear(e.target.value);
-              //assume that the selected year doesn't contains the selected academic semester
-              let contains_semester = false;
-              {
-                academicSemesters[e.target.value] &&
-                  academicSemesters[e.target.value].map(
-                    (entry) =>
-                      (contains_semester =
-                        entry.key == semester ? true : contains_semester)
-                  );
-              }
-              setSemester(contains_semester ? semester : "All");
-            }}
-            inputProps={{ "aria-label": "Without label" }}
-          >
-            <MenuItem value="All">
-              <em>All</em>
-            </MenuItem>{" "}
-            {Object.keys(academicSemesters).map((year) => (
-              <MenuItem value={year}>{year}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <label>Semester</label>
-          <Select
-            style={term_dropdown_style}
-            value={semester}
-            displayEmpty
-            name="semester"
-            onChange={(e) => {
-              setSemester(e.target.value);
-            }}
-            inputProps={{ "aria-label": "Without label" }}
-          >
-            <MenuItem value="All">
-              <em>All</em>
-            </MenuItem>
-            {academicYear != "All"
-              ? academicSemesters[academicYear].map((entry) => (
-                  <MenuItem value={entry.key}>{entry.value}</MenuItem>
-                ))
-              : Object.keys(semesters).map((key) => (
-                  <MenuItem value={key}>{semesters[key]}</MenuItem>
-                ))}
-          </Select>
-        </FormControl>
-        <Button
-          onClick={() => {
-            let year = academicYear.substring(0, 4);
-            let section_term =
-              (year == "All" ? "" : year) + (semester == "All" ? "" : semester);
-            filters.section_term = section_term;
-            filters.page = 1;
-            console.log(filters.section_term)
-            updateTable();
+        <TableContainer
+          component={Paper}
+          className={classes.tableContainer}
+          style={{
+            maxHeight: 500,
+            maxWidth: "100%"
           }}
-          align="center"
-          variant="contained"
         >
-          Apply Filters
-        </Button>
-      </TableContainer>
+          <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
+            {"My Curriculum"}{" "}
+            {/* will be dynamic, just placeholder for styling */}
+          </Typography>
+          <Table
+            sx={{ minWidth: 600 }}
+            aria-label="enrolled courses"
+            className={classes.table}
+            stickyHeader
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>Course Name</TableCell>
+                <TableCell align="right">Course Code</TableCell>
+                <TableCell align="right">Credit Hours</TableCell>
+                <TableCell align="right">Department Name</TableCell>
+                <TableCell align="right">Grade Obtained</TableCell>
+                <TableCell align="right">Term Taken</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredClasses.map((courseData) => (
+                <TableRow
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  key={courseData.section.course.course_name}
+                  hover={true}
+                >
+                  <TableCell component="th" scope="row">
+                    {courseData.section.course.course_name}
+                  </TableCell>
+                  <TableCell align="right">
+                    {courseData.section.course.course_code}
+                  </TableCell>
+                  <TableCell align="right">
+                    {courseData.section.course.course_credits}
+                  </TableCell>
+                  <TableCell align="right">
+                    {courseData.section.course.department.department_name}
+                  </TableCell>
+                  <TableCell align="right">
+                    {courseData.grade_obtained}
+                  </TableCell>
+                  <TableCell align="right">
+                    {courseData.section.section_term}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Container
+        sx={{my:1, justifyContent:"space-between"}}>
+          <FormControl>
+            <Select
+              style={term_dropdown_style}
+              value={academicYear}
+              displayEmpty
+              name="year"
+              onChange={(e) => {
+                setAcademicYear(e.target.value);
+                //assume that the selected year doesn't contains the selected academic semester
+                let contains_semester = false;
+                {
+                  academicSemesters[e.target.value] &&
+                    academicSemesters[e.target.value].map(
+                      (entry) =>
+                        (contains_semester =
+                          entry.key == semester ? true : contains_semester)
+                    );
+                }
+                setSemester(contains_semester ? semester : "All");
+              }}
+              inputProps={{ "aria-label": "Without label" }}
+            >
+              <MenuItem value="All">
+                <em>All</em>
+              </MenuItem>{" "}
+              {Object.keys(academicSemesters).map((year) => (
+                <MenuItem value={year}>{year}</MenuItem>
+              ))}
+            </Select>
+            <label>Year Taken</label>
+          </FormControl>
+          <FormControl>
+            <Select
+              style={term_dropdown_style}
+              value={semester}
+              displayEmpty
+              name="semester"
+              onChange={(e) => {
+                setSemester(e.target.value);
+              }}
+              inputProps={{ "aria-label": "Without label" }}
+            >
+              <MenuItem value="All">
+                <em>All</em>
+              </MenuItem>
+              {academicYear != "All"
+                ? academicSemesters[academicYear].map((entry) => (
+                    <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                  ))
+                : Object.keys(semesters).map((key) => (
+                    <MenuItem value={key}>{semesters[key]}</MenuItem>
+                  ))}
+            </Select>
+            <label>Semester</label>
+          </FormControl>
+          <Button
+            onClick={() => {
+              let year = academicYear.substring(0, 4);
+              let section_term =
+                (year == "All" ? "" : year) +
+                (semester == "All" ? "" : semester);
+              filters.section_term = section_term;
+              filters.page = 1;
+              console.log(filters.section_term);
+              updateTable();
+            }}
+            align="center"
+            variant="contained"
+          >
+            Apply Filters
+          </Button>
+        </Container>
+      </Grid>
     );
     return result;
   }
