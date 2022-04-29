@@ -73,11 +73,13 @@ export default function CourseInsights() {
 
     //a warning that will be displayed when changing instructor
     const [instructorDisplayWarning, setInstructorDisplayWarning] = useState();
+    const [sectionDisplayWarning, setSectionDisplayWarning] = useState();
+
     const displayInstructorResetWarning = () => {
         let shouldDisplay =
-           (academicYear != "All"
-            || semester != "All"
-            || selectedSection != "All");
+            (academicYear != "All"
+                || semester != "All"
+                || selectedSection != "All");
         setInstructorDisplayWarning(shouldDisplay);
     }
 
@@ -143,44 +145,40 @@ export default function CourseInsights() {
     if (course && sections) {
         return (
             <div>
+                <div className='center-components' style={{ fontWeight: 'bold', marginTop: 15 }}>{course.course_code}: {course.course_name}</div>
+
                 <div className='center-components'>
-
-                    {selectedInstructor && selectedInstructor != "All" ?
-                        <div class='instructor-container'>
-                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
-                            <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                            <div>{selectedInstructor.name}</div>
-                        </div> : selectedSection && selectedSection != "All"
-                        && <div class='instructor-container'>
-                            <Avatar className='instructor-avatar' sx={avatar_style}>{selectedSection.instructors[0].name[0]}</Avatar>
-                            <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                            <div>{selectedSection.instructors[0].name}</div>
-                        </div>
-                    }
-
-                    <div class='graph-container'>
-                        <div style={{ fontWeight: 'bold' }}>{course.course_code}: {course.course_name}</div>
-                        {(studentsCountByTerm.length > 1 || studentsCountByInstructor.length > 1) && <AreaChart
-                            width={575}
-                            height={400}
-                            data={(academicYear != "All" && semester != "All") ? studentsCountByInstructor : studentsCountByTerm}
-                            margin={{
-                                top: 25,
-                                right: 0,
-                                left: 0,
-                                bottom: 25
-                            }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
-                            <YAxis />
-                            <Tooltip />
-                            <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
-                        </AreaChart>}
+                    <div class='block-container'>
+                        {selectedInstructor && selectedInstructor != "All" &&
+                            <div>
+                                <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
+                                <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
+                                <div>{selectedInstructor.name}</div>
+                            </div>}
                     </div>
 
-                    <div class='grade-container'>
-                        <PieChart width={250} height={250}>
+                    {(studentsCountByTerm.length > 1 || studentsCountByInstructor.length > 1) &&
+                                <AreaChart
+                                    width={575}
+                                    height={400}
+                                    data={(academicYear != "All" && semester != "All") ? studentsCountByInstructor : studentsCountByTerm}
+                                    margin={{
+                                        top: 25,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 25
+                                    }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
+                                </AreaChart>}
+                    <div class='block-container'>
+                        <PieChart 
+                        width={275} 
+                        height={275}>
                             <Pie
                                 dataKey="value"
                                 data={gradesCount}
@@ -196,6 +194,7 @@ export default function CourseInsights() {
                             </Pie>
                             <Tooltip />
                         </PieChart>
+                        <div style={{ fontWeight: 'bold' }}>Grade Statistics</div>
                     </div>
                 </div>
                 <div className="center-components">
@@ -212,8 +211,9 @@ export default function CourseInsights() {
                                 setAcademicYear("All");
                                 setSemester("All");
                                 setSelectedSection("All");
-                                //delete all section terms
-                                evaluate_and_apply(filters, false, "section_term", null);
+                                //delete all section terms and section codes
+                                delete filters["section_term"]
+                                delete filters["section_code"]
                                 evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
                                 filterSections();
                             }
@@ -283,6 +283,12 @@ export default function CourseInsights() {
                                 let section = e.target.value;
                                 setSelectedSection(section);
                                 evaluate_and_apply(filters, section != "All", "section_code", section.section_code);
+
+                                if(selectedInstructor == "All" && section.instructors.length == 1){
+                                    setSelectedInstructor(section.instructors[0]);
+                                    setSectionDisplayWarning(true);
+                                }
+
                                 filterSections();
                             }}
                             inputProps={{ 'aria-label': 'Without label' }}>
@@ -300,6 +306,11 @@ export default function CourseInsights() {
                 <Snackbar open={instructorDisplayWarning} autoHideDuration={6000} onClose={() => setInstructorDisplayWarning(false)}>
                     <Alert onClose={() => setInstructorDisplayWarning(false)} severity="warning" sx={{ width: '100%' }}>
                         You just changed the instructor. Hence, the other applied filters have been cleared.
+                    </Alert>
+                </Snackbar>
+                <Snackbar open={sectionDisplayWarning} autoHideDuration={6000} onClose={() => setSectionDisplayWarning(false)}>
+                    <Alert onClose={() => setSectionDisplayWarning(false)} severity="warning" sx={{ width: '100%' }}>
+                        The currently selected section only has one instructor. Hence, we have setted the instructor for you.
                     </Alert>
                 </Snackbar>
             </div>
