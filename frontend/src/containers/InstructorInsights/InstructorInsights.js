@@ -1,6 +1,6 @@
 import {
     Grid, Avatar, Container,
-    CardContent, Typography, 
+    CardContent, Typography,
     Button, Card, Paper
 } from "@mui/material";
 import { Box } from "@mui/system";
@@ -29,19 +29,20 @@ export default function InstructorDetails() {
     const [courses, setCourses] = useState();
     const [sections, setSections] = useState();
     const location = useLocation();
+    const [selectedCourse, setSelectedCourse] = useState();
 
     const getCourses = (sections) => {
         let unique_courses = {}
-        for (let section of sections){
+        for (let section of sections) {
             let course = section['course'];
             let unique_course = course['course_id'];
-            if(!unique_courses[unique_course]){
+            if (!unique_courses[unique_course]) {
                 unique_courses[unique_course] = course
                 unique_courses[unique_course]['sections'] = []
             }
             unique_courses[unique_course]['sections'].push(section)
         }
-        
+
         return Object.values(unique_courses);
     }
 
@@ -89,7 +90,7 @@ export default function InstructorDetails() {
                     </Grid>
                 </Grid>
                 <Grid item container lg={4} justifyContent='center' style={{ height: "400px" }}>
-                    <Grid item component={Box} xs={12} sx={{ height: "200px" }}>
+                    <Grid item xs={12} sx={{ height: "200px" }}>
                         <Avatar className='instructor-avatar' sx={avatar_style}>{instructor.name[0]}</Avatar>
                     </Grid>
                     <Grid className="center-components" item component={Box} xs={12} sx={{ height: "200px" }}>
@@ -104,7 +105,8 @@ export default function InstructorDetails() {
                                 </div>
                                 <VscFeedback size={18} style={{ marginTop: 2 }} />
                             </div>
-                        </Button>                    </Grid>
+                        </Button>
+                    </Grid>
                 </Grid>
                 <Grid item container
                     sx={{
@@ -112,26 +114,52 @@ export default function InstructorDetails() {
                         overflowY: "auto",
                     }}
                     lg={4}>
-                        <Container component={Paper} sx={{ backgroundColor: "#e5e5e5" }}>
+                    <Container component={Paper} sx={{ backgroundColor: "#e5e5e5" }}>
                         <CourseFeedback sections={sections}
-                        instructor={instructor}
-                        section={"All"}
-                        sx={{
-                            margin: "auto",
-                            paddingTop: 3,
-                            alignItems: "center",
-                            fontSize: 12,
-                            width: '100%'
-                        }} />
-                        </Container>
+                            instructor={instructor}
+                            section={"All"}
+                            sx={{
+                                margin: "auto",
+                                paddingTop: 3,
+                                alignItems: "center",
+                                fontSize: 12,
+                                width: '100%'
+                            }} />
+                    </Container>
 
                 </Grid>
             </Grid>
 
             {/* Bottom Row Container */}
             <Grid item container lg={12} justifyContent="center">
-                <Grid item component={Box} lg={7} sx={{ backgroundColor: "blueviolet", height: "350px" }}> Course list </Grid>
-                <Grid item component={Box} lg={5} sx={{ backgroundColor: "navajowhite", height: "350px" }}> Course info </Grid>
+                <Grid component={Paper} item lg={7} sx={{ height: "350px", overflowY: "auto" }}>
+                    <Container sx={{ backgroundColor: "white" }}>
+                        <Typography sx={{ fontSize: 26, fontWeight: 'bold' }} align="center">
+                            Courses
+                        </Typography>
+                        <Grid item container lg={12}>
+                            {courses.map(course => (
+                                <Grid item container lg={6}>
+                                    <Box sx={{ mx: 1, my: 1 }}>
+                                        <Button onClick={() => setSelectedCourse(course)} sx={{ width: "25vw", height: "4vw" }} variant="outlined">{course.course_code + ": " + course.course_name}</Button>
+                                    </Box>
+                                </Grid>))}
+                        </Grid>
+
+                    </Container>
+                </Grid>
+                <Grid item component={Paper} lg={5} sx={{ backgroundColor: "#e5e5e5", height: "350px" }}>
+                    <Container>
+                        {
+                            selectedCourse &&
+                            <Typography sx={{ fontSize: 20, fontWeight: 'bold' }} align="center">
+                                {selectedCourse.course_code + ': ' + selectedCourse.course_name}
+
+                            </Typography>
+                        }
+                    </Container>
+
+                </Grid>
             </Grid>
         </Grid></Box>)
     }
