@@ -6,7 +6,7 @@ class FeedbackRepository:
     def get_feedback_by_params(section_id=None):
         feedback = Feedback.objects.all() \
         .prefetch_related('student__curriculums__department', 'likes') \
-        .select_related('instructor')
+        .select_related('instructor__department')
 
         if section_id != None:
             feedback = feedback.filter(section = section_id)

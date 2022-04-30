@@ -68,7 +68,10 @@ function FeedbackList(props) {
                                         <div style={{ display: 'flex' }}>
                                             <Box bgcolor="white" sx={getTagTheme("Tomato")}>{"Term: " + feedback.section_term}</Box>
                                             <Box bgcolor="white" sx={getTagTheme("Orange")}>{"Section: " + feedback.section_code}</Box>
-                                            <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Instructor: " + feedback.instructor.name}</Box>
+                                            {feedback.course ? 
+                                            <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Course: " + feedback.course.course_code}</Box>
+                                            : <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Instructor: " + feedback.instructor.name}</Box>
+                                            }
                                         </div>
                                         <Box
                                             bgcolor="white"

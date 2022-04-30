@@ -1,6 +1,7 @@
 import {
-    Grid, Avatar, Card,
-    CardContent, Typography, Button
+    Grid, Avatar, Container,
+    CardContent, Typography, 
+    Button, Card, Paper
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
@@ -29,30 +30,40 @@ export default function InstructorDetails() {
     const [sections, setSections] = useState();
     const location = useLocation();
 
+    const getCourses = (sections) => {
+        let unique_courses = {}
+        for (let section of sections){
+            let course = section['course'];
+            let unique_course = course['course_id'];
+            if(!unique_courses[unique_course]){
+                unique_courses[unique_course] = course
+                unique_courses[unique_course]['sections'] = []
+            }
+            unique_courses[unique_course]['sections'].push(section)
+        }
+        
+        return Object.values(unique_courses);
+    }
+
     useEffect(() => {
         let instructor = location.state.instructor;
 
         get_instructors_by_id(instructor.member_id).then(
             response => {
-                setCourses(response.data.courses);
-
-                let unified_sections = [];
-                response.data.courses.map(course => {
-                    course.sections.map(section => unified_sections.push(section));
-                });
-
-                delete response.data["courses"];
-                setSections(unified_sections);
+                let sections = response.data.sections;
+                delete response.data["sections"];
                 setInstructor(response.data);
+                setSections(sections);
+                setCourses(getCourses(sections));
             }
         ).catch((error) => {
             console.log(error.response.data)
         });
     }, []);
 
-    if (instructor && sections) {
+    if (instructor && sections && courses) {
         return (<Box sx={{ mx: 3, my: 3 }}> <Grid container spacing={0} columnSpacing={3} rowGap={3}>
-            {instructor && <InstructorCoursesModal instructor={instructor} courses={courses} open={showInstructorCoursesModal} handleClose={closeInstructorCoursesModal} />}
+            <InstructorCoursesModal instructor={instructor} courses={courses} open={showInstructorCoursesModal} handleClose={closeInstructorCoursesModal} />
             {/* Top Row Container, each item container can be adjusted for width by changing lg*/}
             <Grid item container lg={12} justifyContent="center" columnSpacing={3}>
                 <Grid item container lg={4} justifyContent="center">
@@ -100,19 +111,20 @@ export default function InstructorDetails() {
                         height: "400px",
                         overflowY: "auto",
                     }}
-                    lg={4}
-                    style={{ backgroundColor: "#e5e5e5" }}
-                    component={Card}>
-                    <CourseFeedback sections={sections}
+                    lg={4}>
+                        <Container component={Paper} sx={{ backgroundColor: "#e5e5e5" }}>
+                        <CourseFeedback sections={sections}
                         instructor={instructor}
                         section={"All"}
                         sx={{
                             margin: "auto",
-                            padding: 3,
+                            paddingTop: 3,
                             alignItems: "center",
                             fontSize: 12,
                             width: '100%'
                         }} />
+                        </Container>
+
                 </Grid>
             </Grid>
 

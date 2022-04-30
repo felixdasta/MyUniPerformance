@@ -95,6 +95,10 @@ export default function CourseInsights() {
         setGradesCount(stats.grade_count);
         setFilteredSections(filtered_sections);
 
+        if(filtered_sections.length == 1){
+            setSelectedSection(filtered_sections[0]);
+        }
+
         if (filters.instructor_name) {
             setSelectedInstructor(() => {
                 for (let section of filtered_sections) {
@@ -130,7 +134,6 @@ export default function CourseInsights() {
             setAcademicYear(academic_year);
             //example: if section_term == 2020S2 or section_term == S2, then semester = S2
             setSemester(get_specified_semester(filters.section_term));
-
             setCourse(course);
         }).catch((error) => console.log(error));
     }, []);
@@ -149,7 +152,7 @@ export default function CourseInsights() {
     if (course && sections) {
         return (
             <div>
-                <div className='center-components' style={{ fontWeight: 'bold', marginTop: 15 }}>{course.course_code}: {course.course_name}</div>
+                <div className='center-components' style={{ fontWeight: 'bold', margin: "30px 0px 15px 0px" }}>{course.course_code}: {course.course_name}</div>
 
                 <div className='center-components'>
                     <div class='block-container'>
@@ -180,6 +183,7 @@ export default function CourseInsights() {
                                     <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
                                 </AreaChart>}
                     {gradesCount.length > 0 && <div class='block-container'>
+                    <div style={{ fontWeight: 'bold' }}>Grade Statistics</div>
                         <PieChart 
                         width={275} 
                         height={275}>
@@ -198,7 +202,6 @@ export default function CourseInsights() {
                             </Pie>
                             <Tooltip />
                         </PieChart>
-                        <div style={{ fontWeight: 'bold' }}>Grade Statistics</div>
                     </div>}
                 </div>
                 <div className="center-components">
