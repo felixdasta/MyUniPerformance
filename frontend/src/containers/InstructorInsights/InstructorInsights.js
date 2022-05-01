@@ -162,7 +162,7 @@ export default function InstructorDetails() {
                         data={courses_passing_rate}
                         margin={{ top: 0, right: 50, left: 0, bottom: 25 }}
                     >
-                        <XAxis dataKey="name" tick={quickFactsAxisTick} />
+                        <XAxis dataKey="name" tick={quickFactsAxisTick} interval={0}/>
                         <YAxis />
                         <Tooltip />
                         <Legend layout="horizontal" verticalAlign="top" align="center" />
@@ -322,7 +322,7 @@ export default function InstructorDetails() {
                                         margin: "auto",
                                         paddingTop: 3,
                                         alignItems: "center",
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         width: '100%'
                                     }} />
                             </Container>
