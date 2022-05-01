@@ -49,7 +49,6 @@ function CurriculumTable(props) {
   };
 
   const classes = useStyles();
-  let data = [];
   const [academicSemesters, setAvailableAcademicSemesters] = useState([]);
   const [academicYear, setAcademicYear] = useState("All");
   const [semester, setSemester] = useState("All");
@@ -75,15 +74,12 @@ function CurriculumTable(props) {
     if (student.enrolled_sections) {
       if (filters.section_term !== "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses);
-        let payload = filteredClasses.filter(
+        let payload = student.enrolled_sections.filter(
           (payload) => payload.section.section_term === filters.section_term
         );
         setFilteredClasses(payload);
-        console.log(filteredClasses);
       } else if (filters.section_term === "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses);
       }
     }
   }
@@ -217,7 +213,6 @@ function CurriculumTable(props) {
                 (semester == "All" ? "" : semester);
               filters.section_term = section_term;
               filters.page = 1;
-              console.log(filters.section_term);
               updateTable();
             }}
             align="center"

@@ -23,9 +23,12 @@ import {
 import "./StudentStatistics.scss";
 
 function StudentStatistics(props) {
+  const [filteredClasses, setFilteredClasses] = useState([]);
+
   let student = props.student;
   let totalCredits = 0;
   let takenCredits = 0;
+  let gpaCredits = 0;
   let totalSemesters = 0;
   let honorPoints = 0;
   let gpa = 0.0;
@@ -35,6 +38,13 @@ function StudentStatistics(props) {
   let dCount = 0;
   let fCount = 0;
   let wCount = 0;
+
+  useEffect(() => {
+    let payload = student.enrolled_sections.filter(
+        (payload) => payload.grade_obtained !== "IP"
+    );
+    setFilteredClasses(payload)      
+  }, []);
 
   if (student.curriculums) {
     for (let i = 0; i < student.curriculums.length; i++) {
@@ -59,26 +69,31 @@ function StudentStatistics(props) {
             aCount += 1;
             honorPoints =
               honorPoints + 4 * courseData.section.course.course_credits;
+            gpaCredits += courseData.section.course.course_credits;
             break;
           case "B":
             bCount += 1;
             honorPoints =
               honorPoints + 3 * courseData.section.course.course_credits;
+              gpaCredits += courseData.section.course.course_credits;
             break;
           case "C":
             cCount += 1;
             honorPoints =
               honorPoints + 2 * courseData.section.course.course_credits;
+            gpaCredits += courseData.section.course.course_credits;
             break;
           case "D":
             dCount += 1;
             honorPoints =
               honorPoints + 1 * courseData.section.course.course_credits;
+            gpaCredits += courseData.section.course.course_credits;
             break;
           case "F":
             fCount += 1;
             honorPoints =
               honorPoints + 0 * courseData.section.course.course_credits;
+            gpaCredits += courseData.section.course.course_credits;
             break;
           case "W":
             wCount += 1;
@@ -86,7 +101,7 @@ function StudentStatistics(props) {
           default:
             break;
         }
-        gpa = honorPoints / takenCredits;
+        gpa = honorPoints / gpaCredits;
         gpa = gpa.toPrecision(2);
       });
     }
