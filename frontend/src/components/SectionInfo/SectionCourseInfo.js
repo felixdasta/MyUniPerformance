@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import { Tooltip as Rechtool } from "recharts";
 import { get_courses_by_id } from '../../actions/courses';
-import { get_stats, get_filtered_sections } from "../../actions/sections";
+import { get_filtered_sections, get_students_count_by_term } from "../../actions/sections";
 import { useNavigate } from "react-router-dom";
 import * as Loader from "react-loader-spinner";
 
@@ -62,8 +62,8 @@ export default function SectionCourseInfo(props) {
     useEffect(() => {
         if (course) {
             let filtered_sections = get_filtered_sections(course.sections, { 'instructor_name': props.section.section.instructors[0].name });
-            let stats = get_stats(filtered_sections);
-            setStudentsCountByTerm(stats.student_count_by_term);
+            let students_count_by_term = get_students_count_by_term(filtered_sections);
+            setStudentsCountByTerm(students_count_by_term);
         }
 
     }, [course])

@@ -5,7 +5,7 @@ export const randomColor = () => {
 }
 
 export const GRADE_COLORS = {
-    "A's count": "#10E900",
+    "A's count": "#3dd932",
     "B's count": "#2FDECC",
     "C's count": "#FFCD00",
     "D's count": "#FF9A00",

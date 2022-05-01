@@ -6,27 +6,28 @@ import {
     AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Text,
     PieChart, Pie, Cell
-} from "recharts";
+} from 'recharts';
 import { get_courses_by_id } from '../../actions/courses';
 import {
     get_available_sections_filters,
     get_filtered_sections,
-    get_stats,
+    get_students_count_by_term,
     get_specified_semester,
     get_specified_year,
     get_specified_academic_year,
     year_contains_academic_semester,
-    evaluate_and_apply
-} from "../../actions/sections";
+    evaluate_and_apply,
+    get_students_count_by_instructor,
+    get_sections_grades_stats
+} from '../../actions/sections';
 import {
     Box, MenuItem, FormControl,
     Select, TextField, Button,
     Typography, Avatar, Snackbar,
     Alert
 } from '@mui/material';
-import { randomColor } from '../../actions/utilities';
-import CourseFeedback from "../../components/CourseFeedback/CourseFeedback";
-import { GRADE_COLORS } from '../../actions/utilities'
+import { randomColor, GRADE_COLORS } from '../../actions/utilities';
+import CourseFeedback from '../../components/CourseFeedback/CourseFeedback';
 
 
 const renderCustomizedLabel = ({ percent }) => {
@@ -85,14 +86,13 @@ export default function CourseInsights() {
 
     const filterSections = () => {
         let filtered_sections = get_filtered_sections(sections, filters);
-        let stats = get_stats(filtered_sections);
+        let students_count_by_term = get_students_count_by_term(filtered_sections);
+        let students_count_by_instructor = get_students_count_by_instructor(filtered_sections);
+        let grades_count = get_sections_grades_stats(filtered_sections);
 
-        stats.student_count_by_term.sort((a,b) => a.term.localeCompare(b.term));
-        stats.student_count_by_instructor.sort((a,b) => a.name.localeCompare(b.name));
-
-        setStudentsCountByTerm(stats.student_count_by_term);
-        setStudentsCountByInstructor(stats.student_count_by_instructor);
-        setGradesCount(stats.grade_count);
+        setStudentsCountByTerm(students_count_by_term);
+        setStudentsCountByInstructor(students_count_by_instructor);
+        setGradesCount(grades_count);
         setFilteredSections(filtered_sections);
 
         if(filtered_sections.length == 1){
