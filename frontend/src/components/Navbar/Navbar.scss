@@ -1,16 +1,5 @@
-.left-logo{
-    width: 225px;
-    position: absolute;
-}
 .center-logo{
     display: block;
     width: 225px;
     margin:0 auto;
-}
-
-.nav{
-    position: -webkit-sticky !important; /* Safari */
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 3;
 }
