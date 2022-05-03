@@ -61,9 +61,9 @@ function CourseFeedback(props) {
     }, [props.sections]);
 
     let default_sx = {
-        width: "50%",
         margin: "auto",
         padding: 3,
+        width: "100%",
         alignItems: "center",
         fontSize: 14
     };

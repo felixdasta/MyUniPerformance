@@ -49,7 +49,7 @@ const Navbar = () => {
   if (window.location.pathname !== "/login" && window.location.pathname !== "/create-account") {
     if (loggedInUser) {
       return (
-        <AppBar position="static">
+        <AppBar position="sticky">
           <Container maxWidth="xl">
             <Toolbar disableGutters>
               <Box
@@ -107,7 +107,7 @@ const Navbar = () => {
                   <Button
                     key={page.name}
                     onClick={page.action}
-                    sx={{ my: 2, color: 'white', display: 'block' }}
+                    sx={{ my: 2, color: 'white', display: 'block', paddingLeft: 2.5, paddingRight: 2.5 }}
                   >
                     {page.name}
                   </Button>

@@ -5,7 +5,7 @@ import './CourseInsights.scss';
 import {
     AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Text,
-    PieChart, Pie, Cell
+    PieChart, Pie, Cell, ResponsiveContainer,
 } from 'recharts';
 import { get_courses_by_id } from '../../actions/courses';
 import {
@@ -24,7 +24,7 @@ import {
     Box, MenuItem, FormControl,
     Select, TextField, Button,
     Typography, Avatar, Snackbar,
-    Alert
+    Alert, Paper, Grid, CardContent, Card
 } from '@mui/material';
 import { randomColor, GRADE_COLORS } from '../../actions/utilities';
 import CourseFeedback from '../../components/CourseFeedback/CourseFeedback';
@@ -95,7 +95,7 @@ export default function CourseInsights() {
         setGradesCount(grades_count);
         setFilteredSections(filtered_sections);
 
-        if(filtered_sections.length == 1){
+        if (filtered_sections.length == 1) {
             setSelectedSection(filtered_sections[0]);
         }
 
@@ -151,165 +151,206 @@ export default function CourseInsights() {
 
     if (course && sections) {
         return (
-            <div>
+            <Box>
                 <div className='center-components' style={{ fontWeight: 'bold', margin: "30px 0px 15px 0px" }}>{course.course_code}: {course.course_name}</div>
 
-                <div className='center-components'>
-                    <div class='block-container'>
+                <Grid container rowGap={3}>
+                    {/* Top Row Container, each item container can be adjusted for width by changing lg*/}
+                    <Grid container alignItems="center" justifyContent="center">
+
                         {selectedInstructor && selectedInstructor != "All" &&
-                            <div>
-                                <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
-                                <div style={{ fontWeight: 'bold' }}>Instructor name:</div>
-                                <div>{selectedInstructor.name}</div>
-                            </div>}
-                    </div>
+                            <Grid item container lg={3} justifyContent={"center"}>
+                                <Grid item lg={12}>
+                                    <CardContent>
+                                        <Typography variant="h5" component="div" align="center">
+                                            {selectedInstructor.name}
+                                        </Typography>
+                                        <Typography variant="body2" align="center">
+                                            Department of {selectedInstructor.department.department_name}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardContent>
+                                        <Avatar className='instructor-avatar' sx={avatar_style}>{selectedInstructor.name[0]}</Avatar>
+                                    </CardContent>
+                                </Grid>
+                            </Grid>}
 
-                    {(studentsCountByTerm.length > 1 || studentsCountByInstructor.length > 1) &&
-                                <AreaChart
-                                    width={575}
-                                    height={400}
-                                    data={(academicYear != "All" && semester != "All") ? studentsCountByInstructor : studentsCountByTerm}
-                                    margin={{
-                                        top: 25,
-                                        right: 0,
-                                        left: 0,
-                                        bottom: 25
-                                    }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
-                                </AreaChart>}
-                    {gradesCount.length > 0 && <div class='block-container'>
-                    <div style={{ fontWeight: 'bold' }}>Grade Statistics</div>
-                        <PieChart 
-                        width={275} 
-                        height={275}>
-                            <Pie
-                                dataKey="value"
-                                data={gradesCount}
-                                cx="50%"
-                                cy="50%"
-                                label={renderCustomizedLabel}
-                                fill="#8884d8"
-                                outerRadius={80}
-                            >
-                                {gradesCount.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={GRADE_COLORS[entry.name]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </div>}
-                </div>
-                <div className="center-components">
-                    <FormControl sx={form_sx}>
-                        <label>Instructor name</label>
-                        <Select style={term_dropdown_style}
-                            value={getInstructorName()} displayEmpty
-                            name="instructor"
-                            onChange={(e) => {
-                                displayInstructorResetWarning();
+                        {(studentsCountByTerm.length > 1 || studentsCountByInstructor.length > 1) &&
+                            <Grid item container md={6}>
+                                <ResponsiveContainer className="center-components" width="100%" height={400}>
+                                    <AreaChart
+                                        data={(academicYear != "All" && semester != "All") ? studentsCountByInstructor : studentsCountByTerm}
+                                        margin={{
+                                            top: 0,
+                                            right: 50,
+                                            left: 25,
+                                            bottom: 25
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis interval={1} dataKey="name" axisLine={false} tick={CustomizedAxisTick} />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Area type="monotone" dataKey="Enrolled students" stroke="#8884d8" fill="#8884d8" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </Grid>}
 
-                                let instructor = e.target.value;
-                                setSelectedInstructor(instructor);
-                                setAcademicYear("All");
-                                setSemester("All");
-                                setSelectedSection("All");
-                                //delete all section terms and section codes
-                                delete filters["section_term"]
-                                delete filters["section_code"]
-                                evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
-                                filterSections();
-                            }
-                            }
-                            inputProps={{ 'aria-label': 'Without label' }}>
-                            {(Object.keys(sectionsByInstructor)).map((instructor) => (
-                                <MenuItem value={instructor}>{instructor}</MenuItem>))}
-                        </Select>
-                    </FormControl>
-                    <FormControl sx={form_sx}>
-                        <label>Academic Year</label>
-                        <Select style={term_dropdown_style}
-                            value={academicYear} displayEmpty
-                            name="year"
-                            onChange={(e) => {
-                                let academic_year = e.target.value;
-                                setAcademicYear(academic_year);
-                                let contains_semester = year_contains_academic_semester(
-                                    academic_year,
-                                    semester,
-                                    sectionsByInstructor[getInstructorName()]);
-                                let section_term = (academic_year == "All" ? ""
-                                    : academic_year.substring(0, 4)) +
-                                    (semester == "All" || !contains_semester ? ""
-                                        : semester);
-                                setSemester(contains_semester ? semester : "All");
-                                //section term is the academic year + the semester, example = 2020 + S2
-                                //if empty, then academic year and semester selected value = All
-                                evaluate_and_apply(filters, section_term, "section_term", section_term);
-                                //section code must be reseted
-                                delete filters["section_code"];
-                                filterSections();
-                                setSelectedSection("All");
-                            }
-                            }
-                            inputProps={{ 'aria-label': 'Without label' }}>
-                            {(Object.keys(sectionsByInstructor[getInstructorName()].filtered_semesters)).map((year) => (
-                                <MenuItem value={year}>{year}</MenuItem>))}
-                        </Select>
-                    </FormControl>
-                    <FormControl sx={form_sx}>
-                        <label>Semester</label>
-                        <Select style={term_dropdown_style}
-                            value={semester}
-                            displayEmpty name="semester"
-                            onChange={(e) => {
-                                setSemester(e.target.value);
-                                let section_term = (academicYear == "All" ? "" : academicYear.substring(0, 4)) + (e.target.value == "All" ? "" : e.target.value);
-                                evaluate_and_apply(filters, section_term, "section_term", section_term);
-                                delete filters["section_code"];
-                                filterSections();
-                                setSelectedSection("All");
-                            }}
-                            inputProps={{ 'aria-label': 'Without label' }}>
-                            <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[getInstructorName()]
-                                .filtered_semesters[academicYear].map((entry) => (
-                                    <MenuItem value={entry.key}>{entry.value}</MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl disabled={academicYear == "All" || semester == "All"} sx={form_sx}>
-                        <label>Section</label>
-                        <Select style={term_dropdown_style}
-                            value={selectedSection}
-                            onChange={(e) => {
-                                let section = e.target.value;
-                                setSelectedSection(section);
-                                evaluate_and_apply(filters, section != "All", "section_code", section.section_code);
+                        {gradesCount.length > 0 &&
+                            <Grid item container md={3} justifyContent={"center"}>
+                                <Grid item lg={12}>
+                                    <CardContent>
+                                        <Typography variant="h5" component="div" align="center">
+                                            Grade Statistics
+                                        </Typography>
+                                        <ResponsiveContainer width="100%" height={275}>
+                                            <PieChart>
+                                                <Pie
+                                                    dataKey="value"
+                                                    data={gradesCount}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    label={renderCustomizedLabel}
+                                                    fill="#8884d8"
+                                                    outerRadius={80}
+                                                >
+                                                    {gradesCount.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={GRADE_COLORS[entry.name]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </CardContent>
+                                </Grid>
+                            </Grid>}
+                    </Grid>
 
-                                if(selectedInstructor == "All" && section.instructors.length == 1){
-                                    setSelectedInstructor(section.instructors[0]);
-                                    setSectionDisplayWarning(true);
-                                }
+                    {/* Bottom Row Container */}
+                    <Grid container alignItems="center" justifyContent="center">
+                        {/* Feedback Component */}
+                        <Grid item container lg={6}>
+                            <Grid item container lg={12}>
+                                <Grid item xs={3}>
+                                    <FormControl sx={form_sx}>
+                                        <label>Instructor name</label>
+                                        <Select style={term_dropdown_style}
+                                            value={getInstructorName()} displayEmpty
+                                            name="instructor"
+                                            onChange={(e) => {
+                                                displayInstructorResetWarning();
 
-                                filterSections();
-                            }}
-                            inputProps={{ 'aria-label': 'Without label' }}>
-                            <MenuItem value="All">All</MenuItem>
-                            {sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term]
-                                && sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term].map((value) =>
-                                    (<MenuItem value={value}>{value.section_code}</MenuItem>)
-                                )}
-                        </Select>
-                    </FormControl>
-                </div>
-                <CourseFeedback sections={filteredSections}
-                    section={selectedSection}
-                    instructor={selectedInstructor} />
+                                                let instructor = e.target.value;
+                                                setSelectedInstructor(instructor);
+                                                setAcademicYear("All");
+                                                setSemester("All");
+                                                setSelectedSection("All");
+                                                //delete all section terms and section codes
+                                                delete filters["section_term"]
+                                                delete filters["section_code"]
+                                                evaluate_and_apply(filters, instructor != "All", "instructor_name", instructor);
+                                                filterSections();
+                                            }
+                                            }
+                                            inputProps={{ 'aria-label': 'Without label' }}>
+                                            {(Object.keys(sectionsByInstructor)).map((instructor) => (
+                                                <MenuItem value={instructor}>{instructor}</MenuItem>))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <FormControl sx={form_sx}>
+                                        <label>Academic Year</label>
+                                        <Select style={term_dropdown_style}
+                                            value={academicYear} displayEmpty
+                                            name="year"
+                                            onChange={(e) => {
+                                                let academic_year = e.target.value;
+                                                setAcademicYear(academic_year);
+                                                let contains_semester = year_contains_academic_semester(
+                                                    academic_year,
+                                                    semester,
+                                                    sectionsByInstructor[getInstructorName()]);
+                                                let section_term = (academic_year == "All" ? ""
+                                                    : academic_year.substring(0, 4)) +
+                                                    (semester == "All" || !contains_semester ? ""
+                                                        : semester);
+                                                setSemester(contains_semester ? semester : "All");
+                                                //section term is the academic year + the semester, example = 2020 + S2
+                                                //if empty, then academic year and semester selected value = All
+                                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                                //section code must be reseted
+                                                delete filters["section_code"];
+                                                filterSections();
+                                                setSelectedSection("All");
+                                            }
+                                            }
+                                            inputProps={{ 'aria-label': 'Without label' }}>
+                                            {(Object.keys(sectionsByInstructor[getInstructorName()].filtered_semesters)).map((year) => (
+                                                <MenuItem value={year}>{year}</MenuItem>))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <FormControl sx={form_sx}>
+                                        <label>Semester</label>
+                                        <Select style={term_dropdown_style}
+                                            value={semester}
+                                            displayEmpty name="semester"
+                                            onChange={(e) => {
+                                                setSemester(e.target.value);
+                                                let section_term = (academicYear == "All" ? "" : academicYear.substring(0, 4)) + (e.target.value == "All" ? "" : e.target.value);
+                                                evaluate_and_apply(filters, section_term, "section_term", section_term);
+                                                delete filters["section_code"];
+                                                filterSections();
+                                                setSelectedSection("All");
+                                            }}
+                                            inputProps={{ 'aria-label': 'Without label' }}>
+                                            <MenuItem value="All">All</MenuItem>
+                                            {sectionsByInstructor[getInstructorName()]
+                                                .filtered_semesters[academicYear].map((entry) => (
+                                                    <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                                                ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <FormControl disabled={academicYear == "All" || semester == "All"} sx={form_sx}>
+                                        <label>Section</label>
+                                        <Select style={term_dropdown_style}
+                                            value={selectedSection}
+                                            onChange={(e) => {
+                                                let section = e.target.value;
+                                                setSelectedSection(section);
+                                                evaluate_and_apply(filters, section != "All", "section_code", section.section_code);
+
+                                                if (selectedInstructor == "All" && section.instructors.length == 1) {
+                                                    setSelectedInstructor(section.instructors[0]);
+                                                    setSectionDisplayWarning(true);
+                                                }
+
+                                                filterSections();
+                                            }}
+                                            inputProps={{ 'aria-label': 'Without label' }}>
+                                            <MenuItem value="All">All</MenuItem>
+                                            {sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term]
+                                                && sectionsByInstructor[getInstructorName()].filtered_sections[filters.section_term].map((value) =>
+                                                    (<MenuItem value={value}>{value.section_code}</MenuItem>)
+                                                )}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                            <Grid item container lg={12}>
+                                <CourseFeedback
+                                    sections={filteredSections}
+                                    section={selectedSection}
+                                    instructor={selectedInstructor} />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
                 <Snackbar open={instructorDisplayWarning} autoHideDuration={6000} onClose={() => setInstructorDisplayWarning(false)}>
                     <Alert onClose={() => setInstructorDisplayWarning(false)} severity="warning" sx={{ width: '100%' }}>
                         You just changed the instructor. Hence, the other applied filters have been cleared.
@@ -320,7 +361,7 @@ export default function CourseInsights() {
                         The currently selected section only has one instructor. Hence, we have setted the instructor for you.
                     </Alert>
                 </Snackbar>
-            </div>
+            </Box>
         );
     }
     else {
