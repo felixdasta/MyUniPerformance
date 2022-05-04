@@ -8,6 +8,14 @@ export const semesters = {
     "S2": "Spring Semester",
 }
 
+const formatTerm = value => {
+    let year = parseInt(value.substring(0, 4));
+    let semester = value.substring(4);
+    year = semester == "S2" ? year + 1 : year;
+    semester = semesters[semester];
+    return semester + " " + year;
+};
+
 export const get_available_semesters_by_academic_year = (terms) => {
     let response = {};
     for (let i = 0; i < terms.length; i++) {
@@ -154,39 +162,35 @@ export const evaluate_and_apply = (filters, condition, key, value) => {
     }
 }
 
-export const get_stats = (sections) => {
-    const formatTerm = value => {
-        let year = parseInt(value.substring(0, 4));
-        let semester = value.substring(4);
-        year = semester == "S2" ? year + 1 : year;
-        semester = semesters[semester];
-        return semester + " " + year;
-    };
-
+export const get_students_count_by_term = (sections) => {
     let sections_student_count_by_term = []
-    let sections_student_count_by_instructor = []
-    let sections_grade_stats = []
     let term_count_mapping = {}
-    let instructor_count_mapping = {}
-    let grade_stats_mapping = {}
     for (let section of sections) {
         let term_student_count = term_count_mapping[section.section_term] ? term_count_mapping[section.section_term] : 0;
-        for (let key in section.grades) {
-            //Retrieve each on the individual grades of each section, and add it to the overall grade count of every section
-            //Example: there are two sections, 1 from instructor Fred and 1 from instructor Ted
-            //Fred gve 10 F's
-            //Ted gave 5 F's
-            //Hence, total F's count = 15
-            grade_stats_mapping[key] = grade_stats_mapping[key] ? grade_stats_mapping[key] + section.grades[key] : section.grades[key];
-            //Example: an instructor gave 2 A's, 2 B's, 2 C's, 2 D's, 2 F's and 1 student dropped from the section
-            //Another instructor gave 1 A, 1 B, 1 C, 1 D, 1 F and nobody dropped from the section
-            //Both instructor gave the same course in the same term
-            //Hence, total student count between both sections = 16
-            term_student_count += section.grades[key];
-            //Apply the previous logic, but with every section that has been given by the same instructor
+        for (let grade in section.grades) {
+            term_student_count += section.grades[grade];
+        }
+        //we don't want to add empty sections!
+        if (term_student_count > 0) {
+            term_count_mapping[section.section_term] = term_student_count;
+        }
+    }
+    for (let section_term in term_count_mapping) {
+        sections_student_count_by_term.push({ name: formatTerm(section_term), "Enrolled students": term_count_mapping[section_term], term: section_term });
+    }
+
+    sections_student_count_by_term.sort((a,b) => a.term.localeCompare(b.term));
+    return sections_student_count_by_term;
+}
+
+export const get_students_count_by_instructor = (sections) => {
+    let sections_student_count_by_instructor = []
+    let instructor_count_mapping = {}
+    for (let section of sections) {
+        for (let grade in section.grades) {
             for (let instructor of section.instructors) {
                 let instructor_student_count = instructor_count_mapping[instructor.name] ? instructor_count_mapping[instructor.name] : 0;
-                instructor_student_count += section.grades[key];
+                instructor_student_count += section.grades[grade];
 
                 //update the enrolled students of a given instructor only if we summed more enrolled students
                 if (instructor_student_count > 0) {
@@ -194,32 +198,34 @@ export const get_stats = (sections) => {
                 }
             }
         }
-        //we don't want to add empty sections!
-        if (term_student_count > 0) {
-            term_count_mapping[section.section_term] = term_student_count;
-        }
     }
-    for (let key in term_count_mapping) {
-        sections_student_count_by_term.push({ name: formatTerm(key), "Enrolled students": term_count_mapping[key] });
-    }
-    for (let key in instructor_count_mapping) {
-        sections_student_count_by_instructor.push({ name: key, "Enrolled students": instructor_count_mapping[key] });
+    for (let instructor in instructor_count_mapping) {
+        sections_student_count_by_instructor.push({ name: instructor, "Enrolled students": instructor_count_mapping[instructor] });
     }
 
+    sections_student_count_by_instructor.sort((a,b) => a.name.localeCompare(b.name));
+    return sections_student_count_by_instructor;
+}
+
+export const get_sections_grades_stats = (sections) => {
+    let sections_grade_stats = []
+    let grade_stats_mapping = {}
+    for (let section of sections) {
+        for (let grade in section.grades) {
+            grade_stats_mapping[grade] = grade_stats_mapping[grade] ? grade_stats_mapping[grade] + section.grades[grade] : section.grades[grade];
+        }
+    }
+    
     let unnecesary_values = ['ib_count', 'ic_count', 'id_count', 'if_count'];
 
-    for (let key in grade_stats_mapping) {
-        let grade = key[0].toUpperCase();
-        let count = grade_stats_mapping[key];
-        if (!unnecesary_values.includes(key) && count > 0) {
-            sections_grade_stats.push({ name: `${grade}'s count`, value: grade_stats_mapping[key] });
+    for (let grade in grade_stats_mapping) {
+        let grade_as_upper = grade[0].toUpperCase();
+        let count = grade_stats_mapping[grade];
+        if (!unnecesary_values.includes(grade) && count > 0) {
+            sections_grade_stats.push({ name: `${grade_as_upper}'s count`, value: grade_stats_mapping[grade] });
         }
     }
-    return {
-        grade_count: sections_grade_stats,
-        student_count_by_term: sections_student_count_by_term,
-        student_count_by_instructor: sections_student_count_by_instructor
-    };
+    return sections_grade_stats;
 }
 
 export const year_contains_academic_semester = (year, semester, sections) =>{
@@ -244,4 +250,29 @@ export const get_sections_terms_by_university = async (university_id) => {
 export const get_section_info_by_id = async (section_id) => {
     const response = await axios.get(url + 'sections/' + section_id);
     return response;
+}
+
+export const setUniversitySectionsTerms = (selectedUniversity, setTerms) => {
+    //get university sections terms
+    get_sections_terms_by_university(selectedUniversity).then(
+        response => {
+            let sections_terms = response.data.sections_terms;
+            setTerms(sections_terms);
+        }
+    ).catch((error) => {
+        console.log(error)
+    });
+}
+
+export const get_specified_semester = (section_term) => {
+    return (section_term && section_term.length == 6) ? section_term.substring(4, 6) :
+        (section_term && section_term.length == 2) ? section_term : "All";
+}
+
+export const get_specified_year = (section_term) => {
+    return (section_term && section_term.length >= 4) ? section_term.substring(0, 4) : "All";
+}
+
+export const get_specified_academic_year = (year) => {
+    return year == "All" ? year : year + "-" + (parseInt(year) + 1);
 }

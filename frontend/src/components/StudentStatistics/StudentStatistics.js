@@ -1,9 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Container, Box, Typography, Paper } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
-import { useLocation } from "react-router-dom";
-import * as Loader from "react-loader-spinner";
-import { fontWeight } from "@mui/system";
 import {
   PieChart,
   Pie,
