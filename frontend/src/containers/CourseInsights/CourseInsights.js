@@ -18,7 +18,8 @@ import {
     year_contains_academic_semester,
     evaluate_and_apply,
     get_students_count_by_instructor,
-    get_sections_grades_stats
+    get_sections_grades_stats,
+    calculate_gpa_based_on_counts
 } from '../../actions/sections';
 import {
     Box, MenuItem, FormControl,
@@ -60,6 +61,7 @@ export default function CourseInsights() {
     const [studentsCountByTerm, setStudentsCountByTerm] = useState();
     const [studentsCountByInstructor, setStudentsCountByInstructor] = useState();
     const [gradesCount, setGradesCount] = useState();
+    const [GPA, setGPA] = useState();
     let [filters, setFilters] = useState();
 
     //criterias that will be used to filter sections
@@ -90,6 +92,7 @@ export default function CourseInsights() {
         let students_count_by_instructor = get_students_count_by_instructor(filtered_sections);
         let grades_count = get_sections_grades_stats(filtered_sections);
 
+        setGPA(calculate_gpa_based_on_counts(grades_count));
         setStudentsCountByTerm(students_count_by_term);
         setStudentsCountByInstructor(students_count_by_instructor);
         setGradesCount(grades_count);
@@ -221,6 +224,12 @@ export default function CourseInsights() {
                                                 <Tooltip />
                                             </PieChart>
                                         </ResponsiveContainer>
+                                        <Typography variant="subtitle1" sx={{fontWeight: 450}} component="div" align="center">
+                                            GPA: {GPA}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{fontStyle: "italic"}} component="div" align="center">
+                                            *Based on selected criterias
+                                        </Typography>
                                     </CardContent>
                                 </Grid>
                             </Grid>}
