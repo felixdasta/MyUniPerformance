@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
 import { makeStyles } from "@material-ui/styles";
-import CoursesCategories from "../../components/CoursesCategories/CoursesCategories";
 import {
   get_available_semesters_by_academic_year,
   semesters,
@@ -150,7 +149,7 @@ function CurriculumTable(props) {
         </TableContainer>
         <Container
         sx={{my:1}}>
-          <FormControl sx={{mx:-15}}>
+          <FormControl sx={{mx:-3}}>
             <Select
               style={term_dropdown_style}
               value={academicYear}
@@ -181,7 +180,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Year Taken</label>
           </FormControl>
-          <FormControl sx={{mx: 17}}>
+          <FormControl sx={{mx: 6}}>
             <Select
               style={term_dropdown_style}
               value={semester}
@@ -205,7 +204,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Semester</label>
           </FormControl>
-          <Button sx={{mx: -15}}
+          <Button sx={{mx: 3}}
             onClick={() => {
               let year = academicYear.substring(0, 4);
               let section_term =
