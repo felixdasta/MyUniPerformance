@@ -22,7 +22,7 @@ import {
 } from "../../actions/sections";
 import axios from "axios";
 import { ResponsiveContainer } from "recharts";
-import { Box } from "@mui/system";
+import { Box, shadows } from "@mui/system";
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -149,8 +149,8 @@ function CurriculumTable(props) {
           </Table>
         </TableContainer>
         <Container
-        sx={{my:1, justifyContent:"space-between"}}>
-          <FormControl>
+        sx={{my:1}}>
+          <FormControl sx={{mx:-15}}>
             <Select
               style={term_dropdown_style}
               value={academicYear}
@@ -181,7 +181,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Year Taken</label>
           </FormControl>
-          <FormControl>
+          <FormControl sx={{mx: 17}}>
             <Select
               style={term_dropdown_style}
               value={semester}
@@ -205,7 +205,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Semester</label>
           </FormControl>
-          <Button
+          <Button sx={{mx: -15}}
             onClick={() => {
               let year = academicYear.substring(0, 4);
               let section_term =
@@ -217,6 +217,7 @@ function CurriculumTable(props) {
             }}
             align="center"
             variant="contained"
+            
           >
             Apply Filters
           </Button>
