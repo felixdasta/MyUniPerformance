@@ -60,6 +60,7 @@ export const get_available_sections_filters = (sections) => {
 
     //initialize universal values
     let instructors_sections_response = {"All": {filtered_semesters: {}, filtered_sections: {}}};
+    sections.sort((a,b) => a.section_term.localeCompare(b.section_term));
 
     for (let section of sections) {
         let year = parseInt(section.section_term.substring(0, 4));
@@ -262,6 +263,22 @@ export const setUniversitySectionsTerms = (selectedUniversity, setTerms) => {
     ).catch((error) => {
         console.log(error)
     });
+}
+
+export const calculate_gpa_based_on_counts = (grades_count) => {
+    let grades = {};
+
+    for(let grade of grades_count){
+        grades[grade.name] = grade.value; 
+    }
+
+    let aCount = grades["A's count"] ? grades["A's count"] : 0;
+    let bCount = grades["B's count"] ? grades["B's count"] : 0;
+    let cCount = grades["C's count"] ? grades["C's count"] : 0;
+    let dCount = grades["D's count"] ? grades["D's count"] : 0;
+    let fCount = grades["F's count"] ? grades["F's count"] : 0;
+
+    return ((aCount * 4 + bCount * 3 + cCount * 2 + dCount * 1)/(aCount + bCount + cCount + dCount + fCount)).toFixed(2);
 }
 
 export const get_specified_semester = (section_term) => {

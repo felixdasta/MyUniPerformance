@@ -314,7 +314,7 @@ export default function InstructorDetails() {
                         </Grid>
 
                         <Grid item container lg={4}>
-                            <Container component={Paper} sx={{ ...top_grid_container_style, backgroundColor: "#e5e5e5" }}>
+                            <Container component={Paper} sx={{ ...top_grid_container_style, backgroundColor: "#e5e5e5", overflow: "auto" }}>
                                 <CourseFeedback sections={sections}
                                     instructor={instructor}
                                     section={"All"}
