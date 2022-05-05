@@ -13,25 +13,24 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import django_heroku
+django_heroku.settings(locals(), staticfiles=False)
 
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(_file_).resolve().parent.parent
 
-REAL_BASE_DIR = Path(__file__).resolve().parent.parent.parent
+REAL_BASE_DIR = Path(_file_).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g!jtb4!+0ur-w^&5pk^b!up3y@(k9b)iw6=5f)_fhe!(uguptn'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', 'myuniperformance-backend.herokuapp.com']
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
@@ -76,7 +75,7 @@ CORS_ORIGIN_WHITELIST = (
 
 ROOT_URLCONF = 'config.urls'
 
-SETTINGS_PATH = os.path.normpath(os.path.dirname(__file__))
+SETTINGS_PATH = os.path.normpath(os.path.dirname(_file_))
 
 TEMPLATE_DIRS = (
     os.path.join(SETTINGS_PATH, 'api/templates'),
@@ -150,7 +149,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 # EMAIL CONFIG
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -160,6 +158,9 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+#SECRET KEY
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
