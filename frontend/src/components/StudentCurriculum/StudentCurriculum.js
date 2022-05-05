@@ -1,9 +1,10 @@
-import { React, useCallback } from 'react';
+import { React, useCallback,useEffect, useState } from 'react';
 import { Button, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Paper, Table, Typography } from '@mui/material';
 import axios from 'axios';
 
 function StudentCurriculum(props) {
+    const [filteredClasses, setFilteredClasses] = useState([]);
     let student = props.student;
     //Defining styles for table
 
@@ -14,8 +15,17 @@ function StudentCurriculum(props) {
         }
     }, [])
 
+    useEffect(() => {
+        let payload = student.enrolled_sections.filter(
+            (payload) => payload.grade_obtained == "IP"
+        );
+        setFilteredClasses(payload)      
+      }, []);
+
     if (student.enrolled_sections) {
-        let result = []
+        let result = [];
+        
+
         result.push(
             <TableContainer component={Paper} height="100vh">
                 <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
@@ -31,7 +41,7 @@ function StudentCurriculum(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(student.enrolled_sections).map((courseData) => (
+                        {(filteredClasses).map((courseData) => (
 
                             <TableRow
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

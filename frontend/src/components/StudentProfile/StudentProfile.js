@@ -17,11 +17,12 @@ function StudentProfile(props) {
   let student = props.student
   let takenCredits = 0;
   let honorPoints = 0;
-  let gpa = 0.0;
+
 
   if (student.enrolled_sections) {
     {
       student.enrolled_sections.map((courseData) => {
+
         takenCredits += courseData.section.course.course_credits;
         switch (courseData.grade_obtained) {
           case "A":
@@ -44,8 +45,6 @@ function StudentProfile(props) {
           default:
             break;
         }
-        gpa = (honorPoints/takenCredits)
-        gpa = gpa.toPrecision(2)
       });
       
     }
