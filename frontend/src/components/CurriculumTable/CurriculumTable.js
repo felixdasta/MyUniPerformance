@@ -15,14 +15,13 @@ import {
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
 import { makeStyles } from "@material-ui/styles";
-import CoursesCategories from "../../components/CoursesCategories/CoursesCategories";
 import {
   get_available_semesters_by_academic_year,
   semesters,
 } from "../../actions/sections";
 import axios from "axios";
 import { ResponsiveContainer } from "recharts";
-import { Box } from "@mui/system";
+import { Box, shadows } from "@mui/system";
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -49,7 +48,6 @@ function CurriculumTable(props) {
   };
 
   const classes = useStyles();
-  let data = [];
   const [academicSemesters, setAvailableAcademicSemesters] = useState([]);
   const [academicYear, setAcademicYear] = useState("All");
   const [semester, setSemester] = useState("All");
@@ -75,15 +73,12 @@ function CurriculumTable(props) {
     if (student.enrolled_sections) {
       if (filters.section_term !== "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses);
-        let payload = filteredClasses.filter(
+        let payload = student.enrolled_sections.filter(
           (payload) => payload.section.section_term === filters.section_term
         );
         setFilteredClasses(payload);
-        console.log(filteredClasses);
       } else if (filters.section_term === "") {
         setFilteredClasses(student.enrolled_sections);
-        console.log(filteredClasses);
       }
     }
   }
@@ -153,8 +148,8 @@ function CurriculumTable(props) {
           </Table>
         </TableContainer>
         <Container
-        sx={{my:1, justifyContent:"space-between"}}>
-          <FormControl>
+        sx={{my:1}}>
+          <FormControl sx={{mx:-3}}>
             <Select
               style={term_dropdown_style}
               value={academicYear}
@@ -185,7 +180,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Year Taken</label>
           </FormControl>
-          <FormControl>
+          <FormControl sx={{mx: 6}}>
             <Select
               style={term_dropdown_style}
               value={semester}
@@ -209,7 +204,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Semester</label>
           </FormControl>
-          <Button
+          <Button sx={{mx: -1}}
             onClick={() => {
               let year = academicYear.substring(0, 4);
               let section_term =
@@ -217,11 +212,11 @@ function CurriculumTable(props) {
                 (semester == "All" ? "" : semester);
               filters.section_term = section_term;
               filters.page = 1;
-              console.log(filters.section_term);
               updateTable();
             }}
             align="center"
             variant="contained"
+            
           >
             Apply Filters
           </Button>

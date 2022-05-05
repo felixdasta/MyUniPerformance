@@ -3,7 +3,7 @@ from api.views \
 import student, curriculum, \
 course, university, section, \
 grade_stats, feedback, grade_stats, \
-department
+department, staff_member
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('sectionstudents', section.SectionStudentsList.as_view()),
     path('send-activation-email', student.send_activation_email),
     path('departments', department.DepartmentList.as_view()),
+    path('instructors/<pk>', staff_member.StaffMemberDetail.as_view()),
     
     path('universities', university.UniversityList.as_view()),
     path('universities/<pk>', university.UniversityDetail.as_view()),
@@ -21,6 +22,7 @@ urlpatterns = [
     path('universities/<university_id>/courses', course.CourseList.as_view()),
     path('universities/<university_id>/sections-terms', section.get_sections_terms_by_university),
     path('universities/<university_id>/departments', department.get_departments_by_university),
+    path('universities/<university_id>/instructors', staff_member.StaffMemberList.as_view()),
 
     path('courses', course.CourseList.as_view()),
     path('courses/<pk>', course.CourseDetail.as_view()),

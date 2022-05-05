@@ -1,4 +1,4 @@
-import { Box, Menu, MenuItem } from '@mui/material';
+import { Box, Menu, MenuItem, Grid } from '@mui/material';
 import { useEffect, useState } from "react";
 import { department_logos } from '../../config.js';
 import { VscTriangleDown } from 'react-icons/vsc';
@@ -41,8 +41,8 @@ function CourseFeedback(props) {
         let feedbacks = [];
         for (let section of sections) {
             let section_feedbacks = []
-            for(let feedback of section.feedbacks){
-                let merged_value = {...feedback, ...section}
+            for (let feedback of section.feedbacks) {
+                let merged_value = { ...feedback, ...section }
                 merged_value['likes'] = feedback.likes;
                 delete merged_value.feedbacks
                 section_feedbacks.push(merged_value);
@@ -60,10 +60,10 @@ function CourseFeedback(props) {
         }
     }, [props.sections]);
 
-    let sx = {
-        width: "50%",
+    let default_sx = {
         margin: "auto",
         padding: 3,
+        width: "100%",
         alignItems: "center",
         fontSize: 14
     };
@@ -76,13 +76,22 @@ function CourseFeedback(props) {
     }
 
     return (
-        <Box bgcolor="#e5e5e5" sx={sx}>
+        <Box style={{backgroundColor: "#e5e5e5"}} sx={props.sx ? props.sx : default_sx}>
+            <Grid container spacing={0}>
+                <Grid container item xs={6}>
+                    <div style={{ fontWeight: 600 }} >Feedbacks</div>
+                </Grid>
+                <Grid container item xs={6} justifyContent="flex-end">
+                    <div class="feedbackFilterButton" onClick={handleClick}>
+                        <div style={{ marginRight: 2.5 }}>
+                            {filterType}
+                        </div>
+                        <VscTriangleDown style={{ marginTop: 2 }} />
+                    </div>
+                </Grid>
+            </Grid>
+
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ fontWeight: 600 }}>Feedbacks</div>
-                <div class="feedbackFilterButton" onClick={handleClick}>
-                    <div style={{ marginRight: 2.5 }}>{filterType}</div>
-                    <VscTriangleDown style={{ marginTop: 2 }} />
-                </div>
                 <Menu
                     id="basic-menu"
                     anchorEl={anchorEl}
@@ -107,18 +116,18 @@ function CourseFeedback(props) {
                         department_logos={department_logos}
                         avatar_style={avatar_style}
                         getStudentDepartmentId={getStudentDepartmentId}
-                        pushNewFeedback={ (feedback) => {
+                        pushNewFeedback={(feedback) => {
                             props.section.feedbacks.push(feedback);
-                            let merged_value = {...feedback, ...props.section};
+                            let merged_value = { ...feedback, ...props.section };
                             delete merged_value.feedbacks;
                             let feedbacks_copy = feedbacks.slice();
                             feedbacks_copy.unshift(merged_value);
                             setFeedbacks(feedbacks_copy);
-                        } }
-                        />
+                        }}
+                    />
                 </div>
             }
-            {feedbacks && feedbacks.length > 0 ?<FeedbackList
+            {feedbacks && feedbacks.length > 0 ? <FeedbackList
                 user_id={user_id}
                 department_logos={department_logos}
                 avatar_style={avatar_style}
@@ -126,25 +135,25 @@ function CourseFeedback(props) {
                 getStudentDepartmentName={getStudentDepartmentName}
                 feedbacks={feedbacks}
                 setFeedbacks={setFeedbacks}
-                section = {props.section}
-                instructor = {props.instructor}
-                deleteFeedback ={ (feedback, index) => {
+                section={props.section}
+                instructor={props.instructor}
+                deleteFeedback={(feedback, index) => {
                     let feedbacks_copy = feedbacks.slice();
-                    feedbacks_copy.splice(index, 1);       
+                    feedbacks_copy.splice(index, 1);
 
-                    for(let section of props.sections){
-                        for(let i = 0; i < section.feedbacks.length; i++){
+                    for (let section of props.sections) {
+                        for (let i = 0; i < section.feedbacks.length; i++) {
                             let other_feedback = section.feedbacks[i];
-                            if(other_feedback.feedback_id == feedback.feedback_id){
-                                section.feedbacks.splice(i, 1);       
+                            if (other_feedback.feedback_id == feedback.feedback_id) {
+                                section.feedbacks.splice(i, 1);
                                 break;
                             }
                         }
                     }
 
                     setFeedbacks(feedbacks_copy);
-                } }
-            /> : <div style={{textAlign: 'center'}}>No feedbacks available.</div>}
+                }}
+            /> : <div style={{ textAlign: 'center' }}><hr />No feedbacks available.</div>}
         </Box>)
 }
 

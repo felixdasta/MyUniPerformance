@@ -13,7 +13,8 @@ import uprm_ingl_logo from "./assets/department-logos/uprm/INGL_Logo.png";
 import uprm_adem_logo from "./assets/department-logos/uprm/ADEM_Logo.png";
 import uprm_inge_logo from "./assets/department-logos/uprm/INGE_Logo.png";
 
-export const url = "https://myuniperformance-backend.herokuapp.com";
+
+export const url = "https://myuniperformance-backend.herokuapp.com/";
 export const department_logos = { 
     1: uprm_inqu_logo,
     2: default_inci_logo,

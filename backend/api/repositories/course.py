@@ -1,4 +1,4 @@
-from api.serializers import CourseSerializer
+from api.serializers import CustomCourseSerializer
 from api.models.course import Course
 from api.repositories.section import SectionRepository
 from django.db.models.functions import Length
@@ -7,7 +7,7 @@ from django.db.models import Prefetch, CharField, Subquery, Q
 class CourseRepository:
 
     @staticmethod
-    def get_courses_by_params(queryprms, university_id):
+    def get_courses_by_params(queryprms, university_id=None):
         CharField.register_lookup(Length, 'length')
         courses = Course.objects.all()
 
@@ -48,7 +48,7 @@ class CourseRepository:
 
     @staticmethod
     def create_course(request):
-        serializer = CourseSerializer(data=request.data)
+        serializer = CustomCourseSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
         return serializer
@@ -58,16 +58,14 @@ class CourseRepository:
         sections = SectionRepository.get_all_sections()
         course = Course.objects.select_related('department') \
                     .prefetch_related(Prefetch('section_set', queryset=sections)) \
-                    .order_by('course_code') \
                     .filter(course_id__in = Subquery(sections.values("course_id"))) \
                     .distinct().get(pk=pk)
-        serializer = CourseSerializer(course)
-        return serializer
+        return course
 
     @staticmethod
     def update_course(request, pk):
         course = Course.objects.get(pk=pk)
-        serializer = CourseSerializer(course, data=request.data)
+        serializer = CustomCourseSerializer(course, data=request.data)
         if serializer.is_valid():
             serializer.save()
         return serializer

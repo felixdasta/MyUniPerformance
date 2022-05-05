@@ -4,11 +4,11 @@ import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/
 import { Paper, Table } from '@mui/material';
 import InfiniteScroll from 'react-infinite-scroller';
 import * as Loader from "react-loader-spinner";
-import './FilteredCoursesList.scss'
+import './FilteredInstructorsList.scss'
 
-function FilteredCoursesList(props) {
-  let [courses, setCourses] = useState();
-  const [fetchedCourses, setFetchedCourses] = useState();
+function FilteredInstructorsList(props) {
+  let [instructors, setInstructors] = useState();
+  const [fetchedInstructors, setFetchedInstructors] = useState();
   let [filters, setFilters] = useState();
   const [lastPage, setLastPage] = useState();
 
@@ -16,30 +16,30 @@ function FilteredCoursesList(props) {
 
   const fetchData = () => {
     filters.page = filters.page + 1;
-    props.setCourses(setFetchedCourses, filters)
+    props.setInstructors(setFetchedInstructors, filters)
   }
 
-  const viewCourseDetails = (index) => {
-    navigate('details', {state: {course: courses[index], filters: filters}});
+  const viewInstructorDetails = (index) => {
+    navigate('details', {state: {instructor: instructors[index]}});
   }
 
   useEffect(() => {
     setLastPage(props.lastPage);
     setFilters(props.filteredData);
-    setCourses(props.courses);
+    setInstructors(props.instructors);
   }, []);
 
   useEffect(() => {
-    if (fetchedCourses) {
-      for (let course of fetchedCourses) {
-        courses.push(course);
+    if (fetchedInstructors) {
+      for (let course of fetchedInstructors) {
+        instructors.push(course);
       }
-      setFetchedCourses(null);
+      setFetchedInstructors(null);
     }
-  }, [fetchedCourses])
+  }, [fetchedInstructors])
 
   //Defining styles for table
-  if (courses) {
+  if (instructors) {
     return (
     <TableContainer style={{overflowY: "hidden"}} component={Paper}>
       <InfiniteScroll
@@ -56,21 +56,17 @@ function FilteredCoursesList(props) {
         <Table sx={{ minWidth: 350 }} aria-label="simple table" stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>Course Name</TableCell>
-              <TableCell align='right'>Course Code</TableCell>
-              <TableCell align='right'>Credit Hours</TableCell>
+              <TableCell>Instructor Name</TableCell>
               <TableCell align='right'>Department Name</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {(courses).map((course, index) => (<TableRow class="historical-courses" 
+            {(instructors).map((instructor, index) => (<TableRow class="historical-courses" 
                                                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                         key={course.course_id}
-                                                         onClick={ () => {viewCourseDetails(index)}}>
-              <TableCell component="th" scope='row'> {course.course_name} </TableCell>
-              <TableCell align='right'>{course.course_code}</TableCell>
-              <TableCell align='right'>{course.course_credits}</TableCell>
-              <TableCell align='right'>{course.department.department_name}</TableCell>
+                                                         key={instructor.member_id}
+                                                         onClick={ () => {viewInstructorDetails(index)}}>
+              <TableCell component="th" scope='row'> {instructor.name} </TableCell>
+              <TableCell align='right'>{instructor.department.department_name}</TableCell>
             </TableRow>))}
           </TableBody>
         </Table>
@@ -81,4 +77,4 @@ function FilteredCoursesList(props) {
     return null;
   }
 
-} export default (FilteredCoursesList);
+} export default (FilteredInstructorsList);
