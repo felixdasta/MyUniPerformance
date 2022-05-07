@@ -83,6 +83,13 @@ function CurriculumTable(props) {
     }
   }
 
+  const sectionClickHandler = useCallback((section) => {
+    return async (e) => {
+      e.preventDefault()
+      props.changeSection(section)
+    }
+  }, [])
+
   if (student.enrolled_sections) {
     let result = [];
     result.push(
@@ -122,6 +129,7 @@ function CurriculumTable(props) {
                 <TableRow
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   key={courseData.section.course.course_name}
+                  onClick={sectionClickHandler(courseData)}
                   hover={true}
                 >
                   <TableCell component="th" scope="row">
@@ -148,8 +156,8 @@ function CurriculumTable(props) {
           </Table>
         </TableContainer>
         <Container
-        sx={{my:1}}>
-          <FormControl sx={{mx:-3}}>
+          sx={{ my: 1 }}>
+          <FormControl sx={{ mx: -3 }}>
             <Select
               style={term_dropdown_style}
               value={academicYear}
@@ -163,8 +171,8 @@ function CurriculumTable(props) {
                   academicSemesters[e.target.value] &&
                     academicSemesters[e.target.value].map(
                       (entry) =>
-                        (contains_semester =
-                          entry.key == semester ? true : contains_semester)
+                      (contains_semester =
+                        entry.key == semester ? true : contains_semester)
                     );
                 }
                 setSemester(contains_semester ? semester : "All");
@@ -180,7 +188,7 @@ function CurriculumTable(props) {
             </Select>
             <label>Year Taken</label>
           </FormControl>
-          <FormControl sx={{mx: 6}}>
+          <FormControl sx={{ mx: 6 }}>
             <Select
               style={term_dropdown_style}
               value={semester}
@@ -196,15 +204,15 @@ function CurriculumTable(props) {
               </MenuItem>
               {academicYear != "All"
                 ? academicSemesters[academicYear].map((entry) => (
-                    <MenuItem value={entry.key}>{entry.value}</MenuItem>
-                  ))
+                  <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                ))
                 : Object.keys(semesters).map((key) => (
-                    <MenuItem value={key}>{semesters[key]}</MenuItem>
-                  ))}
+                  <MenuItem value={key}>{semesters[key]}</MenuItem>
+                ))}
             </Select>
             <label>Semester</label>
           </FormControl>
-          <Button sx={{mx: 3}}
+          <Button sx={{ mx: 3 }}
             onClick={() => {
               let year = academicYear.substring(0, 4);
               let section_term =
@@ -216,7 +224,7 @@ function CurriculumTable(props) {
             }}
             align="center"
             variant="contained"
-            
+
           >
             Apply Filters
           </Button>
