@@ -20,7 +20,7 @@ import { Paper, Table, Typography } from "@mui/material";
 
 function CurriculumInfo(props) {
   let student = props.student;
-
+  let university = props.university
   if (student.curriculums) {
     let result = [];
     result.push(
@@ -32,12 +32,15 @@ function CurriculumInfo(props) {
             </Typography>
           </Container>
           <Container>
-            <Card sx={{ maxWidth: 600, height: 135, my: 3, boxShadow: 4 }}>
+            <Card sx={{ maxWidth: 600, height: 145, my: 3, boxShadow: 4 }}>
               <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
-                Name: {student.curriculums[0].curriculum_name}
+                University: {university.university_name}
+              </Typography>
+              <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
+                Curriculum Name: {student.curriculums[0].curriculum_name}
               </Typography >
               <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
-                Year: {student.curriculums[0].curriculum_year}
+                Curriculum Year: {student.curriculums[0].curriculum_year}
               </Typography>
               <Typography sx={{ fontSize: 18, my:1, mx:1 }}>
                 Department: {student.curriculums[0].department.department_name}
