@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { get_student_by_id } from '../../actions/user.js';
 import CurriculumTable from "../../components/CurriculumTable/CurriculumTable.js";
 import CurriculumInfo from "../../components/CurriculumInfo/CurriculumInfo.js";
+import CurriculumCoursePicker from "../../components/CurriculumCoursePicker/CurriculumCoursePicker.js";
 
 export default function Curriculum() {
     const [student, setStudent] = useState();
@@ -28,11 +29,11 @@ export default function Curriculum() {
         <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3} rowGap={3}>
             {/* Top Row Container, each item container can be adjusted for width by changing lg*/}
             <Grid item container lg={3} justifyContent="center">
-                <Grid item component={Box} lg={12} sx={{ backgroundColor: "peachpuff", height: "700px" }}> Course List </Grid>
+                <Grid item component={CurriculumCoursePicker} student={student} lg={12} />
             </Grid>
             <Grid item container lg={9} direction={"column"} rowGap={3}>
-                <Grid item component={CurriculumTable} student={student} lg={12} sx={{ backgroundColor: "salmon", height: "800px" }}> Curriculum </Grid>
-                <Grid item component={CurriculumInfo} student={student} lg={12} sx={{ backgroundColor: "burlywood", height: "350px" }}> Curriculum info </Grid>
+                <Grid item component={CurriculumTable} student={student} lg={12} />
+                <Grid item component={CurriculumInfo} student={student} lg={12} />
             </Grid>
         </Grid> : <div className="loader">
             <Loader.ThreeDots color="black" height={120} width={120} />
