@@ -5,6 +5,10 @@ import { useLocation } from "react-router-dom";
 import * as Loader from "react-loader-spinner";
 import { fontWeight } from "@mui/system";
 import {
+  get_sections_grades_stats,
+  calculate_gpa_based_on_counts
+} from '../../actions/sections';
+import {
   PieChart,
   Pie,
   Text,
@@ -37,7 +41,9 @@ function StudentStatistics(props) {
   let cCount = 0;
   let dCount = 0;
   let fCount = 0;
+  let pCount = 0;
   let wCount = 0;
+  let result = 0;
 
   useEffect(() => {
     let payload = student.enrolled_sections.filter(
@@ -61,6 +67,16 @@ function StudentStatistics(props) {
     }
   }
   if (student.enrolled_sections) {
+    let GPA = [];
+    student.enrolled_sections.map((payload, i) => {
+      let grades_count = get_sections_grades_stats([payload.section])
+      GPA.push(calculate_gpa_based_on_counts(grades_count))
+    })
+    for(let i = 0; i < GPA.length; i++){
+      result += parseFloat(GPA[i])
+    }
+    result = result / GPA.length
+    result = result.toPrecision(2)
     {
       student.enrolled_sections.map((courseData) => {
         takenCredits += courseData.section.course.course_credits;
@@ -98,6 +114,9 @@ function StudentStatistics(props) {
           case "W":
             wCount += 1;
             break;
+          case "P":
+            pCount += 1;
+            break;
           default:
             break;
         }
@@ -126,6 +145,7 @@ function StudentStatistics(props) {
     { name: "C", grade: cCount },
     { name: "D", grade: dCount },
     { name: "F", grade: fCount },
+    { name: "P", grade: pCount },
     { name: "W", grade: wCount },
   ];
 
@@ -231,7 +251,7 @@ function StudentStatistics(props) {
       <Typography sx={{ fontSize: 28 }} align="center">
         Student Statistics
       </Typography>
-      <Box height={475} alignContent="center">
+      <Box height={550} alignContent="center">
         <Carousel>
           {GRAPHS.map((GRAPH, index) => {
             return (<Box>
@@ -246,6 +266,9 @@ function StudentStatistics(props) {
         </Typography>
         <Typography align="center" sx={{ my: 3.5 }}>
           Your current GPA is: {gpa}
+        </Typography>
+        <Typography align="center" sx={{ my: 3.5 }}>
+          The average GPA of students who have taken the same courses as you: {result}
         </Typography>
       </Box>
     </Container>

@@ -10,6 +10,10 @@ import {
   Container,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
+import {
+  get_sections_grades_stats,
+  calculate_gpa_based_on_counts
+} from '../../actions/sections';
 import { deepOrange, deepPurple } from "@mui/material/colors";
 import { fontWeight } from "@mui/system";
 

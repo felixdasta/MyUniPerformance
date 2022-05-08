@@ -10,7 +10,6 @@ import {
   TableRow,
   FormControl,
   Select,
-  TextField,
   MenuItem,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
@@ -19,19 +18,7 @@ import {
   get_available_semesters_by_academic_year,
   semesters,
 } from "../../actions/sections";
-import axios from "axios";
-import { ResponsiveContainer } from "recharts";
-import { Box, shadows } from "@mui/system";
 import {
-  get_available_sections_filters,
-  get_filtered_sections,
-  get_students_count_by_term,
-  get_specified_semester,
-  get_specified_year,
-  get_specified_academic_year,
-  year_contains_academic_semester,
-  evaluate_and_apply,
-  get_students_count_by_instructor,
   get_sections_grades_stats,
   calculate_gpa_based_on_counts
 } from '../../actions/sections';
@@ -99,12 +86,10 @@ function CurriculumTable(props) {
 
   if (student.enrolled_sections) {
     let GPA = [];
-    console.log(filteredClasses)
     filteredClasses.map((payload, i) => {
       let grades_count = get_sections_grades_stats([payload.section])
       GPA.push(calculate_gpa_based_on_counts(grades_count))
     })
-    console.log(GPA)
     let result = [];
     result.push(
       <Grid
