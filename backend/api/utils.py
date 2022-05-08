@@ -1,6 +1,14 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from better_profanity import profanity
+from googletrans import Translator
 import six
+
+def contains_profanity(word):
+    #always check profanity in the english language
+    translator= Translator()
+    translation = translator.translate(word)
+    return profanity.contains_profanity(translation.text)
 
 def paginate_result(query_input, serializer_class, entity_name, page_number, page_size):
     paginator = Paginator(query_input, page_size)

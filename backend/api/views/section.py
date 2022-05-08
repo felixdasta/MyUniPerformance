@@ -21,21 +21,6 @@ class SectionList(APIView):
         except Section.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-class SectionStudentsList(APIView):
-    """
-    List sections in which a student is found and can filter by section term
-    """
-    def get(self, request, format=None):
-        try:
-            queryprms = request.GET
-            sections = SectionRepository.get_sections_by_student(queryprms)
-            page = 1 if not queryprms.get('page') else int(queryprms.get('page'))
-            sections = paginate_result(sections, SectionStudentSerializer, 'sections', page, 50)
-            return Response(sections)
-        except Section.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
 class SectionDetail(APIView):
     """
     Retrieve a section instance
