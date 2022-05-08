@@ -47,7 +47,7 @@ const useStyles = makeStyles({
 });
 
 function CurriculumTable(props) {
-  
+
   let [filters, setFilters] = useState({
     section_term: "",
   });
@@ -98,6 +98,13 @@ function CurriculumTable(props) {
   }
 
   if (student.enrolled_sections) {
+    let GPA = [];
+    console.log(filteredClasses)
+    filteredClasses.map((payload, i) => {
+      let grades_count = get_sections_grades_stats([payload.section])
+      GPA.push(calculate_gpa_based_on_counts(grades_count))
+    })
+    console.log(GPA)
     let result = [];
     result.push(
       <Grid
@@ -133,11 +140,8 @@ function CurriculumTable(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredClasses.map((courseData) => (
-                <TableRow
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  hover={true}
-                >
+              {filteredClasses.map((courseData, i) => (
+                <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }} hover={true}>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
                   </TableCell>
@@ -155,6 +159,9 @@ function CurriculumTable(props) {
                   </TableCell>
                   <TableCell align="right">
                     {courseData.section.section_term}
+                  </TableCell>
+                  <TableCell align="right">
+                    {GPA[i]}
                   </TableCell>
                 </TableRow>
               ))}

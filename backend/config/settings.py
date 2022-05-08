@@ -19,9 +19,9 @@ django_heroku.settings(locals(), staticfiles=False)
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(_file_).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-REAL_BASE_DIR = Path(_file_).resolve().parent.parent.parent
+REAL_BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -75,7 +75,7 @@ CORS_ORIGIN_WHITELIST = (
 
 ROOT_URLCONF = 'config.urls'
 
-SETTINGS_PATH = os.path.normpath(os.path.dirname(_file_))
+SETTINGS_PATH = os.path.normpath(os.path.dirname(__file__))
 
 TEMPLATE_DIRS = (
     os.path.join(SETTINGS_PATH, 'api/templates'),
