@@ -52,7 +52,6 @@ export const get_courses_passing_rate = (courses) => {
         let result = { name: course.course_code, "Passing rate": (passing_count / total_count).toPrecision(2) };
         
         if(result["Passing rate"] != "NaN"){
-            console.log(result);
             courses_passing_rate.push(result);
         }
     }

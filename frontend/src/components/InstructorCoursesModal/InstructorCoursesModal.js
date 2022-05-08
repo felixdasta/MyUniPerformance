@@ -72,13 +72,19 @@ export default function InstructorCoursesModal(props) {
             let section_term = section.section_term;
 
             let sections_by_term =
-                course_offered_years[section_term] ?
-                    course_offered_years[section_term] : []
+            course_offered_years[section_term] ?
+            course_offered_years[section_term] : []
 
             sections_by_term.push(section);
 
             course_offered_years[section_term] = sections_by_term;
         }
+
+        course_offered_years = Object.keys(course_offered_years).sort().reduce(function (acc, key) { 
+            acc[key] = course_offered_years[key];
+            return acc;
+        }, {});
+
         setSectionsByTerm(course_offered_years);
         setSelectedCourse(course);
     }

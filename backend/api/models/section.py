@@ -11,7 +11,6 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     instructors = models.ManyToManyField(Staff_Member)
     enrolled_students = models.ManyToManyField(Student, through='Section_Students')
-    likes = models.ManyToManyField(Student,related_name="section_likes", blank=True)
 
 class Section_Students(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
