@@ -1,6 +1,6 @@
 import * as Loader from "react-loader-spinner";
 import { get_student_by_id } from '../../../actions/user.js';
-import { Avatar, Box, Button } from '@mui/material';
+import { Avatar, Box, Button, Alert } from '@mui/material';
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { create_feedback } from "../../../actions/feedback"
@@ -13,6 +13,7 @@ function NewFeedback(props) {
     const [postingComment, setPostingComment] = useState();
     const [openNewFeedbackActions, setOpenNewFeedbackActions] = useState();
     const [student, setStudent] = useState();
+    const [error, setError] = useState();
     let navigate = useNavigate();
 
     const inputChange = (e) => {
@@ -32,10 +33,15 @@ function NewFeedback(props) {
             instructor_id: props.instructor_id,
             ...newFeedback
         }
+        setError(null);
         create_feedback(props.section_id, feedback).then(response => {
             props.pushNewFeedback(response.data);
             setPostingComment(false);
-        }).catch((error) => setPostingComment(false));
+        }).catch((error) => {
+            let message = error.response.data.error;
+            setError(message);
+            setPostingComment(false);
+        });
 
         clearCommentBox();
         setOpenNewFeedbackActions(false);
@@ -56,6 +62,8 @@ function NewFeedback(props) {
 
     return (
         <div>
+            {error && <Alert severity="error">{error}</Alert>}
+
             {student && !postingComment ?
                 <div>
                     <div style={{ display: 'flex' }}>

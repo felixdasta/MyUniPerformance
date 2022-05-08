@@ -1,13 +1,19 @@
 import { AiOutlineLike, AiFillLike } from 'react-icons/ai';
 import { FaTrashAlt } from 'react-icons/fa';
 import { like_feedback, unlike_feedback, delete_feedback } from "../../../actions/feedback";
-import { Avatar, Box } from '@mui/material';
+import { Avatar, Box, Grid, Alert, Snackbar } from '@mui/material';
 import { useState } from "react";
 import * as Loader from "react-loader-spinner";
+import ReportFeedbackModal from '../../ReportFeedbackModal/ReportFeedbackModal';
 
 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 function FeedbackList(props) {
+    const [selectedFeedback, setSelectedFeedback] = useState();
+    const [reportedFeedbackMessage, setReportedFeedbackMessage] = useState();
+    const openReportFeedbackModal = (feedback) => setSelectedFeedback(feedback);
+    const closeReportFeedbackModal = () => {setSelectedFeedback(null); setReportedFeedbackMessage(true); }
+
     const [feedbackDeleteLoading, setFeedbackDeleteLoading] = useState();
 
     const addFeedbackLike = (feedback, index) => {
@@ -49,14 +55,15 @@ function FeedbackList(props) {
 
     return (
         <div>
+            <ReportFeedbackModal feedback={selectedFeedback} user_id={props.user_id} handleClose={closeReportFeedbackModal} />
             {props.feedbacks &&
                 (props.feedbacks).map((feedback, index) => {
                     if (feedbackDeleteLoading == index) {
                         return (
-                        <div className='infinite-loader'>
-                            <hr/>
-                            <Loader.RotatingLines style={{ display: "inline-block" }} color="black" height={40} width={40} />
-                        </div>)
+                            <div className='infinite-loader'>
+                                <hr />
+                                <Loader.RotatingLines style={{ display: "inline-block" }} color="black" height={40} width={40} />
+                            </div>)
                     }
                     else {
                         return (
@@ -68,9 +75,9 @@ function FeedbackList(props) {
                                         <div style={{ display: 'flex' }}>
                                             <Box bgcolor="white" sx={getTagTheme("Tomato")}>{"Term: " + feedback.section_term}</Box>
                                             <Box bgcolor="white" sx={getTagTheme("Orange")}>{"Section: " + feedback.section_code}</Box>
-                                            {feedback.course ? 
-                                            <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Course: " + feedback.course.course_code}</Box>
-                                            : <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Instructor: " + feedback.instructor.name}</Box>
+                                            {feedback.course ?
+                                                <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Course: " + feedback.course.course_code}</Box>
+                                                : <Box bgcolor="white" sx={getTagTheme("DodgerBlue")}>{"Instructor: " + feedback.instructor.name}</Box>
                                             }
                                         </div>
                                         <Box
@@ -92,26 +99,48 @@ function FeedbackList(props) {
                                             marginTop: 5,
                                             marginLeft: 30
                                         }}>
-                                            {(feedback.student.user_id == props.user_id) && <FaTrashAlt
-                                                size={18}
-                                                style={{ cursor: 'pointer', marginRight: 5 }}
-                                                onClick={() => deleteFeedback(feedback, index)} />}
-                                            {feedback.likes.includes(props.user_id)
-                                                ? <AiFillLike
-                                                    size={18}
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => removeFeedbackLike(feedback, index)} /> :
-                                                <AiOutlineLike
-                                                    size={18}
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => addFeedbackLike(feedback)} />}
-                                            <div style={{ fontSize: 15 }}>{feedback.likes.length}</div>
+                                            <Grid container spacing={0}>
+                                                <Grid container item xs={4}>
+                                                    {(feedback.student.user_id == props.user_id) && <FaTrashAlt
+                                                        size={18}
+                                                        style={{ cursor: 'pointer', marginRight: 5 }}
+                                                        onClick={() => deleteFeedback(feedback, index)} />}
+                                                    {feedback.likes.includes(props.user_id)
+                                                        ? <AiFillLike
+                                                            size={18}
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => removeFeedbackLike(feedback, index)} /> :
+                                                        <AiOutlineLike
+                                                            size={18}
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => addFeedbackLike(feedback)} />}
+                                                    <div style={{ fontSize: 15 }}>{feedback.likes.length}</div>
+                                                </Grid>
+                                                <Grid container item xs={8} justifyContent="flex-end">
+                                                    {feedback.reports.includes(props.user_id) ?
+                                                        <div style={{ marginRight: 25 }}>
+                                                            You have already reported this feedback
+                                                        </div> :
+                                                        <div  onClick={() => {openReportFeedbackModal(feedback)}} style={{ cursor: 'pointer', marginRight: 25, fontWeight: 425 }}>
+                                                            Report
+                                                        </div>
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+
+
                                         </div>
                                     </div>
                                 </div>
                             </div>);
                     }
                 })}
+                                <Snackbar open={reportedFeedbackMessage} autoHideDuration={6000} onClose={() => setReportedFeedbackMessage(false)}>
+                    <Alert onClose={() => setReportedFeedbackMessage(false)} severity="success" sx={{ width: '100%' }}>
+                        Thank you for reporting the feedback! Our team will be reviewing it.
+                    </Alert>
+                </Snackbar>
         </div>
     )
 }

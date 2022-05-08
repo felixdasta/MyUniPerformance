@@ -1,13 +1,18 @@
 import axios from "axios";
 import {url} from "../config.js";
 
+export const report_feedback = async (feedback_id, student_id, report) => {
+    const response = await axios.put(url+'students/' + student_id + '/feedbacks/' + feedback_id + '/report', report);
+    return response;
+}
+
 export const like_feedback = async (feedback_id, student_id) => {
-    const response = await axios.put(url+'students/' + student_id + '/feedbacks/' + feedback_id);
+    const response = await axios.put(url+'students/' + student_id + '/feedbacks/' + feedback_id + '/like');
     return response;
 }
 
 export const unlike_feedback = async (feedback_id, student_id) => {
-    const response = await axios.delete(url+'students/' + student_id + '/feedbacks/' + feedback_id);
+    const response = await axios.delete(url+'students/' + student_id + '/feedbacks/' + feedback_id) + '/like';
     return response;
 }
 

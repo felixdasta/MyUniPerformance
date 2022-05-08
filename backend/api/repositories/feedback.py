@@ -1,4 +1,6 @@
 from api.models.feedback import Feedback
+from api.models.feedback import Feedback_Reports
+from api.models.student import Student
 import datetime
 
 class FeedbackRepository:
@@ -47,9 +49,11 @@ class FeedbackRepository:
         return feedback
 
     @staticmethod
-    def report_feedback(report, pk):
-        feedback = Feedback.objects.get(pk=pk)
-        feedback.reports.add(report)
+    def report_feedback(request, user_id, feedback_id):
+        feedback = Feedback.objects.get(pk=feedback_id)
+        student = Student.objects.get(pk=user_id) 
+        if feedback and student:
+            Feedback_Reports.objects.create(**{"feedback": feedback, "student": student, "reason": request.data["reason"]})
         return feedback
 
     @staticmethod
