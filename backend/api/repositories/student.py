@@ -8,8 +8,12 @@ class StudentRepository:
     
     @staticmethod
     def get_students_by_params(queryprms):        
-        students = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department',
-         'section_students_set__section__course__department', 'section_students_set__section__instructors')
+        students = Student.objects.prefetch_related(
+         'curriculums__department',
+         'curriculums__curriculum_courses_set__course__department',
+         'section_students_set__section__grade_stats',
+         'section_students_set__section__course__department', 
+         'section_students_set__section__instructors__department')
 
         if queryprms.get('university_id') != None:
             students = students.filter(curriculums__department__university = queryprms.get('university_id'))
@@ -33,7 +37,12 @@ class StudentRepository:
 
     @staticmethod
     def get_student_by_id(pk):
-        student = Student.objects.prefetch_related('curriculums__curriculum_courses_set__course__department').get(pk=pk)
+        student = Student.objects.prefetch_related(
+         'curriculums__department',
+         'curriculums__curriculum_courses_set__course__department',
+         'section_students_set__section__grade_stats',
+         'section_students_set__section__course__department', 
+         'section_students_set__section__instructors__department').get(pk=pk)
         return student
 
     @staticmethod

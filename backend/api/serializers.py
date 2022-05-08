@@ -93,7 +93,7 @@ class FeedbackSerializer(ModelSerializer):
 
     class Meta:
         model = models.feedback.Feedback
-        fields = ['feedback_id', 'timestamp', 'praises', 'criticism', 'instructor', 'student', 'is_misplaced', 'likes']
+        fields = ['feedback_id', 'timestamp', 'praises', 'criticism', 'instructor', 'student', 'is_misplaced', 'likes', 'reports']
 
 class CustomSectionSerializer(ModelSerializer):
     instructors = StaffMemberSerializer(many=True, read_only=True)
@@ -102,7 +102,7 @@ class CustomSectionSerializer(ModelSerializer):
     
     class Meta:
         model = models.section.Section
-        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'feedbacks', 'instructors', 'grades', 'likes']
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'feedbacks', 'instructors', 'grades']
 
 class CustomCourseSerializer(ModelSerializer):
     department = DepartmentSerializer(read_only=True)
@@ -119,7 +119,7 @@ class InstructorSectionSerializer(ModelSerializer):
     
     class Meta:
         model = models.section.Section
-        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'feedbacks', 'grades', 'likes', 'course']
+        fields = ['section_id', 'section_code', 'section_syllabus', 'section_term', 'feedbacks', 'grades', 'course']
 
 class CustomStaffMemberSerializer(ModelSerializer):
     department = CustomDepartmentSerializer(read_only=True)
