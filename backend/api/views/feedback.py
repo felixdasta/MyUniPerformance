@@ -5,7 +5,7 @@ from api.repositories.feedback import FeedbackRepository
 from api.models.feedback import Feedback
 from api.serializers import FeedbackSerializer
 from api.utils import paginate_result, contains_profanity
-from datetime import datetime
+from rest_framework.decorators import api_view
 from dateutil.relativedelta import relativedelta
 
 
@@ -102,3 +102,12 @@ class FeedbackLike(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Feedback.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+def report_feedback(request, user_id, feedback_id):
+    try:
+        feedback = FeedbackRepository.report_feedback(request, user_id, feedback_id)
+        serializer = FeedbackSerializer(feedback)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Feedback.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)

@@ -32,7 +32,9 @@ urlpatterns = [
     path('sections/<pk>/grade-stats', grade_stats.GradeStatsDetail.as_view()),
 
     path('feedbacks/<pk>', feedback.FeedbackDetail.as_view()),
-    path('students/<user_id>/feedbacks/<feedback_id>', feedback.FeedbackLike.as_view()),
+    path('students/<user_id>/feedbacks/<feedback_id>/like', feedback.FeedbackLike.as_view()),
+    path('students/<user_id>/feedbacks/<feedback_id>/report', feedback.report_feedback),
+
 
     path('curriculums/<pk>', curriculum.CurriculumDetail.as_view()),
     path('curriculums', curriculum.CurriculumList.as_view()),

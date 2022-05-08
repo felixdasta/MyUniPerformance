@@ -60,10 +60,6 @@ function StudentProfile(props) {
         <Container align="center">
           <Avatar sx={{ bgcolor: deepOrange[500] }}>{student.first_name[0]}</Avatar>
         </Container>
-        <Typography>  </Typography>
-        <Typography sx={{ fontSize: 18 }} align="center">
-          Name: {student.first_name} {student.last_name}
-        </Typography>
         <Typography sx={{ fontSize: 18 }} align="center">
           Year of Admission: {student.year_of_admission}
         </Typography>

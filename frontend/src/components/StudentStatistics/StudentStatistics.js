@@ -41,9 +41,9 @@ function StudentStatistics(props) {
 
   useEffect(() => {
     let payload = student.enrolled_sections.filter(
-        (payload) => payload.grade_obtained !== "IP"
+      (payload) => payload.grade_obtained !== "IP"
     );
-    setFilteredClasses(payload)      
+    setFilteredClasses(payload)
   }, []);
 
   if (student.curriculums) {
@@ -75,7 +75,7 @@ function StudentStatistics(props) {
             bCount += 1;
             honorPoints =
               honorPoints + 3 * courseData.section.course.course_credits;
-              gpaCredits += courseData.section.course.course_credits;
+            gpaCredits += courseData.section.course.course_credits;
             break;
           case "C":
             cCount += 1;
@@ -101,8 +101,8 @@ function StudentStatistics(props) {
           default:
             break;
         }
-        gpa = honorPoints / gpaCredits;
-        gpa = gpa.toPrecision(2);
+        gpa = honorPoints / takenCredits;
+        gpa = gpa.toFixed(2);
       });
     }
   }
@@ -186,11 +186,11 @@ function StudentStatistics(props) {
   );
 
   TITLES.push(
-      <Typography align="center" sx={{ my: 0.75, fontWeight: 500 }}>
+    <Typography align="center" sx={{ my: 0.75, fontWeight: 500 }}>
       Degree Completion Breakdown
-      </Typography>
+    </Typography>
   )
-  
+
 
   GRAPHS.push(
     <ResponsiveContainer width="100%" height={250}>
@@ -222,7 +222,7 @@ function StudentStatistics(props) {
 
   TITLES.push(
     <Typography align="center" sx={{ my: 0.75, fontWeight: 500 }}>
-    Grade Distribution
+      Grade Distribution
     </Typography>
   )
 
@@ -235,9 +235,9 @@ function StudentStatistics(props) {
         <Carousel>
           {GRAPHS.map((GRAPH, index) => {
             return (<Box>
-                {GRAPH}
-                {TITLES[index]}
-                </Box>);
+              {GRAPH}
+              {TITLES[index]}
+            </Box>);
           })}
         </Carousel>
         <Typography align="center" sx={{ my: 3.5 }}>
