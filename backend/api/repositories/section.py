@@ -15,7 +15,7 @@ class SectionRepository:
         return sections
 
     def get_sections_by_student(queryprms):
-        sections = Section_Students.objects.select_related('section__course__department')
+        sections = Section_Students.objects.select_related('section__course__department', 'section__grades').prefetch_related('section__instructors__department')
         
         if queryprms.get('student_id'):
             sections = sections.filter(student = queryprms.get('student_id'))
