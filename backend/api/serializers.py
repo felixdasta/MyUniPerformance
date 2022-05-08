@@ -59,11 +59,12 @@ class CustomCurriculumSerializer(ModelSerializer):
 
 class SectionSerializer(ModelSerializer):
     course = CourseSerializer(read_only=True)
+    grades = GradeStatsSerializer(source='grade_stats', read_only=True)
     instructors = StaffMemberSerializer(many=True, read_only=True)
     
     class Meta:
         model = models.section.Section
-        fields = ['section_id', 'section_code', 'section_term', 'course', 'instructors']
+        fields = ['section_id', 'section_code', 'section_term', 'course', 'instructors', 'grades']
 
 class SectionStudentSerializer(ModelSerializer):
     section = SectionSerializer(read_only=True)
