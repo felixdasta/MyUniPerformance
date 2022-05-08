@@ -120,8 +120,8 @@ function StudentStatistics(props) {
           default:
             break;
         }
-        gpa = honorPoints / takenCredits;
-        gpa = gpa.toFixed(2);
+        gpa = honorPoints / gpaCredits;
+        gpa = gpa.toPrecision(2);
       });
     }
   }
