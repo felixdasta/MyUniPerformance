@@ -22,6 +22,19 @@ import {
 import axios from "axios";
 import { ResponsiveContainer } from "recharts";
 import { Box, shadows } from "@mui/system";
+import {
+  get_available_sections_filters,
+  get_filtered_sections,
+  get_students_count_by_term,
+  get_specified_semester,
+  get_specified_year,
+  get_specified_academic_year,
+  year_contains_academic_semester,
+  evaluate_and_apply,
+  get_students_count_by_instructor,
+  get_sections_grades_stats,
+  calculate_gpa_based_on_counts
+} from '../../actions/sections';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -34,6 +47,7 @@ const useStyles = makeStyles({
 });
 
 function CurriculumTable(props) {
+  
   let [filters, setFilters] = useState({
     section_term: "",
   });
@@ -115,13 +129,13 @@ function CurriculumTable(props) {
                 <TableCell align="right">Department Name</TableCell>
                 <TableCell align="right">Grade Obtained</TableCell>
                 <TableCell align="right">Term Taken</TableCell>
+                <TableCell align="right">Section GPA</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredClasses.map((courseData) => (
                 <TableRow
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  key={courseData.section.course.course_name}
                   hover={true}
                 >
                   <TableCell component="th" scope="row">
