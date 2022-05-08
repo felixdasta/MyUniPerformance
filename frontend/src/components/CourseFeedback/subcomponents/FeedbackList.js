@@ -5,14 +5,20 @@ import { Avatar, Box, Grid, Alert, Snackbar } from '@mui/material';
 import { useState } from "react";
 import * as Loader from "react-loader-spinner";
 import ReportFeedbackModal from '../../ReportFeedbackModal/ReportFeedbackModal';
+import FeedbackDeleteConfirmationModal from '../../ConfirmationModal/ConfirmationModal';
 
 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 function FeedbackList(props) {
-    const [selectedFeedback, setSelectedFeedback] = useState();
+    const [feedbackToReport, setFeedbackToReport] = useState();
     const [reportedFeedbackMessage, setReportedFeedbackMessage] = useState();
-    const openReportFeedbackModal = (feedback) => setSelectedFeedback(feedback);
-    const closeReportFeedbackModal = () => {setSelectedFeedback(null); setReportedFeedbackMessage(true); }
+    const [feedbackToDelete, setFeedbackToDelete] = useState();
+    
+    const openConfirmFeedbackDeleteModal = (feedback) => setFeedbackToDelete(feedback);
+    const closeConfirmFeedbackDeleteModal = () => {setFeedbackToDelete(null); }
+
+    const openReportFeedbackModal = (feedback) => setFeedbackToReport(feedback);
+    const closeReportFeedbackModal = () => {setFeedbackToReport(null); setReportedFeedbackMessage(true); }
 
     const [feedbackDeleteLoading, setFeedbackDeleteLoading] = useState();
 
@@ -55,7 +61,8 @@ function FeedbackList(props) {
 
     return (
         <div>
-            <ReportFeedbackModal feedback={selectedFeedback} user_id={props.user_id} handleClose={closeReportFeedbackModal} />
+            <FeedbackDeleteConfirmationModal feedback={feedbackToDelete} action={deleteFeedback} handleClose={closeConfirmFeedbackDeleteModal} />
+            <ReportFeedbackModal feedback={feedbackToReport} user_id={props.user_id} handleClose={closeReportFeedbackModal} />
             {props.feedbacks &&
                 (props.feedbacks).map((feedback, index) => {
                     if (feedbackDeleteLoading == index) {
@@ -104,7 +111,7 @@ function FeedbackList(props) {
                                                     {(feedback.student.user_id == props.user_id) && <FaTrashAlt
                                                         size={18}
                                                         style={{ cursor: 'pointer', marginRight: 5 }}
-                                                        onClick={() => deleteFeedback(feedback, index)} />}
+                                                        onClick={() => openConfirmFeedbackDeleteModal({'feedback': feedback, 'index': index}) } />}
                                                     {feedback.likes.includes(props.user_id)
                                                         ? <AiFillLike
                                                             size={18}
@@ -127,9 +134,6 @@ function FeedbackList(props) {
                                                     }
                                                 </Grid>
                                             </Grid>
-
-
-
                                         </div>
                                     </div>
                                 </div>
