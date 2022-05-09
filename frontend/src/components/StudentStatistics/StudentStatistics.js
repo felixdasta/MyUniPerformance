@@ -76,10 +76,14 @@ function StudentStatistics(props) {
       result += parseFloat(GPA[i])
     }
     result = result / GPA.length
-    result = result.toPrecision(2)
+    result = result.toFixed(2)
     {
       student.enrolled_sections.map((courseData) => {
-        takenCredits += courseData.section.course.course_credits;
+
+        if(courseData.grade_obtained !== "F" || "W"){
+          takenCredits += courseData.section.course.course_credits;
+        }
+
         switch (courseData.grade_obtained) {
           case "A":
             aCount += 1;
