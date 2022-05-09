@@ -1,9 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Container, Box, Typography, Paper } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
-import { useLocation } from "react-router-dom";
-import * as Loader from "react-loader-spinner";
-import { fontWeight } from "@mui/system";
 import {
   get_sections_grades_stats,
   calculate_gpa_based_on_counts
@@ -11,12 +8,9 @@ import {
 import {
   PieChart,
   Pie,
-  Text,
   Tooltip,
   XAxis,
   YAxis,
-  Area,
-  AreaChart,
   ResponsiveContainer,
   Cell,
   BarChart,
@@ -76,7 +70,7 @@ function StudentStatistics(props) {
       result += parseFloat(GPA[i])
     }
     result = result / GPA.length
-    result = result.toPrecision(2)
+    result = result.toFixed(2)
     {
       student.enrolled_sections.map((courseData) => {
         takenCredits += courseData.section.course.course_credits;
@@ -121,7 +115,7 @@ function StudentStatistics(props) {
             break;
         }
         gpa = honorPoints / gpaCredits;
-        gpa = gpa.toPrecision(2);
+        gpa = gpa.toFixed(2);
       });
     }
   }
@@ -247,7 +241,7 @@ function StudentStatistics(props) {
   )
 
   return (
-    <Container component={Paper} sx={{ backgroundColor: "white" }}>
+    <Container component={Paper} sx={{ backgroundColor: "white", height: 675 }}>
       <Typography sx={{ fontSize: 28 }} align="center">
         Student Statistics
       </Typography>
@@ -260,15 +254,17 @@ function StudentStatistics(props) {
                 </Box>);
           })}
         </Carousel>
-        <Typography align="center" sx={{ my: 3.5 }}>
+        <Typography align="center" sx={{ my: 3.5}}>
           You have approximately {remainingSemester} semesters left if you
           progress at a rate of {creditProgress} credits per semester.
         </Typography>
-        <Typography align="center" sx={{ my: 3.5 }}>
-          Your current GPA is: {gpa}
+        <Typography align="center" sx={{ my: 3.5}}>
+          Your current GPA is:<br/>
+          <div style={{fontWeight: 'bold', fontSize: 18}}>{gpa}</div>
         </Typography>
-        <Typography align="center" sx={{ my: 3.5 }}>
-          The average GPA of students who have taken the same courses as you: {result}
+        <Typography align="center" sx={{ my: 3.5}}>
+          Students who took the same sections as you have an average GPA of:<br/>
+          <div style={{fontWeight: 'bold', fontSize: 18}}>{result}</div>
         </Typography>
       </Box>
     </Container>
