@@ -1,10 +1,7 @@
 import React from "react";
-import { Box, maxHeight, maxWidth } from "@mui/system";
 
 export default function Home() {
     return (
-        <Box sx={{ mx: 3 }}>
-
-        </Box>
+        <iframe style={{ overflowY: 'hidden', width: '100%', height: '4600px' }} src="https://araigumedra.github.io/MyUniPerformance.github.io/" frameborder="0" width="100%" height="17560px" type="text/html"> </iframe>
     );
 }

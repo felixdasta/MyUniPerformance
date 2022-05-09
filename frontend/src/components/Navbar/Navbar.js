@@ -56,8 +56,9 @@ const Navbar = () => {
                 noWrap
                 component="img"
                 width="225px"
-                sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+                sx={{ mr: 2, display: { xs: 'none', md: 'flex', cursor: 'pointer' } }}
                 src={logo}
+                onClick={() => {navigate("/")}}
               />
 
               <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -150,7 +151,7 @@ const Navbar = () => {
     }
     else {
       return (
-        <AppBar position='static' elevation={0}>
+        <AppBar position='sticky' elevation={0}>
           <Toolbar>
             <img className="center-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */}
             <Button style={{
