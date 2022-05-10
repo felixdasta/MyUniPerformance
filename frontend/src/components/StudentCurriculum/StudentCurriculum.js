@@ -4,8 +4,16 @@ import { Paper, Table, Typography } from '@mui/material';
 
 function StudentCurriculum(props) {
     const [filteredClasses, setFilteredClasses] = useState([]);
+    const [termValue, setTermValue] = useState();
     let student = props.student;
     //Defining styles for table
+
+    const semesters = {
+        "V1": "First Summer",
+        "V2": "Second Summer",
+        "S1": "Fall Semester",
+        "S2": "Spring Semester",
+    }
 
     const sectionClickHandler = useCallback((section) => {
         return async (e) => {
@@ -14,6 +22,14 @@ function StudentCurriculum(props) {
         }
     }, [])
 
+    const formatTerm = value => {
+        let year = parseInt(value.substring(0, 4));
+        let semester = value.substring(4);
+        year = semester == "S2" ? year + 1 : year;
+        semester = semesters[semester];
+        return semester + " " + year;
+    };
+
     useEffect(() => {
         let term = [];
         {(student.enrolled_sections).map((section) => {
@@ -21,7 +37,7 @@ function StudentCurriculum(props) {
         })}
         term.sort((a,b) => b.term.localeCompare(a.term))
         let recentTerm = term[0]
-        console.log(recentTerm)
+        setTermValue(formatTerm(recentTerm.term))
         let payload = student.enrolled_sections.filter(
             (payload) => payload.section.section_term == recentTerm.term
         );
@@ -33,7 +49,7 @@ function StudentCurriculum(props) {
         result.push(
             <TableContainer component={Paper} height="100vh" sx={{width:1000}}>
                 <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
-                    Spring Semester 2022 {/* will be dynamic, just placeholder for styling */}
+                    {termValue} {/* will be dynamic, just placeholder for styling */}
                 </Typography>
                 <Table sx={{ Width: 250 }} aria-label="enrolled courses" stickyHeader>
                     <TableHead>
