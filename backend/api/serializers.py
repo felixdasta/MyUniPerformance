@@ -79,7 +79,7 @@ class StudentSerializer(ModelSerializer):
 
     class Meta:
         model = models.student.Student
-        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'curriculums', 'enrolled_sections']
+        fields = ['user_id', 'first_name', 'last_name', 'year_of_admission', 'institutional_email', 'curriculums', 'enrolled_sections', 'is_email_verified']
 
 class CustomStudentSerializer(ModelSerializer):
     curriculums = CustomCurriculumSerializer(many=True, read_only=True)

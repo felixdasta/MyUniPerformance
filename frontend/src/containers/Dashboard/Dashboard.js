@@ -28,13 +28,13 @@ export default function Dashboard() {
       localStorage.removeItem("user_id");
       navigate("/");
     })
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (section) {
       setInstructor(section.section.instructors)
     }
-  }, [section])
+  }, [section]);
 
   const changeSectionHandler = (newSection) => {
     setSection(newSection)
@@ -105,7 +105,7 @@ export default function Dashboard() {
 
     </Grid> : <div className="loader">
       <Loader.ThreeDots color="black" height={120} width={120} />
-
-    </div>}</Box>
+    </div>}
+    </Box>
   );
 }

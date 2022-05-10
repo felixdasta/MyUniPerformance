@@ -5,7 +5,7 @@ import { Avatar, Box, Grid, Alert, Snackbar } from '@mui/material';
 import { useState } from "react";
 import * as Loader from "react-loader-spinner";
 import ReportFeedbackModal from '../../ReportFeedbackModal/ReportFeedbackModal';
-import FeedbackDeleteConfirmationModal from '../../ConfirmationModal/ConfirmationModal';
+import FeedbackDeleteConfirmationModal from '../../ConfirmFeedbackDeleteModal/ConfirmFeedbackDeleteModal';
 
 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 

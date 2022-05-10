@@ -5,10 +5,9 @@ import { BiUserCircle } from 'react-icons/bi';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   Avatar, Box, Button,
-  ButtonGroup, Tooltip,
-  IconButton, Menu, MenuItem,
-  Typography, Toolbar, Container,
-  AppBar
+  Tooltip, IconButton, Menu, 
+  MenuItem, Typography, Toolbar, 
+  Container, AppBar
 } from '@mui/material';
 import "./Navbar.scss"
 
@@ -22,7 +21,7 @@ const Navbar = () => {
   { name: 'Curriculum', action: () => navigate("/curriculum") }];
 
   const settings = [
-  {name: 'Profile', action: null /* to be implemented*/}, 
+  {name: 'Profile', action: () => navigate("/profile") }, 
   {name: 'Logout', action: () => { 
     localStorage.removeItem("user_id"); 
     navigate("/"); 
@@ -116,7 +115,7 @@ const Navbar = () => {
               </Box>
 
               <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title="Open settings">
+                <Tooltip title="Menu">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                     <Avatar />
                   </IconButton>

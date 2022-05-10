@@ -4,11 +4,12 @@ import Courses from './containers/Courses/Courses'
 import CourseInsights from "./containers/CourseInsights/CourseInsights";
 import Curriculum from './containers/Curriculum/Curriculum';
 import Navbar from "./components/Navbar/Navbar";
-import Home from "./containers/Home";
+import Home from "./containers/Home/Home";
 import Login from "./containers/Login/Login";
 import SignUp from "./containers/Sign Up/SignUp";
 import Instructors from "./containers/Instructors/Instructors";
 import InstructorInsights from "./containers/InstructorInsights/InstructorInsights";
+import UserInformation from "./containers/UserInformation/UserInformation";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/curriculum" element={<Curriculum />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<SignUp />} />
+        <Route path="/profile" element={<UserInformation />} />
       </Routes>
     </BrowserRouter>
   );

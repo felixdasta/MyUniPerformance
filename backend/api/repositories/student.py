@@ -3,6 +3,8 @@ from django.contrib import messages
 from api.models.student import Student
 from api.utils import generate_token
 from base64 import urlsafe_b64decode
+from api.models.curriculum import Curriculum
+from api.serializers import StudentSerializer
 
 class StudentRepository:
     
@@ -52,7 +54,19 @@ class StudentRepository:
 
     @staticmethod
     def update_student(request, pk):
-        student = Student.objects.get(pk=pk)
+        student = StudentRepository.get_student_by_id(pk)
+        serializer = StudentSerializer(student, data=request.data, partial=True)
+        
+        if 'curriculums' in request.data:
+            curriculums = []
+            for curriculum_id in request.data['curriculums']:
+                curriculum = Curriculum.objects.get(pk=curriculum_id)
+                curriculums.append(curriculum)
+            student.curriculums.set(curriculums)
+
+        if serializer.is_valid():
+            serializer.save()
+
         return student
 
     @staticmethod

@@ -58,8 +58,9 @@ class StudentDetail(APIView):
         errors = []
         
         if 'institutional_email' in request.data:
-            errors = Authentication.validate_email(request, pk)
+            errors = Authentication.validate_email(request)
             request.data['is_email_verified'] = False
+            
         if 'password' in request.data:
             password_is_not_valid =  Authentication.validate_password(request)
             if password_is_not_valid:
@@ -71,21 +72,11 @@ class StudentDetail(APIView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
             
         student = StudentRepository.update_student(request, pk)
+        if('is_email_verified' in request.data and not request.data['is_email_verified']):
+            Authentication.send_activation_email(student, request)
 
-        serializer = StudentSerializer(student, data=request.data, partial=True)
-        
-        if 'curriculums' in request.data:
-            curriculums = []
-            for curriculum_id in request.data['curriculums']:
-                curriculum = Curriculum.objects.get(pk=curriculum_id)
-                curriculums.append(curriculum)
-            student.curriculums.set(curriculums)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status.HTTP_201_CREATED)
-        else:
-            return Response(serializer._errors, status.HTTP_400_BAD_REQUEST)
+        serializer = StudentSerializer(student)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk, format=None):
         StudentRepository.delete_student(pk)

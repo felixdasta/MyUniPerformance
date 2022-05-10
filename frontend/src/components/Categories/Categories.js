@@ -34,7 +34,7 @@ function Categories(props) {
     let input_style = { backgroundColor: "white", fontSize: 14 }
 
     return (
-        <Box height="100vh" className="slide-right" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 70, fontSize: 14 }}>
+        <Box height="100vh" className="slide-right" bgcolor="#F6F6F6" sx={{ width: 310, position: "sticky", top: 0, fontSize: 14 }}>
             {academicSemesters
                 && <div>
                     <div class="term-container">
