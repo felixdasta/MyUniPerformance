@@ -58,7 +58,7 @@ function StudentProfile(props) {
   }
 
   return (
-    <Card sx={{ width: 350, maxHeight: 500 }}>
+    <Card sx={{width: 450, maxHeight: 500 }}>
       <CardContent>
         <Typography sx={{ fontSize: 36}} align="center">
           {student.first_name} {student.last_name}

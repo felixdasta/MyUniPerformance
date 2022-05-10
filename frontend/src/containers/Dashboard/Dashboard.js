@@ -41,7 +41,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
+    <Box sx={{ mx: 28, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
       {/* Container for student information */}
       <Grid
         item
@@ -87,13 +87,14 @@ export default function Dashboard() {
                 component={SectionCourseInfo}
                 section={section}
                 course={course}
+                instructor={instructor}
                 lg={6} />
-              <Grid
+              {instructor && <Grid
                 item
                 component={SectionInstructorInfo}
                 section={section}
                 instructor={instructor}
-                lg={6} />
+                lg={6} />}
             </Grid> :
             <Grid
               item

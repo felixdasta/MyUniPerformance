@@ -256,7 +256,7 @@ function StudentStatistics(props) {
         Student Statistics
       </Typography>
       <Box height={550} alignContent="center">
-        <Carousel>
+        <Carousel interval={5000}>
           {GRAPHS.map((GRAPH, index) => {
             return (<Box>
                 {GRAPH}

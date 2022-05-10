@@ -69,7 +69,7 @@ export default function SectionCourseInfo(props) {
     }, [course])
 
     return (
-        <Card sx={{ backgroundColor: "white", width: 500, height: 350 }}>
+        <Card sx={{ backgroundColor: "white", width: 500, height: 430 }}>
             <CardHeader
                 title={
                     <Typography sx={{ fontSize: 27 }} align="left">
