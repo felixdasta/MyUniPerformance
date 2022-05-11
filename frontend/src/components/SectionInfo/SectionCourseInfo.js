@@ -72,7 +72,7 @@ export default function SectionCourseInfo(props) {
         <Card sx={{ backgroundColor: "white", width: 500, height: 430 }}>
             <CardHeader
                 title={
-                    <Typography sx={{ fontSize: 27 }} align="left">
+                    <Typography sx={{ fontSize: 26 }} align="left">
                         {section.name}
                     </Typography>
                 }

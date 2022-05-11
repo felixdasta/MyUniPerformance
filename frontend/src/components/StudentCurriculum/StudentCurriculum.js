@@ -47,7 +47,7 @@ function StudentCurriculum(props) {
     if (student.enrolled_sections) {
         let result = [];
         result.push(
-            <TableContainer component={Paper} height="100vh" sx={{width:1000}}>
+            <TableContainer component={Paper} height="100vh" sx={{width:"100%"}}>
                 <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
                     {termValue} {/* will be dynamic, just placeholder for styling */}
                 </Typography>

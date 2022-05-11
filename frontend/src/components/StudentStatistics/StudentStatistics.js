@@ -245,7 +245,7 @@ function StudentStatistics(props) {
   )
 
   return (
-    <Container component={Paper} sx={{ backgroundColor: "white", height: 675 }}>
+    <Container component={Paper} sx={{ backgroundColor: "white", height: 750 }}>
       <Typography sx={{ fontSize: 28 }} align="center">
         Student Statistics
       </Typography>

@@ -119,9 +119,6 @@ export default function InstructorDetails() {
         let courses_passing_rate = get_courses_passing_rate(courses);
         let graphs = [];
 
-        console.log(most_given_courses);
-        console.log(courses_passing_rate);
-
         graphs.push(
             <Box>
                 <ResponsiveContainer width="100%" height={250}>

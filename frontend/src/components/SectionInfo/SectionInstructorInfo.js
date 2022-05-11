@@ -1,19 +1,20 @@
-import { Card, Grid, CardContent, Typography, CardHeader  } from "@mui/material";
+import { Card, Grid, CardContent, Typography, CardHeader, IconButton, Tooltip as MuiTooltip } from "@mui/material";
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import React from "react";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
-import { useLocation } from "react-router-dom";
 import { get_instructors_by_id } from "../../actions/instructors";
 import * as Loader from "react-loader-spinner";
 import {
   get_courses_passing_rate,
   get_courses_number_of_semesters_offered,
 } from "../../actions/courses";
+import { useNavigate } from "react-router-dom";
 
 import {
   Text,
-  Tooltip,
+  Tooltip as RechartTooltip,
   XAxis,
   YAxis,
   ResponsiveContainer,
@@ -25,12 +26,7 @@ import {
 
 function SectionInstructorInfo(props) {
   const [quickFactsGraphs, setQuickFactsGraphs] = useState();
-  const [courses, setCourses] = useState();
-  const [instructorID, setInstructorID] = useState();
-  const [sections, setSections] = useState();
-  const location = useLocation();
-
-
+  let navigate = useNavigate();
 
   const getCourses = (sections) => {
     let unique_courses = {};
@@ -66,10 +62,6 @@ function SectionInstructorInfo(props) {
       </Text>
     );
   };
-  const top_grid_container_style = {
-    height: "400px",
-    width: "100%",
-  };
 
   const representQuickFacts = (courses) => {
     let most_given_courses = get_courses_number_of_semesters_offered(courses);
@@ -92,7 +84,7 @@ function SectionInstructorInfo(props) {
           >
             <XAxis dataKey="name" tick={quickFactsAxisTick} interval={0} />
             <YAxis />
-            <Tooltip />
+            <RechartTooltip />
             <Legend layout="horizontal" verticalAlign="top" align="center" />
             <CartesianGrid strokeDasharray="3 3" />
             <Bar
@@ -105,9 +97,8 @@ function SectionInstructorInfo(props) {
         </ResponsiveContainer>
         <Typography
           sx={{ fontWeight: 400, fontSize: 16, marginTop: 2 }}
-          align="center"
-        >
-          Number of semesters the instructor has taught the course
+          align="center">
+          Number of semesters the instructor has taught a given course
         </Typography>
       </Box>
     );
@@ -123,7 +114,7 @@ function SectionInstructorInfo(props) {
           >
             <XAxis dataKey="name" tick={quickFactsAxisTick} interval={0} />
             <YAxis />
-            <Tooltip />
+            <RechartTooltip />
             <Legend layout="horizontal" verticalAlign="top" align="center" />
             <CartesianGrid strokeDasharray="3 3" />
             <Bar
@@ -138,7 +129,7 @@ function SectionInstructorInfo(props) {
           sx={{ fontWeight: 400, fontSize: 16, marginTop: 2 }}
           align="center"
         >
-          Percentage of students who pass the course
+          Percentage of students who pass the courses
         </Typography>
       </Box>
     );
@@ -147,59 +138,74 @@ function SectionInstructorInfo(props) {
   };
 
   useEffect(() => {
-    if (props.instructor[0]) {
-      setInstructorID(props.instructor[0].member_id);
-      get_instructors_by_id(instructorID)
+    if (props.instructor) {
+      get_instructors_by_id(props.instructor[0].member_id)
         .then((response) => {
           let sections = response.data.sections;
           let courses = getCourses(sections);
           delete response.data["sections"];
-          setSections(sections);
-          setCourses(courses);
           representQuickFacts(courses);
         })
         .catch((error) => {
           console.log(error.response.data);
         });
     }
-  }, [instructorID]);
+  }, [props.instructor]);
 
-  let result = [];
+  const viewInstructorDetails = () => {
+    navigate('../instructors/details', {
+      state: {
+        instructor: props.instructor[0],
+      }
+    });
+  }
 
-    result.push(
-        <Card sx={{ width: 500, height: 430 }}>
-            <CardHeader
-                title={
-                    <Typography sx={{ fontSize: 25 }} align="left">
-                        Quick Facts for {props.instructor[0].name}
-                    </Typography>
-                }
-                color="primary"
-            />
-          <CardContent>
-          {!quickFactsGraphs ?
-                    <div className='infinite-loader'>
-                        <Loader.RotatingLines style={{ display: "inline-block" }} color="black" height={40} width={40} />
-                    </div> :
-            <Grid
-              item
-              container
-              justifyContent="center"
-              sx={{my:-4}}
-            >
-              <Grid item container justifyContent="center" lg={12}>
-              </Grid>
-              <Grid item container lg={12}>
-                <Carousel sx={{ width: "100%" }} interval={5000}>
-                  {quickFactsGraphs.map((GRAPH) => GRAPH)}
-                </Carousel>
-              </Grid>
-            </Grid>}
-          </CardContent>
-        </Card>
-      );
-  
 
-  return result;
+  return (
+    <Card sx={{ width: 500, height: 430 }}>
+      <CardHeader
+        title={
+          <Typography sx={{ fontSize: 26 }} align="left">
+            {props.instructor[0].name}
+          </Typography>
+        }
+        action={
+          <MuiTooltip title="View in instructor page">
+            <IconButton onClick={viewInstructorDetails}>
+              <OpenInNewOutlinedIcon />
+            </IconButton>
+          </MuiTooltip>
+        }
+        subheader={
+          <div>
+              <Typography variant="body1">
+                  <Box sx={{ fontWeight: 'bold' }} display="inline">Quick Facts</Box>
+              </Typography>
+          </div>
+      }
+
+        color="primary"
+      />
+      <CardContent>
+        {!quickFactsGraphs ?
+          <div className='infinite-loader'>
+            <Loader.RotatingLines style={{ display: "inline-block" }} color="black" height={40} width={40} />
+          </div> :
+          <Grid
+            item
+            container
+            justifyContent="center"
+            sx={{ my: -4 }}
+          >
+            <Grid item container justifyContent="center" lg={12}>
+            </Grid>
+            <Grid item container lg={12}>
+              <Carousel sx={{ width: "100%" }} interval={5000}>
+                {quickFactsGraphs.map((GRAPH) => GRAPH)}
+              </Carousel>
+            </Grid>
+          </Grid>}
+      </CardContent>
+    </Card>);
 }
 export default SectionInstructorInfo;

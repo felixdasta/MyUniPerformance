@@ -41,7 +41,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Box sx={{ mx: 28, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
+    <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3}>
       {/* Container for student information */}
       <Grid
         item
@@ -87,12 +87,10 @@ export default function Dashboard() {
                 component={SectionCourseInfo}
                 section={section}
                 course={course}
-                instructor={instructor}
                 lg={6} />
               {instructor && <Grid
                 item
                 component={SectionInstructorInfo}
-                section={section}
                 instructor={instructor}
                 lg={6} />}
             </Grid> :
@@ -106,7 +104,7 @@ export default function Dashboard() {
 
     </Grid> : <div className="loader">
       <Loader.ThreeDots color="black" height={120} width={120} />
-    </div>}
-    </Box>
+
+    </div>}</Box>
   );
 }

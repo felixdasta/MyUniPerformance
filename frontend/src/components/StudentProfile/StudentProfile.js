@@ -10,26 +10,28 @@ import {
   Container,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import {
-  get_sections_grades_stats,
-  calculate_gpa_based_on_counts
-} from '../../actions/sections';
 import { deepOrange, deepPurple } from "@mui/material/colors";
-import { fontWeight } from "@mui/system";
 
 function StudentProfile(props) {
   let student = props.student
   let takenCredits = 0;
   let honorPoints = 0;
 
-
   if (student.enrolled_sections) {
     {
+      let student_dept_id = student.curriculums[0].department.department_id;
       student.enrolled_sections.map((courseData) => {
-
-        if(courseData.grade_obtained !== "F" || "W"){
+        let course_dept_id = courseData.section.course.department.department_id;
+        let grade = courseData.grade_obtained;
+        if (student_dept_id == course_dept_id
+          && (grade !== "F" && grade !== "D" && grade !== "W")) {
           takenCredits += courseData.section.course.course_credits;
         }
+        else if (student_dept_id != course_dept_id
+          && (grade !== "F" && grade !== "W")) {
+          takenCredits += courseData.section.course.course_credits;
+        }
+
         switch (courseData.grade_obtained) {
           case "A":
             honorPoints = honorPoints + (4 * courseData.section.course.course_credits)
@@ -52,15 +54,15 @@ function StudentProfile(props) {
             break;
         }
       });
-      
+
     }
 
   }
 
   return (
-    <Card sx={{width: 450, maxHeight: 500 }}>
+    <Card sx={{ width: "100%", maxHeight: 500 }}>
       <CardContent>
-        <Typography sx={{ fontSize: 36}} align="center">
+        <Typography sx={{ fontSize: 36 }} align="center">
           {student.first_name} {student.last_name}
         </Typography>
         <Container align="center">
