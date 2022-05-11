@@ -125,7 +125,7 @@ function StudentStatistics(props) {
             break;
         }
         gpa = honorPoints / gpaCredits;
-        gpa = gpa.toPrecision(2);
+        gpa = gpa.toFixed(2);
       });
     }
   }
