@@ -5,90 +5,162 @@ import ListItemText from '@mui/material/ListItemText';
 import InfiniteScroll from 'react-infinite-scroller';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField } from "@mui/material";
-import { get_sections_grades_stats } from "../../actions/sections";
+import { enroll_student_or_update_grade, get_sections_grades_stats } from "../../actions/sections";
 import { get_courses_by_id, get_courses_by_university } from "../../actions/courses";
+import { get_departments_by_university } from "../../actions/departments";
 
 export default function CurriculumCoursePicker(props) {
-    const [filters, setFilters] = useState();
     const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({ year: "", semester: "", section_id: "", grade: "" });
+    const [formData, setFormData] = useState({ department_id: "", course_id: "", year: "", semester: "", section_id: "", grade: "" });
     const [course, setCourse] = useState();
     const [sections, setSections] = useState();
-    const [electiveCourse, setElectiveCourses] = useState([]);
-    const [filteredSections, setFilteredSections] = useState();
     const [missingCourses, setMissingCourses] = useState([]);
 
+    const [selectDepartments, setSelectDepartments] = useState();
+    const [selectCourses, setSelectCourses] = useState();
     const [selectYears, setSelectYears] = useState();
     const [selectSemesters, setSelectSemesters] = useState();
+    const [selectSections, setSelectSections] = useState();
     const selectGrades = ["IP", "A", "B", "C", "D", "F", "P", "W", "IB", "ID", "IC", "IF"]
 
+    const socioHumanisticFilter = [29, 24, 25, 26, 12, 27, 33]
     const university = 1;
 
     const handleClickOpen = useCallback((course) => {
         setOpen(true);
         setCourse(course);
 
+        // check if non free elective
+        // initial value electives is the department id
         if (course.course.course_code.slice(4, 8) === "XXXX") {
-            get_courses_by_university(university, { department_id: course.course.department.department_id }).then(response => {
-                setElectiveCourses(response.data.courses)
-                console.log(response.data.courses)
+            setFormData({ ...formData, department_id: course.course.department.department_id });
+            setSelectDepartments([course.course.department]);
+            getCoursesByDepartmentID(course.course.department.department_id);
+        }
+
+        // check if free elective
+        // free electives have no initial value
+        else if (course.course.department.department_name === "Other") {
+            get_departments_by_university(university).then(response => {
+                setSelectDepartments(response.data);
             })
         }
-        else {
-            let yearsSet = new Set();
-            get_courses_by_id(course.course.course_id).then(response => {
-                setSections(response.data.sections);
-                response.data.sections.forEach(record => {
-                    yearsSet.add(record.section_term.slice(0, 4))
-                })
-                setSelectYears(Array.from(yearsSet))
+
+        else if (course.course.course_code === "----") {
+            let socioHumanisticDepartments = []
+
+            get_departments_by_university(university).then(response => {
+                response.data.forEach(record => {
+                    if (socioHumanisticFilter.includes(record.department_id)) {
+                        socioHumanisticDepartments.push(record)
+                    }
+                });
+                setSelectDepartments(socioHumanisticDepartments);
             })
+        }
+
+        // regular course
+        // initial value is the department and course id
+        else {
+            setFormData({ ...formData, department_id: course.course.department.department_id, course_id: course.course.course_id })
+            setSelectDepartments([course.course.department]);
+            setSelectCourses([course.course]);
+            getSectionsByCourseID(course.course.course_id);
         }
 
     }, []);
 
     const handleClose = () => {
         setOpen(false);
+        setSelectDepartments();
+        setSelectCourses();
         setSelectYears();
         setSelectSemesters();
-        setFormData({ year: "", semester: "", section_id: "", grade: "" });
+        setSelectSections();
+        setFormData({ department_id: "", course_id: "", year: "", semester: "", section_id: "", grade: "" });
     };
+
     const handleSubmit = () => {
         setOpen(false);
+        setSelectDepartments();
+        setSelectCourses();
+        setSelectYears();
+        setSelectSemesters();
+        setSelectSections();
+        enroll_student_or_update_grade(props.student.user_id, formData.section_id, formData.grade).then(response => {
+            //maybe some success alert
+        }).catch((error) => {
+            //maybe some failure alert
+        })
     };
 
     const handleFormData = (e) => {
         switch (e.target.name) {
+            case "department_id":
+                setFormData({ ...formData, department_id: e.target.value });
+                getCoursesByDepartmentID(e.target.value);
+                break;
+            case "course_id":
+                setFormData({ ...formData, course_id: e.target.value });
+                getSectionsByCourseID(e.target.value);
+                break;
             case "year":
-                setFormData({ ...formData, year: e.target.value })
-                filterSectionList({ ...formData, year: e.target.value })
+                setFormData({ ...formData, year: e.target.value });
+                filterSectionsByYear(e.target.value);
                 break;
             case "semester":
-                setFormData({ ...formData, semester: e.target.value })
+                setFormData({ ...formData, semester: e.target.value });
+                filterSectionsBySemester(formData.year, e.target.value);
                 break;
             case "section_id":
-                setFormData({ ...formData, section_id: e.target.value })
+                setFormData({ ...formData, section_id: e.target.value });
                 break;
             case "grade":
-                setFormData({ ...formData, grade: e.target.value })
+                setFormData({ ...formData, grade: e.target.value });
                 break;
             default:
                 break;
         }
     }
 
-    const filterSectionList = (filters) => {
-        let newFilteredSections = []
+    const getCoursesByDepartmentID = (department_id) => {
+        get_courses_by_university(university, { department_id: department_id }).then(response => {
+            setSelectCourses(response.data.courses)
+        })
+    }
+
+    const getSectionsByCourseID = (course) => {
+        let yearsSet = new Set();
+
+        get_courses_by_id(course).then(response => {
+            setSections(response.data.sections);
+            response.data.sections.forEach(record => {
+                yearsSet.add(record.section_term.slice(0, 4))
+            })
+            setSelectYears(Array.from(yearsSet))
+        })
+    }
+
+    const filterSectionsByYear = (year) => {
         let newSelectSemesters = new Set();
 
         sections.forEach(record => {
-            if (filters.year !== "" && record.section_term.slice(0, 4) === filters.year) {
-                newFilteredSections.push(record)
+            if (year !== "" && record.section_term.slice(0, 4) === year) {
                 newSelectSemesters.add(record.section_term.slice(4, 6))
             }
         });
         setSelectSemesters(Array.from(newSelectSemesters))
-        setFilteredSections(newFilteredSections)
+    }
+
+    const filterSectionsBySemester = (year, semester) => {
+        let newSelectSections = []
+
+        sections.forEach(record => {
+            if ((year !== "" && semester !== "") && (record.section_term.slice(0, 4) === year) && (record.section_term.slice(4, 6) === semester)) {
+                newSelectSections.push(record)
+            }
+        });
+        setSelectSections(newSelectSections)
     }
 
     useEffect(() => {
@@ -135,12 +207,52 @@ export default function CurriculumCoursePicker(props) {
                         </div>))}
                 </InfiniteScroll>}
             </List>
-            <Dialog open={open} onClose={handleClose} maxWidth={"md"}>
-                <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
+
+            <Dialog open={open} onClose={handleClose} maxWidth={"Lg"}>
+                <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX" || course.course.course_code !== "----") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please choose the year, semester, and section code of the course taken, as well as the grade obtained for this course
                     </DialogContentText>
+
+                    {/* Department input */}
+                    {selectDepartments ?
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                            <InputLabel id="department-label">Department</InputLabel>
+                            <Select
+                                value={formData.department}
+                                onChange={handleFormData}
+                                label="department"
+                                name="department_id"
+                            >
+                                {(selectDepartments).map((record) => (
+                                    <MenuItem value={record.department_id}>{record.department_name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl> :
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                            <InputLabel id="department-label">Department</InputLabel>
+                        </FormControl>
+                    }
+
+                    {/* Course input */}
+                    {selectCourses ?
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                            <InputLabel id="course-label">Course</InputLabel>
+                            <Select
+                                value={formData.course_id}
+                                onChange={handleFormData}
+                                label="course"
+                                name="course_id"
+                            >{(selectCourses).map((record) => (
+                                <MenuItem value={record.course_id}>{record.course_code}</MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl> :
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                            <InputLabel id="course-label">Course</InputLabel>
+                        </FormControl>
+                    }
 
                     {/* Year input */}
                     {selectYears ?
@@ -162,7 +274,7 @@ export default function CurriculumCoursePicker(props) {
                     }
 
                     {/* Semester input */}
-                    {(formData.year) ?
+                    {selectSemesters ?
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
                             <InputLabel id="semester-label">Semester</InputLabel>
                             <Select
@@ -181,21 +293,21 @@ export default function CurriculumCoursePicker(props) {
                     }
 
                     {/* Section Code input */}
-                    {(formData.year && formData.semester) ?
+                    {selectSections ?
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
-                            <InputLabel id="section_id-label">Section Code</InputLabel>
+                            <InputLabel id="section_id-label">Section</InputLabel>
                             <Select
                                 value={formData.section_id}
                                 onChange={handleFormData}
                                 label="section_id"
                                 name="section_id"
-                            >{(filteredSections).map((record) => (
+                            >{(selectSections).map((record) => (
                                 <MenuItem value={record.section_id}>{record.section_code}</MenuItem>
                             ))}
                             </Select>
                         </FormControl> :
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
-                            <InputLabel id="year-label">Semester</InputLabel>
+                            <InputLabel id="year-label">Section</InputLabel>
                         </FormControl>
                     }
 
