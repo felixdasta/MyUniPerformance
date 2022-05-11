@@ -11,13 +11,14 @@ import { get_courses_by_id, get_courses_by_university } from "../../actions/cour
 export default function CurriculumCoursePicker(props) {
     const [filters, setFilters] = useState();
     const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({ year: "", semester: "", section_id: "", grade: "" });
+    const [formData, setFormData] = useState({ department_id: "", course_id: "", year: "", semester: "", section_id: "", grade: "" });
     const [course, setCourse] = useState();
     const [sections, setSections] = useState();
-    const [electiveCourse, setElectiveCourses] = useState([]);
     const [filteredSections, setFilteredSections] = useState();
     const [missingCourses, setMissingCourses] = useState([]);
 
+    const [selectDepartment, setSelectDepartment] = useState();
+    const [selectCourses, setSelectCourses] = useState();
     const [selectYears, setSelectYears] = useState();
     const [selectSemesters, setSelectSemesters] = useState();
     const selectGrades = ["IP", "A", "B", "C", "D", "F", "P", "W", "IB", "ID", "IC", "IF"]
@@ -28,10 +29,15 @@ export default function CurriculumCoursePicker(props) {
         setOpen(true);
         setCourse(course);
 
-        if (course.course.course_code.slice(4, 8) === "XXXX") {
+        // check if non free elective
+        // initial value electives is the department id
+        // free electives have no initial value
+        if (course.course.course_code.slice(4, 8) === "XXXX" ||
+            (course.course.course_code.slice(0, 4) === "----" && course.course.department.department_name !== "Other")) {
+            setFormData({ ...formData, department_id: course.course.department.department_id })
+            setSelectDepartment(course.course.department.department_id)
             get_courses_by_university(university, { department_id: course.course.department.department_id }).then(response => {
-                setElectiveCourses(response.data.courses)
-                console.log(response.data.courses)
+                setSelectCourses(response.data.courses)
             })
         }
         else {
@@ -135,12 +141,51 @@ export default function CurriculumCoursePicker(props) {
                         </div>))}
                 </InfiniteScroll>}
             </List>
-            <Dialog open={open} onClose={handleClose} maxWidth={"md"}>
+
+            <Dialog open={open} onClose={handleClose} maxWidth={"Lg"}>
                 <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please choose the year, semester, and section code of the course taken, as well as the grade obtained for this course
                     </DialogContentText>
+
+                    {/* Department input */}
+                    {selectYears ?
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                            <InputLabel id="department-label">Department</InputLabel>
+                            <Select
+                                value={formData.department}
+                                onChange={handleFormData}
+                                label="department"
+                                name="department"
+                            >{(selectYears).map((year) => (
+                                <MenuItem value={year}>{year}</MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl> :
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                            <InputLabel id="department-label">Department</InputLabel>
+                        </FormControl>
+                    }
+
+                    {/* Course input */}
+                    {selectYears ?
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                            <InputLabel id="year-label">Year</InputLabel>
+                            <Select
+                                value={formData.year}
+                                onChange={handleFormData}
+                                label="year"
+                                name="year"
+                            >{(selectYears).map((year) => (
+                                <MenuItem value={year}>{year}</MenuItem>
+                            ))}
+                            </Select>
+                        </FormControl> :
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                            <InputLabel id="year-label">Year</InputLabel>
+                        </FormControl>
+                    }
 
                     {/* Year input */}
                     {selectYears ?
@@ -183,7 +228,7 @@ export default function CurriculumCoursePicker(props) {
                     {/* Section Code input */}
                     {(formData.year && formData.semester) ?
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
-                            <InputLabel id="section_id-label">Section Code</InputLabel>
+                            <InputLabel id="section_id-label">Section</InputLabel>
                             <Select
                                 value={formData.section_id}
                                 onChange={handleFormData}
@@ -195,7 +240,7 @@ export default function CurriculumCoursePicker(props) {
                             </Select>
                         </FormControl> :
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
-                            <InputLabel id="year-label">Semester</InputLabel>
+                            <InputLabel id="year-label">Section</InputLabel>
                         </FormControl>
                     }
 
