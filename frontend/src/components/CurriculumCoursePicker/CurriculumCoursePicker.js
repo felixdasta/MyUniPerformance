@@ -5,8 +5,9 @@ import ListItemText from '@mui/material/ListItemText';
 import InfiniteScroll from 'react-infinite-scroller';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField } from "@mui/material";
-import { get_sections_grades_stats } from "../../actions/sections";
+import { enroll_student_or_update_grade, get_sections_grades_stats } from "../../actions/sections";
 import { get_courses_by_id, get_courses_by_university } from "../../actions/courses";
+import { get_departments_by_university } from "../../actions/departments";
 
 export default function CurriculumCoursePicker(props) {
     const [open, setOpen] = useState(false);
@@ -15,13 +16,14 @@ export default function CurriculumCoursePicker(props) {
     const [sections, setSections] = useState();
     const [missingCourses, setMissingCourses] = useState([]);
 
-    const [selectDepartment, setSelectDepartment] = useState();
+    const [selectDepartments, setSelectDepartments] = useState();
     const [selectCourses, setSelectCourses] = useState();
     const [selectYears, setSelectYears] = useState();
     const [selectSemesters, setSelectSemesters] = useState();
     const [selectSections, setSelectSections] = useState();
     const selectGrades = ["IP", "A", "B", "C", "D", "F", "P", "W", "IB", "ID", "IC", "IF"]
 
+    const socioHumanisticFilter = [29, 24, 25, 26, 12, 27, 33]
     const university = 1;
 
     const handleClickOpen = useCallback((course) => {
@@ -30,41 +32,73 @@ export default function CurriculumCoursePicker(props) {
 
         // check if non free elective
         // initial value electives is the department id
+        if (course.course.course_code.slice(4, 8) === "XXXX") {
+            setFormData({ ...formData, department_id: course.course.department.department_id });
+            setSelectDepartments([course.course.department]);
+            getCoursesByDepartmentID(course.course.department.department_id);
+        }
+
+        // check if free elective
         // free electives have no initial value
-        if (course.course.course_code.slice(4, 8) === "XXXX" ||
-            (course.course.course_code.slice(0, 4) === "----" && course.course.department.department_name !== "Other")) {
-            setFormData({ ...formData, department_id: course.course.department.department_id })
-            setSelectDepartment(course.course.department.department_id)
-            get_courses_by_university(university, { department_id: course.course.department.department_id }).then(response => {
-                setSelectCourses(response.data.courses)
+        else if (course.course.department.department_name === "Other") {
+            get_departments_by_university(university).then(response => {
+                setSelectDepartments(response.data);
             })
         }
+
+        else if (course.course.course_code === "----") {
+            let socioHumanisticDepartments = []
+
+            get_departments_by_university(university).then(response => {
+                response.data.forEach(record => {
+                    if (socioHumanisticFilter.includes(record.department_id)) {
+                        socioHumanisticDepartments.push(record)
+                    }
+                });
+                setSelectDepartments(socioHumanisticDepartments);
+            })
+        }
+
+        // regular course
+        // initial value is the department and course id
         else {
             setFormData({ ...formData, department_id: course.course.department.department_id, course_id: course.course.course_id })
-            setSelectDepartment(course.course.department.department_id)
-            setSelectCourses([course.course])
-            getSectionsByCourseID(course.course.course_id)
+            setSelectDepartments([course.course.department]);
+            setSelectCourses([course.course]);
+            getSectionsByCourseID(course.course.course_id);
         }
 
     }, []);
 
     const handleClose = () => {
         setOpen(false);
-        setSelectDepartment();
+        setSelectDepartments();
         setSelectCourses();
         setSelectYears();
         setSelectSemesters();
         setSelectSections();
         setFormData({ department_id: "", course_id: "", year: "", semester: "", section_id: "", grade: "" });
     };
+
     const handleSubmit = () => {
         setOpen(false);
+        setSelectDepartments();
+        setSelectCourses();
+        setSelectYears();
+        setSelectSemesters();
+        setSelectSections();
+        enroll_student_or_update_grade(props.student.user_id, formData.section_id, formData.grade).then(response => {
+            alert("Course added")
+        }).catch((error) => {
+            alert("Unsuccesful, please try again")
+        })
     };
 
     const handleFormData = (e) => {
         switch (e.target.name) {
             case "department_id":
                 setFormData({ ...formData, department_id: e.target.value });
+                getCoursesByDepartmentID(e.target.value);
                 break;
             case "course_id":
                 setFormData({ ...formData, course_id: e.target.value });
@@ -87,6 +121,12 @@ export default function CurriculumCoursePicker(props) {
             default:
                 break;
         }
+    }
+
+    const getCoursesByDepartmentID = (department_id) => {
+        get_courses_by_university(university, { department_id: department_id }).then(response => {
+            setSelectCourses(response.data.courses)
+        })
     }
 
     const getSectionsByCourseID = (course) => {
@@ -169,17 +209,14 @@ export default function CurriculumCoursePicker(props) {
             </List>
 
             <Dialog open={open} onClose={handleClose} maxWidth={"Lg"}>
-                <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
+                <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX" || course.course.course_code !== "----") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please choose the year, semester, and section code of the course taken, as well as the grade obtained for this course
                     </DialogContentText>
 
                     {/* Department input */}
-                    {selectDepartment ?
-                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
-                            <InputLabel id="department-label">{course.course.department.department_name}</InputLabel>
-                        </FormControl> :
+                    {selectDepartments ?
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
                             <InputLabel id="department-label">Department</InputLabel>
                             <Select
@@ -188,7 +225,13 @@ export default function CurriculumCoursePicker(props) {
                                 label="department"
                                 name="department_id"
                             >
+                                {(selectDepartments).map((record) => (
+                                    <MenuItem value={record.department_id}>{record.department_name}</MenuItem>
+                                ))}
                             </Select>
+                        </FormControl> :
+                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                            <InputLabel id="department-label">Department</InputLabel>
                         </FormControl>
                     }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {url} from "../config.js";
+import { url } from "../config.js";
 
 export const semesters = {
     "V1": "First Summer",
@@ -52,15 +52,15 @@ export const get_available_semesters_by_academic_year = (terms) => {
 }
 
 export const get_available_sections_filters = (sections) => {
-    const add_value = (object, key, value) =>{
+    const add_value = (object, key, value) => {
         let result = object[key] ? object[key] : [];
         result.push(value);
         object[key] = result;
     }
 
     //initialize universal values
-    let instructors_sections_response = {"All": {filtered_semesters: {}, filtered_sections: {}}};
-    sections.sort((a,b) => a.section_term.localeCompare(b.section_term));
+    let instructors_sections_response = { "All": { filtered_semesters: {}, filtered_sections: {} } };
+    sections.sort((a, b) => a.section_term.localeCompare(b.section_term));
 
     for (let section of sections) {
         let year = parseInt(section.section_term.substring(0, 4));
@@ -80,12 +80,12 @@ export const get_available_sections_filters = (sections) => {
         add_value(all_instructors.filtered_sections, section.section_term, section);
 
         //filter all available years, semesters and sections for a given course from an instructor
-        for(let instructor of section.instructors){
+        for (let instructor of section.instructors) {
             //in case that we need to initialized the value
-            instructors_sections_response[instructor.name] = 
-            instructors_sections_response[instructor.name] ? 
-            instructors_sections_response[instructor.name] : 
-            {filtered_semesters: {}, filtered_sections: {}};
+            instructors_sections_response[instructor.name] =
+                instructors_sections_response[instructor.name] ?
+                    instructors_sections_response[instructor.name] :
+                    { filtered_semesters: {}, filtered_sections: {} };
 
             let some_instructor = instructors_sections_response[instructor.name];
 
@@ -94,11 +94,11 @@ export const get_available_sections_filters = (sections) => {
             //consider the specific year
             add_value(some_instructor.filtered_semesters, year, academic_semester);
             //add the sections to the corresponding academic term
-            add_value(some_instructor.filtered_sections, section.section_term, section); 
+            add_value(some_instructor.filtered_sections, section.section_term, section);
         }
     }
 
-    for(let instructor in instructors_sections_response){
+    for (let instructor in instructors_sections_response) {
         let semesters_response = instructors_sections_response[instructor].filtered_semesters
         for (let year in semesters_response) {
             //Get available semesters of a given year
@@ -180,7 +180,7 @@ export const get_students_count_by_term = (sections) => {
         sections_student_count_by_term.push({ name: formatTerm(section_term), "Enrolled students": term_count_mapping[section_term], term: section_term });
     }
 
-    sections_student_count_by_term.sort((a,b) => a.term.localeCompare(b.term));
+    sections_student_count_by_term.sort((a, b) => a.term.localeCompare(b.term));
     return sections_student_count_by_term;
 }
 
@@ -204,7 +204,7 @@ export const get_students_count_by_instructor = (sections) => {
         sections_student_count_by_instructor.push({ name: instructor, "Enrolled students": instructor_count_mapping[instructor] });
     }
 
-    sections_student_count_by_instructor.sort((a,b) => a.name.localeCompare(b.name));
+    sections_student_count_by_instructor.sort((a, b) => a.name.localeCompare(b.name));
     return sections_student_count_by_instructor;
 }
 
@@ -216,7 +216,7 @@ export const get_sections_grades_stats = (sections) => {
             grade_stats_mapping[grade] = grade_stats_mapping[grade] ? grade_stats_mapping[grade] + section.grades[grade] : section.grades[grade];
         }
     }
-    
+
     let unnecesary_values = ['ib_count', 'ic_count', 'id_count', 'if_count'];
 
     for (let grade in grade_stats_mapping) {
@@ -229,17 +229,17 @@ export const get_sections_grades_stats = (sections) => {
     return sections_grade_stats;
 }
 
-export const year_contains_academic_semester = (year, semester, sections) =>{
+export const year_contains_academic_semester = (year, semester, sections) => {
     let contains_semester = false;
     {
         sections.filtered_semesters[year] &&
-        sections.filtered_semesters[year]
-        .map((entry) => contains_semester = entry.key == semester ? true : contains_semester);
+            sections.filtered_semesters[year]
+                .map((entry) => contains_semester = entry.key == semester ? true : contains_semester);
     }
     return contains_semester;
 }
 
-export const instructor_teached_year = (year, sections_by_instructor) =>{
+export const instructor_teached_year = (year, sections_by_instructor) => {
     return sections_by_instructor.filtered_semesters[year] != null;
 }
 
@@ -250,6 +250,15 @@ export const get_sections_terms_by_university = async (university_id) => {
 
 export const get_section_info_by_id = async (section_id) => {
     const response = await axios.get(url + 'sections/' + section_id);
+    return response;
+}
+
+export const enroll_student_or_update_grade = async (student_id, section_id, grade_obtained) => {
+    const response = await axios.put(url + 'students/' + student_id + '/sections/' + section_id, {
+        student_id: student_id,
+        section_id: section_id,
+        grade_obtained: grade_obtained
+    });
     return response;
 }
 
@@ -268,8 +277,8 @@ export const setUniversitySectionsTerms = (selectedUniversity, setTerms) => {
 export const calculate_gpa_based_on_counts = (grades_count) => {
     let grades = {};
 
-    for(let grade of grades_count){
-        grades[grade.name] = grade.value; 
+    for (let grade of grades_count) {
+        grades[grade.name] = grade.value;
     }
 
     let aCount = grades["A's count"] ? grades["A's count"] : 0;
@@ -278,7 +287,7 @@ export const calculate_gpa_based_on_counts = (grades_count) => {
     let dCount = grades["D's count"] ? grades["D's count"] : 0;
     let fCount = grades["F's count"] ? grades["F's count"] : 0;
 
-    return ((aCount * 4 + bCount * 3 + cCount * 2 + dCount * 1)/(aCount + bCount + cCount + dCount + fCount)).toFixed(2);
+    return ((aCount * 4 + bCount * 3 + cCount * 2 + dCount * 1) / (aCount + bCount + cCount + dCount + fCount)).toFixed(2);
 }
 
 export const get_specified_semester = (section_term) => {

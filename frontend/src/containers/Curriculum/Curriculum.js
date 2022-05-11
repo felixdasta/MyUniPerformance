@@ -21,7 +21,6 @@ export default function Curriculum() {
             response => {
                 setStudent(response.data);
                 setUniversity(response.data.curriculums[0].department.university)
-                console.log(response.data.curriculums[0].department.university)
             }
         ).catch((error) => {
             console.log(error.response.data)
