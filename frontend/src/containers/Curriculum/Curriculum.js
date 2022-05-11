@@ -12,7 +12,7 @@ import SectionCourseInfo from "../../components/SectionInfo/SectionCourseInfo";
 
 export default function Curriculum() {
     const [student, setStudent] = useState();
-    const [university, setUniversity] = useState([]);
+    const [university, setUniversity] = useState();
     const [section, setSection] = useState();
 
     let navigate = useNavigate();
@@ -30,6 +30,7 @@ export default function Curriculum() {
                     console.log(error.response.data)
                     navigate("/")
                 })
+                setUniversity(response.data.curriculums[0].department.university)
             }
         ).catch((error) => {
             console.log(error.response.data)
@@ -41,10 +42,10 @@ export default function Curriculum() {
         setSection(newSection)
     }
     return (
-        <Box sx={{ mx: 3, my: 3 }}> {student ? <Grid container spacing={0} columnSpacing={3} rowGap={3}>
+        <Box sx={{ mx: 3, my: 3 }}> {student && university ? <Grid container spacing={0} columnSpacing={3} rowGap={3}>
             {/* Top Row Container, each item container can be adjusted for width by changing lg*/}
             <Grid item container lg={3} justifyContent="center">
-                <Grid item component={CurriculumCoursePicker} student={student} lg={12} />
+                <Grid item component={CurriculumCoursePicker} student={student} university={university} lg={12} />
             </Grid>
             <Grid item container lg={9} direction={"column"} rowGap={3}>{section ?
                 <div>

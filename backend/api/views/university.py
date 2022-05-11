@@ -24,6 +24,6 @@ class UniversityDetail(APIView):
         try:
             university = UniversityRepository.get_university_by_id(pk)
             serializer = UniversitySerializer(university)
-            return Response(serializer)
+            return Response(serializer.data)
         except University.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
