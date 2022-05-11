@@ -46,6 +46,7 @@ export default function Courses() {
                     universities.push(curriculum.department.university);
                 }
                 setSelectedUniversity(universities[0]);
+                console.log(universities[0])
                 setUniversities(universities);
             }
         ).catch((error) => {
@@ -86,10 +87,10 @@ export default function Courses() {
                 filteredData={filteredData}
                 setCourses={setUniversityCourses}
                 lastPage={lastPage}
-            />:
-            <div className={terms && departments ? "custom-loader" : "loader"}>
-                <Loader.ThreeDots color="black" height={120} width={120} />
-            </div>}
+            /> :
+                <div className={terms && departments ? "custom-loader" : "loader"}>
+                    <Loader.ThreeDots color="black" height={120} width={120} />
+                </div>}
         </div>
     )
 }
