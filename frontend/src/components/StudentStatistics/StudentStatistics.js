@@ -73,7 +73,11 @@ function StudentStatistics(props) {
     result = result.toFixed(2)
     {
       student.enrolled_sections.map((courseData) => {
-        takenCredits += courseData.section.course.course_credits;
+
+        if(courseData.grade_obtained !== "F" || "W"){
+          takenCredits += courseData.section.course.course_credits;
+        }
+
         switch (courseData.grade_obtained) {
           case "A":
             aCount += 1;
@@ -246,7 +250,7 @@ function StudentStatistics(props) {
         Student Statistics
       </Typography>
       <Box height={550} alignContent="center">
-        <Carousel>
+        <Carousel interval={5000}>
           {GRAPHS.map((GRAPH, index) => {
             return (<Box>
                 {GRAPH}

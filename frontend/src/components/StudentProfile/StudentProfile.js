@@ -27,7 +27,9 @@ function StudentProfile(props) {
     {
       student.enrolled_sections.map((courseData) => {
 
-        takenCredits += courseData.section.course.course_credits;
+        if(courseData.grade_obtained !== "F" || "W"){
+          takenCredits += courseData.section.course.course_credits;
+        }
         switch (courseData.grade_obtained) {
           case "A":
             honorPoints = honorPoints + (4 * courseData.section.course.course_credits)
@@ -56,7 +58,7 @@ function StudentProfile(props) {
   }
 
   return (
-    <Card sx={{ width: 350, maxHeight: 500 }}>
+    <Card sx={{width: 450, maxHeight: 500 }}>
       <CardContent>
         <Typography sx={{ fontSize: 36}} align="center">
           {student.first_name} {student.last_name}
@@ -71,7 +73,7 @@ function StudentProfile(props) {
           Email: {student.institutional_email}
         </Typography>
         <Typography sx={{ fontSize: 18 }} align="center">
-          Credits Taken: {takenCredits}
+          Credits Approved: {takenCredits}
         </Typography>
       </CardContent>
     </Card>
