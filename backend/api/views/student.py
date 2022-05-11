@@ -102,7 +102,7 @@ class StudentLogin(APIView):
 
 def activate_student(request, uidb64, token):
     student = StudentRepository.activate_student(request, uidb64, token)
-    return (HttpResponseRedirect('//localhost:3000/login') 
+    return (HttpResponseRedirect('//myuniperformance.herokuapp.com/login') 
     if student.is_email_verified 
     else render(request, 'authentication/activate-failed.html', 
     {"student": student}))
