@@ -88,9 +88,9 @@ export default function CurriculumCoursePicker(props) {
         setSelectSemesters();
         setSelectSections();
         enroll_student_or_update_grade(props.student.user_id, formData.section_id, formData.grade).then(response => {
-            alert("Course added")
+            //maybe some success alert
         }).catch((error) => {
-            alert("Unsuccesful, please try again")
+            //maybe some failure alert
         })
     };
 
