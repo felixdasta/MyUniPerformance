@@ -54,9 +54,7 @@ function StudentProfile(props) {
             break;
         }
       });
-
     }
-
   }
 
   return (

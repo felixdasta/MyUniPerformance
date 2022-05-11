@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../../assets/logo.png'
 import { useNavigate } from 'react-router-dom';
 import { BiUserCircle } from 'react-icons/bi';
@@ -14,6 +14,7 @@ import "./Navbar.scss"
 const Navbar = () => {
   const navigate = useNavigate();
   const loggedInUser = localStorage.getItem("user_id");
+  const hasCurriculums = localStorage.getItem("has_curriculums");
   const pages = [
   { name: 'Dashboard', action: () => navigate("/dashboard") },
   { name: 'Courses', action: () => navigate("/courses") },
@@ -47,106 +48,147 @@ const Navbar = () => {
 
   if (window.location.pathname !== "/login" && window.location.pathname !== "/create-account") {
     if (loggedInUser) {
-      return (
-        <AppBar position="sticky">
-          <Container maxWidth="xl">
-            <Toolbar disableGutters>
-              <Box
-                noWrap
-                component="img"
-                width="225px"
-                sx={{ mr: 2, display: { xs: 'none', md: 'flex', cursor: 'pointer' } }}
-                src={logo}
-                onClick={() => {navigate("/")}}
-              />
-
-              <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
-                >
-                  <MenuIcon />
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorElNav}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                  }}
-                  open={Boolean(anchorElNav)}
-                  onClose={handleCloseNavMenu}
-                  sx={{
-                    display: { xs: 'block', md: 'none' },
-                  }}
-                >
-                  {pages.map((page) => (
-                    <MenuItem key={page.name} onClick={page.action}>
-                      <Typography textAlign="center">{page.name}</Typography>
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Box>
-              <Container
-                noWrap
-                sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
-              >
-                <img className='center-logo' alt='MyUniPerformance logo' src={logo} />
-              </Container>
-              <Box sx={{ flexGrow: 1, paddingLeft: 2.5, display: { xs: 'none', md: 'flex' } }}>
-                {pages.map((page) => (
-                  <Button
-                    key={page.name}
-                    onClick={page.action}
-                    sx={{ my: 2, color: 'white', display: 'block', paddingLeft: 2.5, paddingRight: 2.5 }}
+      if(hasCurriculums === 'true'){
+        return (
+          <AppBar position="sticky">
+            <Container maxWidth="xl">
+              <Toolbar disableGutters>
+                <Box
+                  noWrap
+                  component="img"
+                  width="225px"
+                  sx={{ mr: 2, display: { xs: 'none', md: 'flex', cursor: 'pointer' } }}
+                  src={logo}
+                  onClick={() => {navigate("/")}}
+                />
+  
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                  <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleOpenNavMenu}
+                    color="inherit"
                   >
-                    {page.name}
-                  </Button>
-                ))}
-              </Box>
-
-              <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title="Menu">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar />
+                    <MenuIcon />
                   </IconButton>
-                </Tooltip>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorElNav}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    open={Boolean(anchorElNav)}
+                    onClose={handleCloseNavMenu}
+                    sx={{
+                      display: { xs: 'block', md: 'none' },
+                    }}
+                  >
+                    {pages.map((page) => (
+                      <MenuItem key={page.name} onClick={page.action}>
+                        <Typography textAlign="center">{page.name}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+                <Container
+                  noWrap
+                  sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
                 >
-                  {settings.map((setting) => (
-                    <MenuItem key={setting.name} onClick={setting.action}>
-                      <Typography textAlign="center">{setting.name}</Typography>
-                    </MenuItem>
+                  <img className='center-logo' alt='MyUniPerformance logo' src={logo} />
+                </Container>
+                <Box sx={{ flexGrow: 1, paddingLeft: 2.5, display: { xs: 'none', md: 'flex' } }}>
+                  {pages.map((page) => (
+                    <Button
+                      key={page.name}
+                      onClick={page.action}
+                      sx={{ my: 2, color: 'white', display: 'block', paddingLeft: 2.5, paddingRight: 2.5 }}
+                    >
+                      {page.name}
+                    </Button>
                   ))}
-                </Menu>
-              </Box>
+                </Box>
+  
+                <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Menu">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem key={setting.name} onClick={setting.action}>
+                        <Typography textAlign="center">{setting.name}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              </Toolbar>
+            </Container>
+          </AppBar>
+        );
+      }
+      else{
+        return (
+          <AppBar position='sticky' elevation={0}>
+            <Toolbar>
+              <img className="center-logo" alt='MyUniPerformance logo' src={logo} /> {/* Page Routes Navbar */}
+              <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Menu">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem key={setting.name} onClick={setting.action}>
+                        <Typography textAlign="center">{setting.name}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
             </Toolbar>
-          </Container>
-        </AppBar>
-      );
+          </AppBar>
+        ); 
+      }
+
     }
     else {
       return (

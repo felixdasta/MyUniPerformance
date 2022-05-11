@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Table from '@mui/material/Table';
@@ -12,7 +11,7 @@ import { get_student_by_id, update_student_by_id } from '../../actions/user.js';
 import { get_university_by_params } from '../../actions/university.js';
 import { get_curriculums_by_params } from '../../actions/curriculums.js';
 import Paper from '@mui/material/Paper';
-import { FormControl, TextField, Button, InputLabel, NativeSelect } from '@mui/material';
+import { FormControl, TextField, Button, InputLabel, NativeSelect, Alert } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useNavigate } from 'react-router-dom';
@@ -65,28 +64,10 @@ function Row(props) {
   );
 }
 
-Row.propTypes = {
-  row: PropTypes.shape({
-    calories: PropTypes.number.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
-  }).isRequired,
-};
-
 const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
   let universities = utils.universities;
   let curriculums_by_universities = utils.curriculums
-  let student_curriculum = studentCopy.curriculums[0].curriculum_name;
+  let student_curriculum = studentCopy.curriculums.length > 0 ? studentCopy.curriculums[0].curriculum_name: "None";
 
   const inputChange = (e) => {
     let name = e.target.name;
@@ -104,7 +85,15 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
     }
 
     if (name == "selected_university") { 
-        utils.fetchUniversityCurriculums(value);
+        let freshData = {...studentCopy};
+        delete freshData["selected_curriculum"];
+        setStudentCopy(freshData);
+
+        if(value != null){
+          utils.fetchUniversityCurriculums(value);
+        }
+
+        
      }
      
     setStudentCopy({ ...studentCopy, [name]: value });
@@ -113,9 +102,15 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
   const updateStudent = (success_message, error_message, student) => {
     update_student_by_id(student.user_id, student).then(
       response => {
+        let prev_student_curriculum = student_curriculum;
         setStudentCopy(response.data);
         setStudent(response.data);
         alert(success_message);
+        if(prev_student_curriculum == "None" && student["curriculums"]){
+          console.log("llegur aquiii");
+            utils.navigate("../dashboard");
+        }
+
       }
     ).catch((error) => {
       alert(error_message);
@@ -230,7 +225,7 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
       <FormControl>
         <InputLabel variant="standard" htmlFor="uncontrolled-native">University</InputLabel>
         <NativeSelect
-          defaultValue={null}
+          value={studentCopy["selected_university"]}
           name="selected_university"
           onChange={inputChange}
           style={{width: 300}}
@@ -244,12 +239,12 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
         {curriculums_by_universities && curriculums_by_universities.length != 0 && <div>
           <InputLabel variant="standard" htmlFor="uncontrolled-native">Curriculum</InputLabel>
           <NativeSelect
-            defaultValue={null}
+            value={studentCopy["selected_curriculum"]}
             name="selected_curriculum"
             onChange={inputChange}
             style={{width: 300}}
           >
-            <option value={null}>Select curriculum...</option>
+            <option value={null}>{"Select curriculum..."}</option>
             {Array.from(curriculums_by_universities, (current) => <option value={current.curriculum_id}>{current.curriculum_name}</option>)}
           </NativeSelect>
         </div>}
@@ -272,12 +267,18 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
 
 export default function UserInformation() {
   let navigate = useNavigate();
+  const [warning, setWarning] = React.useState();
   const [student, setStudent] = React.useState();
   const [studentCopy, setStudentCopy] = React.useState();
   const [universities, setUniversities] = React.useState();
   const [availableCurriculums, setAvailableCurriculums] = React.useState();
 
   React.useEffect(() => {
+    let has_curriculums = localStorage.getItem("has_curriculums");
+    if(has_curriculums === 'false'){
+      setWarning("In order to unlock other features of the application, you must configure your curriculum.")
+    }
+
     get_student_by_id(localStorage.getItem("user_id")).then(
       response => {
         setStudentCopy({ ...response.data, selected_university: null });
@@ -308,6 +309,7 @@ export default function UserInformation() {
     get_curriculums_by_params(university_id).then(
       response => {
         setAvailableCurriculums(response.data);
+        localStorage.setItem("has_curriculums", 'true');
       }
     ).catch((error) => {
         setAvailableCurriculums(null);
@@ -316,15 +318,16 @@ export default function UserInformation() {
 
   return (
     <Box sx={{ mx: 6, my: 6 }}>
-
       {student && universities ?
         <div>
           <Typography align="center" sx={{ marginBottom: 2.5 }} variant="h5">Profile</Typography>
+          {warning && <Alert style={{marginBottom: 15}} severity="warning">{warning}</Alert>}
           <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
               <TableBody>
                 {rows(student, setStudent, studentCopy, setStudentCopy, 
-                { universities, 
+                { navigate,
+                  universities, 
                   curriculums: availableCurriculums, 
                   fetchUniversityCurriculums }).map((row) => (
                   <Row key={row.name} row={row} />

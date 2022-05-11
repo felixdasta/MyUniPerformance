@@ -91,7 +91,7 @@ class StudentLogin(APIView):
 
             if Authentication.verify_passwords(request.data['password'], student.password):
                 if student.is_email_verified:
-                    return Response({"user_id": student.user_id}, status=status.HTTP_200_OK)
+                    return Response({"user_id": student.user_id, "has_curriculums": len(student.curriculums.all()) > 0}, status=status.HTTP_200_OK)
                 else:
                     return Response({"error": "You must verify your email before logging in."}, status=status.HTTP_401_UNAUTHORIZED)
             else:

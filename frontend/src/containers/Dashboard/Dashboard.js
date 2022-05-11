@@ -1,6 +1,7 @@
-import { Card, Grid } from "@mui/material";
+import { Card, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
+import { IoWarningOutline } from "react-icons/io5";
 import * as Loader from "react-loader-spinner";
 import { useNavigate } from 'react-router-dom';
 import { get_student_by_id } from '../../actions/user.js';
@@ -63,7 +64,7 @@ export default function Dashboard() {
       </Grid>
 
       {/* Container for curriculum information */}
-      <Grid
+      {student.enrolled_sections.length > 0 ? <Grid
         item
         container
         direction="row"
@@ -99,8 +100,32 @@ export default function Dashboard() {
               lg={12}>
               <Card sx={{ backgroundColor: "white", width: "100%", height: 350, boxShadow: "none" }} />
             </Grid>}
+      </Grid> :
+        <Grid
+          item
+          container
+          direction="row"
+          justifyContent="center"
+          lg={9}
+          rowGap={3}>
+          <div>
+            <Grid item container lg={12} justifyContent="center">
+              <IoWarningOutline size={75} />
+            </Grid>
+            <Grid item container lg={12} justifyContent="center">
+              <Typography variant="h6">
+                {"You haven't enrolled in any section yet."}
+              </Typography>
+            </Grid>
+            <Grid item container lg={12} justifyContent="center">
+              <Typography variant="h6">
+                {"Add your enrolled sections by going to curriculums."}
+              </Typography>
+            </Grid>
+          </div>
 
-      </Grid>
+        </Grid>
+      }
 
     </Grid> : <div className="loader">
       <Loader.ThreeDots color="black" height={120} width={120} />

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, Navigate } from 'react-router-dom';
 import {useState} from 'react';
-import {Button, TextField} from '@mui/material';
+import {Button} from '@mui/material';
 import {signup} from '../../actions/authentication.js'
 import * as Loader from "react-loader-spinner";
 import './SignUp.scss'

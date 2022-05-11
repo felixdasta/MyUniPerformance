@@ -262,14 +262,14 @@ function StudentStatistics(props) {
           You have approximately {remainingSemester} semesters left if you
           progress at a rate of {creditProgress} credits per semester.
         </Typography>
-        <Typography align="center" sx={{ my: 3.5}}>
+        {student.enrolled_sections.length > 0 && <Typography align="center" sx={{ my: 3.5}}>
           Your current GPA is:<br/>
           <div style={{fontWeight: 'bold', fontSize: 18}}>{gpa}</div>
-        </Typography>
-        <Typography align="center" sx={{ my: 3.5}}>
+        </Typography>}
+        {student.enrolled_sections.length > 0 && <Typography align="center" sx={{ my: 3.5}}>
           Students who took the same sections as you have an average GPA of:<br/>
           <div style={{fontWeight: 'bold', fontSize: 18}}>{result}</div>
-        </Typography>
+        </Typography>}
       </Box>
     </Container>
   );

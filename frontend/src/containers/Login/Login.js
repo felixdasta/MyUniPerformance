@@ -48,7 +48,17 @@ export default function Login() {
                 login(userData).then( response => {
                   setLoading(false);
                   localStorage.setItem("user_id", response.data.user_id);
-                  navigate("/dashboard");
+                  
+                  let has_curriculums = response.data.has_curriculums;
+                  localStorage.setItem("has_curriculums", has_curriculums);
+
+                  if(has_curriculums){
+                    navigate("/dashboard");
+                  }
+                  else{
+                    navigate("/profile");
+                  }
+                  
               }).catch((error) => {
                 let message = error.response.data.error
                 setError(message)
