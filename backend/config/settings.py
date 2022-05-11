@@ -72,7 +72,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
   'http://localhost:3000',
   'https://myuniperformance.herokuapp.com',
-  'myuniperformance.herokuapp.com'
+  'http://myuniperformance.herokuapp.com'
 )
 
 ROOT_URLCONF = 'config.urls'
