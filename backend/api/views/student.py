@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from api.repositories.student import StudentRepository
 from api.models.student import Student
-from api.models.curriculum import Curriculum
 from api.serializers import StudentSerializer
 from api.authentication import Authentication 
 from api.utils import paginate_result

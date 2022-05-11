@@ -6,7 +6,7 @@ class CurriculumRepository:
     @staticmethod
     def get_all_curriculums(university_id):  
         curriculums = Curriculum.objects.prefetch_related('curriculum_courses_set__course__department') \
-        .select_related('department')
+        .select_related('department__university')
 
         if university_id != None:
             curriculums = curriculums.filter(department__university = university_id)

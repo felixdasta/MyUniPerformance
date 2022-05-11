@@ -1,42 +1,25 @@
-from api.serializers import UniversitySerializer
 from api.models.university import University
+from django.db.models import Q
 
 class UniversityRepository:
 
     @staticmethod
-    def get_all_universities():
+    def get_universities_by_params(queryprms):
         university = University.objects.all()
-        serializer = UniversitySerializer(university, many=True)
-        return serializer
+        condition = Q()
 
-    @staticmethod
-    def create_university(request):
-        serializer = UniversitySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer
+        if(queryprms.get("institutional_domain")):
+            condition &= Q(institutional_domain = queryprms.get("institutional_domain"))
+
+        university=university.filter(condition)
+        return university
 
     @staticmethod
     def get_university_by_id(pk):
         university = University.objects.get(pk=pk)
-        serializer = UniversitySerializer(university)
-        return serializer
+        return university
 
     @staticmethod
     def get_university_by_name(name):
         university = University.objects.get(university_name=name)
-        serializer = UniversitySerializer(university)
-        return serializer
-    
-    @staticmethod
-    def update_university(request, pk):
-        university = University.objects.get(pk=pk)
-        serializer = UniversitySerializer(university, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer
-    
-    @staticmethod
-    def delete_university(pk):
-        university = University.objects.get(pk=pk)
-        return university.delete()
+        return university

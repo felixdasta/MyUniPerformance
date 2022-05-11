@@ -1,5 +1,6 @@
 from api.models.student import Student
 from api.repositories.student import StudentRepository
+from api.repositories.university import UniversityRepository
 from api.utils import generate_token
 from api.services.email import EmailThread
 from django.contrib.sites.shortcuts import get_current_site
@@ -60,7 +61,8 @@ class Authentication:
         errors = []
         #Eliminate left and right whitespaces on email input, if it haves it
         request.data['institutional_email'] = request.data['institutional_email'].lstrip().rstrip().lower()
-        dot_index = request.data['institutional_email'].rindex('.')
+        domain_index = request.data['institutional_email'].rindex('@') + 1
+        domain =  request.data['institutional_email'][domain_index:]
             
         try:
             object_exists = StudentRepository.get_student_by_email(request.data['institutional_email'])
@@ -69,11 +71,10 @@ class Authentication:
 
         if not Authentication.email_is_valid(request.data['institutional_email']):
             errors.append((1, "The email provided is invalid."))
-        if request.data['institutional_email'][dot_index + 1:] != "edu":
-            errors.append((1, "Email must belong to .edu domain."))
+        if not UniversityRepository.get_universities_by_params({'institutional_domain': domain}):
+            errors.append((1, "Domain '" + domain + "' isn't registered on our system"))
         if object_exists and object_exists.user_id != pk:
             errors.append((1, "This email address is already registered in our database."))
-
         return errors
 
     @staticmethod

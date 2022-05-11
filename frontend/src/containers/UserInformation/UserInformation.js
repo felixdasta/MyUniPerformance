@@ -9,8 +9,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { get_student_by_id, update_student_by_id } from '../../actions/user.js';
+import { get_university_by_params } from '../../actions/university.js';
+import { get_curriculums_by_params } from '../../actions/curriculums.js';
 import Paper from '@mui/material/Paper';
-import { FormControl, TextField, Select, MenuItem, Button } from '@mui/material';
+import { FormControl, TextField, Button, InputLabel, NativeSelect } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useNavigate } from 'react-router-dom';
@@ -81,8 +83,10 @@ Row.propTypes = {
   }).isRequired,
 };
 
-const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
-  let curriculums = "";
+const rows = (student, setStudent, studentCopy, setStudentCopy, utils) => {
+  let universities = utils.universities;
+  let curriculums_by_universities = utils.curriculums
+  let student_curriculum = studentCopy.curriculums[0].curriculum_name;
 
   const inputChange = (e) => {
     let name = e.target.name;
@@ -99,6 +103,10 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
       }
     }
 
+    if (name == "selected_university") { 
+        utils.fetchUniversityCurriculums(value);
+     }
+     
     setStudentCopy({ ...studentCopy, [name]: value });
   };
 
@@ -108,21 +116,10 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
         setStudentCopy(response.data);
         setStudent(response.data);
         alert(success_message);
-
-        if(student['institutional_email']){
-          localStorage.removeItem("user_id");
-          navigate("/");
-        }
       }
     ).catch((error) => {
       alert(error_message);
     });
-  }
-
-  for (let i = 0; i < student.curriculums.length; i++) {
-    let curriculum = student.curriculums[i];
-    curriculums += curriculum.curriculum_name;
-    curriculums += i + 1 < student.curriculums.length ? ", " : "";
   }
 
   return [
@@ -150,7 +147,8 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
           size="small"
           placeholder="Enter your last name" />
       </FormControl>,
-      <Button onClick={() => updateStudent("Name has been succesfully updated!",
+      <Button onClick={() => updateStudent(
+        "Name has been succesfully updated!",
         "Unable to change your name",
         {
           user_id: studentCopy.user_id,
@@ -168,22 +166,12 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
           variant="outlined"
           value={studentCopy.institutional_email}
           name="institutional_email"
-          onChange={inputChange}
+          disabled={true}
           type="email"
           size="small"
           placeholder="Enter your email" />
       </FormControl>,
-      <Button onClick={() => {
-        updateStudent(
-          "Email changed! Please verify it in order to use the account...",
-          "ERROR: It's possible that the email address is invalid or that a user has already registered with that address. \n\nAlways use institutional email.", {
-          user_id: studentCopy.user_id,
-          institutional_email: studentCopy.institutional_email
-        });
-      }}
-        align='center' variant="contained">Update</Button>
     ],
-      <Button align='center' variant="contained">Update</Button>
     ),
     createData('Year of admission', student.year_of_admission, [
       <FormControl>
@@ -199,14 +187,15 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
           size="small"
           placeholder="Enter year of admission" />
       </FormControl>,
-      <Button 
-      onClick={() => updateStudent("Year of admission has been succesfully updated!",
-        "Unable to change your year of admission.",
-        {
-          user_id: studentCopy.user_id,
-          year_of_admission: studentCopy.year_of_admission,
-        })}
-      align='center' variant="contained">Update</Button>]),
+      <Button
+        onClick={() => updateStudent(
+          "Year of admission has been succesfully updated!",
+          "Unable to change your year of admission.",
+          {
+            user_id: studentCopy.user_id,
+            year_of_admission: studentCopy.year_of_admission,
+          })}
+        align='center' variant="contained">Update</Button>]),
     createData('Password', "● ● ● ● ● ● ● ●", [
       <FormControl>
         <TextField
@@ -219,18 +208,64 @@ const rows = (student, setStudent, studentCopy, setStudentCopy, navigate) => {
           size="small"
           placeholder="Enter your new password" />
       </FormControl>,
-      <Button 
-      onClick={() => updateStudent("Password has been succesfully updated!",
-      "Unable update your password.\n\nMake sure it has at least 8 characters and that it contains at least 1 capitalized letter, 1 uncapitalized letter and 1 number."
-      ,
-      {
-        user_id: studentCopy.user_id,
-        password: studentCopy.password,
-      })}
-      align='center' variant="contained">Update</Button>
+      <Button
+        onClick={() => updateStudent(
+          "Password has been succesfully updated!",
+          "Unable update your password.\n\nMake sure it has at least 8 characters and that it contains at least 1 capitalized letter, 1 uncapitalized letter and 1 number."
+          ,
+          {
+            user_id: studentCopy.user_id,
+            password: studentCopy.password,
+          })}
+        align='center' variant="contained">Update</Button>
     ]),
-    createData('Curriculums', curriculums, [
+    createData('Curriculum', student_curriculum, [
+      <div>
+        <Typography variant="h6">{"Enrolled curriculum:"}</Typography>
+        <Typography  style={{fontWeight: 400}}>{student_curriculum}</Typography>
+      </div>
+      ,
+      <Typography variant="h6">Update your curriculum?</Typography>
+      ,
+      <FormControl>
+        <InputLabel variant="standard" htmlFor="uncontrolled-native">University</InputLabel>
+        <NativeSelect
+          defaultValue={null}
+          name="selected_university"
+          onChange={inputChange}
+          style={{width: 300}}
+        >
+          <option value={null}>Select university...</option>
+          {Array.from(universities, (current) => <option value={current.university_id}>{current.university_name}</option>)}
+        </NativeSelect>
+      </FormControl>,
 
+      <FormControl>
+        {curriculums_by_universities && curriculums_by_universities.length != 0 && <div>
+          <InputLabel variant="standard" htmlFor="uncontrolled-native">Curriculum</InputLabel>
+          <NativeSelect
+            defaultValue={null}
+            name="selected_curriculum"
+            onChange={inputChange}
+            style={{width: 300}}
+          >
+            <option value={null}>Select curriculum...</option>
+            {Array.from(curriculums_by_universities, (current) => <option value={current.curriculum_id}>{current.curriculum_name}</option>)}
+          </NativeSelect>
+        </div>}
+      </FormControl>,
+            <Button
+            disabled = {!studentCopy["selected_curriculum"]} 
+            onClick={() => 
+            updateStudent(
+                "Curriculum has been succesfully updated!",
+                "Unable to update curriculum",
+            {
+              user_id: studentCopy.user_id,
+              curriculums: [studentCopy["selected_curriculum"]]
+            })}
+            align='center'
+            variant="contained">Update Curriculum</Button>
     ]),
   ]
 };
@@ -239,31 +274,59 @@ export default function UserInformation() {
   let navigate = useNavigate();
   const [student, setStudent] = React.useState();
   const [studentCopy, setStudentCopy] = React.useState();
+  const [universities, setUniversities] = React.useState();
+  const [availableCurriculums, setAvailableCurriculums] = React.useState();
 
   React.useEffect(() => {
     get_student_by_id(localStorage.getItem("user_id")).then(
       response => {
-        setStudentCopy(response.data);
+        setStudentCopy({ ...response.data, selected_university: null });
         setStudent(response.data);
       }
     ).catch((error) => {
-      console.log(error.response.data)
+      console.log(error.response.data);
       localStorage.removeItem("user_id");
       navigate("/");
-    })
+    });
+
+
   }, []);
 
+  React.useEffect(() => {
+    if (student) {
+      let email = student.institutional_email
+      let domain = email.substring(email.indexOf('@') + 1, email.length);
+      get_university_by_params({'institutional_domain': domain}).then(
+        response => {
+          setUniversities(response.data);
+        }
+      )
+    }
+  }, [student]);
+
+  const fetchUniversityCurriculums = (university_id) => {
+    get_curriculums_by_params(university_id).then(
+      response => {
+        setAvailableCurriculums(response.data);
+      }
+    ).catch((error) => {
+        setAvailableCurriculums(null);
+    });;
+  }
 
   return (
     <Box sx={{ mx: 6, my: 6 }}>
 
-      {student ?
+      {student && universities ?
         <div>
           <Typography align="center" sx={{ marginBottom: 2.5 }} variant="h5">Profile</Typography>
           <TableContainer component={Paper}>
             <Table aria-label="collapsible table">
               <TableBody>
-                {rows(student, setStudent, studentCopy, setStudentCopy, navigate).map((row) => (
+                {rows(student, setStudent, studentCopy, setStudentCopy, 
+                { universities, 
+                  curriculums: availableCurriculums, 
+                  fetchUniversityCurriculums }).map((row) => (
                   <Row key={row.name} row={row} />
                 ))}
               </TableBody>
