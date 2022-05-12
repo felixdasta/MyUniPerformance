@@ -11,10 +11,18 @@ import {
   FormControl,
   Select,
   MenuItem,
+  IconButton,
+  DialogActions,
+  DialogContent,
+  Dialog,
+  DialogContentText,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { makeStyles } from "@material-ui/styles";
 import {
+  drop_student_from_course,
   get_available_semesters_by_academic_year,
   semesters,
 } from "../../actions/sections";
@@ -88,20 +96,22 @@ function CurriculumTable(props) {
   const [semester, setSemester] = useState("All");
   const [filteredClasses, setFilteredClasses] = useState([]);
   const [studentGPA, setStudentGPA] = useState();
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState();
+  const [deleteCourseSection, setDeleteCourseSection] = useState();
 
   //Defining styles for table
   useEffect(() => {
-    let academic_semesters =
-      get_available_semesters_by_academic_year(terms_taken);
+    let academic_semesters = get_available_semesters_by_academic_year(terms_taken);
     setAvailableAcademicSemesters(academic_semesters);
-    let enrolled_sections = student.enrolled_sections.sort(
+    let enrolled_sections = student.enrolled_sections;
+    setFilteredClasses(enrolled_sections.sort(
       function (a, b) {
         if (a.section.section_term === b.section.section_term) {
           // Grade is only important when sections are the same
           return a.grade_obtained - b.grade_obtained;
         }
         return a.section.section_term > b.section.section_term ? 1 : -1;
-      });
+      }));
 
     setStudentGPA(calculate_gpa_based_on_sections_taken(enrolled_sections));
     setFilteredClasses(enrolled_sections);
@@ -140,6 +150,36 @@ function CurriculumTable(props) {
     }
   }, [])
 
+  const modificationClickHandler = useCallback((action, course) => {
+    return async (e) => {
+      e.preventDefault()
+      if (action === "edit") {
+        console.log(course)
+        props.refreshTable();
+      }
+      else {
+        setDeleteConfirmationOpen(true)
+        setDeleteCourseSection(course)
+        console.log(course)
+      }
+    }
+  }, [])
+
+  const handleSubmit = () => {
+    drop_student_from_course(student.user_id, deleteCourseSection.section.section_id, deleteCourseSection.grade_obtained).then(response => {
+      props.refreshTable(response.data.message);
+      setDeleteCourseSection();
+      setDeleteConfirmationOpen(false);
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const handleClose = () => {
+    setDeleteCourseSection();
+    setDeleteConfirmationOpen(false);
+  }
+
   if (student.enrolled_sections) {
     let sectionGPA = [];
     filteredClasses.map((payload, i) => {
@@ -170,12 +210,13 @@ function CurriculumTable(props) {
           >
             <TableHead>
               <TableRow>
-                <TableCell>Course Name</TableCell>
-                <TableCell align="right">Course Code</TableCell>
-                <TableCell align="right">Credit Hours</TableCell>
-                <TableCell align="right">Department Name</TableCell>
-                <TableCell align="right">Grade Obtained</TableCell>
-                <TableCell align="right">Term Taken</TableCell>
+                <TableCell>Modify</TableCell>
+                <TableCell align="left"> Course Name</TableCell>
+                <TableCell align="center">Course Code</TableCell>
+                <TableCell align="center">Credit Hours</TableCell>
+                <TableCell align="left">Department Name</TableCell>
+                <TableCell align="center">Grade Obtained</TableCell>
+                <TableCell align="left">Term Taken</TableCell>
                 <TableCell align="right">Section GPA</TableCell>
               </TableRow>
             </TableHead>
@@ -185,22 +226,30 @@ function CurriculumTable(props) {
                   key={courseData.section.course.course_name}
                   onClick={sectionClickHandler(courseData)}
                   hover={true}>
+                  <TableCell align="left">
+                    <IconButton aria-label="delete" color="error" onClick={modificationClickHandler("delete", courseData)}>
+                      <DeleteIcon />
+                    </IconButton>
+                    <IconButton aria-label="edit" color="primary" onClick={modificationClickHandler("edit", courseData)}>
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.section.course.course_code}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.section.course.course_credits}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     {courseData.section.course.department.department_name}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.grade_obtained}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     {formatTerm(courseData.section.section_term)}
                   </TableCell>
                   <TableCell align="right">
@@ -292,13 +341,24 @@ function CurriculumTable(props) {
               filters.section_term.length == 4 ? "Academic Year GPA: " :
                 "GPA: ")}
             </Typography>
-            <Typography style={{fontWeight: "bold", marginLeft: 2.5}} >{(studentGPA ? studentGPA : "N/A")}</Typography>
+            <Typography style={{fontWeight: "bold", marginLeft: 5}} >{(studentGPA ? studentGPA : "N/A")}</Typography>
                 
           </Grid>
 
         </Grid>
-
+        {deleteCourseSection && <Dialog open={deleteConfirmationOpen} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText>
+              {"Are you sure you want to delete " + deleteCourseSection.section.course.course_code + " ?"}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button edge="start" onClick={handleClose} color="error">Cancel</Button>
+            <Button edge="end" onClick={handleSubmit} color="error" variant="contained">Delete</Button>
+          </DialogActions>
+        </Dialog>}
       </Grid>
+      
     );
   }
 }

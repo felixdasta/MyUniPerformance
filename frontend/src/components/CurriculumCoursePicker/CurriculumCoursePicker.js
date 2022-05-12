@@ -190,7 +190,7 @@ export default function CurriculumCoursePicker(props) {
                 {"Courses Missing"}{" "}
                 {/* will be dynamic, just placeholder for styling */}
             </Typography>
-            <List sx={{ width: '100%', height: 700, maxWidth: 360, bgcolor: 'background.paper', overflow: 'auto' }}>
+            <List sx={{ width: '100%', height: 628, maxWidth: 360, bgcolor: 'background.paper', overflow: 'auto' }}>
                 {<InfiniteScroll>
                     {missingCourses.map((course) => (
                         <div>
