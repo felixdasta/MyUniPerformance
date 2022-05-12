@@ -4,7 +4,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import InfiniteScroll from 'react-infinite-scroller';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
-import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField } from "@mui/material";
+import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { enroll_student_or_update_grade, get_sections_grades_stats } from "../../actions/sections";
 import { get_courses_by_id, get_courses_by_university } from "../../actions/courses";
 import { get_departments_by_university } from "../../actions/departments";
@@ -185,6 +185,10 @@ export default function CurriculumCoursePicker(props) {
 
     return (
         <Box boxShadow={1} height={716} sx={{ border: '1px' }}>
+            <Typography sx={{ fontSize: 36, mb: 1 }} align="center">
+                {"Courses Missing"}{" "}
+                {/* will be dynamic, just placeholder for styling */}
+            </Typography>
             <List sx={{ width: '100%', height: 700, maxWidth: 360, bgcolor: 'background.paper', overflow: 'auto' }}>
                 {<InfiniteScroll>
                     {missingCourses.map((course) => (
