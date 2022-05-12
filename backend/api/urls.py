@@ -23,6 +23,7 @@ urlpatterns = [
     path('universities/<university_id>/departments', department.get_departments_by_university),
     path('universities/<university_id>/instructors', staff_member.StaffMemberList.as_view()),
 
+    path('departments/<department_id>/courses', course.get_courses_by_department_id),
     path('courses', course.CourseList.as_view()),
     path('courses/<pk>', course.CourseDetail.as_view()),
 

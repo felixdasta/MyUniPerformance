@@ -54,6 +54,11 @@ class CourseRepository:
         return serializer
 
     @staticmethod
+    def get_courses_by_department(department_id):
+        courses = Course.objects.all().select_related('department').filter(department = department_id)
+        return courses
+
+    @staticmethod
     def get_course_by_id(pk):
         sections = SectionRepository.get_all_sections()
         course = Course.objects.select_related('department') \

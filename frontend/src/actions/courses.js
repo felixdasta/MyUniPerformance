@@ -6,6 +6,11 @@ export const get_courses_by_university = async (university_id, filteredData=null
     return response;
 }
 
+export const get_courses_by_department_id = async (department_id) => {
+    const response = await axios.get(url+'departments/' + department_id + '/courses');
+    return response;
+}
+
 export const get_courses_by_id= async (course_id) => {
     const response = await axios.get(url+'courses/' + course_id);
     return response;

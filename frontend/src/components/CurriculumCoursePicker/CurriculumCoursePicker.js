@@ -6,7 +6,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { enroll_student_or_update_grade } from "../../actions/sections";
-import { get_courses_by_id, get_courses_by_university } from "../../actions/courses";
+import { get_courses_by_department_id, get_courses_by_id } from "../../actions/courses";
 import { get_departments_by_university } from "../../actions/departments";
 import { get_specified_academic_year, semesters } from "../../actions/sections";
 
@@ -126,7 +126,7 @@ export default function CurriculumCoursePicker(props) {
     }
 
     const getCoursesByDepartmentID = (department_id) => {
-        get_courses_by_university(university, { department_id: department_id }).then(response => {
+        get_courses_by_department_id(department_id).then(response => {
             setSelectCourses(response.data.courses)
         })
     }

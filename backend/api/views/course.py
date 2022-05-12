@@ -5,6 +5,7 @@ from api.repositories.course import CourseRepository
 from api.models.course import Course
 from api.serializers import CustomCourseSerializer, CourseSerializer
 from api.utils import paginate_result
+from rest_framework.decorators import api_view
 
 class CourseList(APIView):
     """
@@ -56,3 +57,12 @@ class CourseDetail(APIView):
     def delete(self, request, pk, format=None):
         CourseRepository.delete_course(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def get_courses_by_department_id(request, department_id):
+        try:
+            courses = CourseRepository.get_courses_by_department(department_id)
+            serializer = CourseSerializer(courses, many=True)
+            return Response(serializer.data)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
