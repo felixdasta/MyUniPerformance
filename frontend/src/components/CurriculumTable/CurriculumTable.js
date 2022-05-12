@@ -112,13 +112,11 @@ function CurriculumTable(props) {
     return async (e) => {
       e.preventDefault()
       if (action === "edit") {
-        console.log(course)
         props.refreshTable();
       }
       else {
         setDeleteConfirmationOpen(true)
         setDeleteCourseSection(course)
-        console.log(course)
       }
     }
   }, [])
@@ -168,7 +166,7 @@ function CurriculumTable(props) {
           >
             <TableHead>
               <TableRow>
-                <TableCell>Modify</TableCell>
+                <TableCell></TableCell>
                 <TableCell align="left"> Course Name</TableCell>
                 <TableCell align="center">Course Code</TableCell>
                 <TableCell align="center">Credit Hours</TableCell>
@@ -188,9 +186,9 @@ function CurriculumTable(props) {
                     <IconButton aria-label="delete" color="error" onClick={modificationClickHandler("delete", courseData)}>
                       <DeleteIcon />
                     </IconButton>
-                    <IconButton aria-label="edit" color="primary" onClick={modificationClickHandler("edit", courseData)}>
+                    {/*                     <IconButton aria-label="edit" color="primary" onClick={modificationClickHandler("edit", courseData)}>
                       <EditIcon />
-                    </IconButton>
+                    </IconButton> */}
                   </TableCell>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
