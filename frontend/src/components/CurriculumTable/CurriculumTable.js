@@ -36,6 +36,39 @@ const useStyles = makeStyles({
 
 function CurriculumTable(props) {
 
+  const calculate_gpa_based_on_sections_taken = (payload) => {
+    let gpaCredits = 0;
+    let honorPoints = 0;
+    payload.map((courseData) => {
+      switch (courseData.grade_obtained) {
+        case "A":
+          honorPoints = honorPoints + 4 * courseData.section.course.course_credits;
+          gpaCredits += courseData.section.course.course_credits;
+          break;
+        case "B":
+          honorPoints = honorPoints + 3 * courseData.section.course.course_credits;
+          gpaCredits += courseData.section.course.course_credits;
+          break;
+        case "C":
+          honorPoints = honorPoints + 2 * courseData.section.course.course_credits;
+          gpaCredits += courseData.section.course.course_credits;
+          break;
+        case "D":
+          honorPoints = honorPoints + 1 * courseData.section.course.course_credits;
+          gpaCredits += courseData.section.course.course_credits;
+          break;
+        case "F":
+          honorPoints = honorPoints + 0 * courseData.section.course.course_credits;
+          gpaCredits += courseData.section.course.course_credits;
+          break;
+        default:
+          break;
+      }
+    });
+    let gpa = honorPoints / gpaCredits;
+    return gpa.toFixed(2);
+  }
+
   let [filters, setFilters] = useState({
     section_term: "",
   });
@@ -54,20 +87,25 @@ function CurriculumTable(props) {
   const [academicYear, setAcademicYear] = useState("All");
   const [semester, setSemester] = useState("All");
   const [filteredClasses, setFilteredClasses] = useState([]);
+  const [studentGPA, setStudentGPA] = useState();
 
   //Defining styles for table
   useEffect(() => {
     let academic_semesters =
       get_available_semesters_by_academic_year(terms_taken);
     setAvailableAcademicSemesters(academic_semesters);
-    setFilteredClasses(student.enrolled_sections.sort(
-      function(a, b) {          
-         if (a.section.section_term === b.section.section_term) {
-            // Grade is only important when sections are the same
-            return a.grade_obtained - b.grade_obtained;
-         }
-         return a.section.section_term > b.section.section_term ? 1 : -1;
-      }));
+    let enrolled_sections = student.enrolled_sections.sort(
+      function (a, b) {
+        if (a.section.section_term === b.section.section_term) {
+          // Grade is only important when sections are the same
+          return a.grade_obtained - b.grade_obtained;
+        }
+        return a.section.section_term > b.section.section_term ? 1 : -1;
+      });
+
+    setStudentGPA(calculate_gpa_based_on_sections_taken(enrolled_sections));
+    setFilteredClasses(enrolled_sections);
+    updateTable();
   }, [props.student]);
 
   if (student.enrolled_sections) {
@@ -84,8 +122,12 @@ function CurriculumTable(props) {
         let payload = student.enrolled_sections.filter(
           (payload) => payload.section.section_term.includes(filters.section_term)
         );
+
+        setStudentGPA(calculate_gpa_based_on_sections_taken(payload));
         setFilteredClasses(payload);
-      } else if (filters.section_term === "") {
+      }
+      else {
+        setStudentGPA(calculate_gpa_based_on_sections_taken(student.enrolled_sections));
         setFilteredClasses(student.enrolled_sections);
       }
     }
@@ -99,10 +141,10 @@ function CurriculumTable(props) {
   }, [])
 
   if (student.enrolled_sections) {
-    let GPA = [];
+    let sectionGPA = [];
     filteredClasses.map((payload, i) => {
       let grades_count = get_sections_grades_stats([payload.section])
-      GPA.push(calculate_gpa_based_on_counts(grades_count))
+      sectionGPA.push(calculate_gpa_based_on_counts(grades_count))
     })
     return (
       <Grid
@@ -162,87 +204,100 @@ function CurriculumTable(props) {
                     {formatTerm(courseData.section.section_term)}
                   </TableCell>
                   <TableCell align="right">
-                    {GPA[i]}
+                    {sectionGPA[i]}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-        <Container
-          sx={{ my: 1 }}>
-          <FormControl sx={{ mx: -3 }}>
-            <Select
-              style={term_dropdown_style}
-              value={academicYear}
-              displayEmpty
-              name="year"
-              onChange={(e) => {
-                setAcademicYear(e.target.value);
-                //assume that the selected year doesn't contains the selected academic semester
-                let contains_semester = false;
-                {
-                  academicSemesters[e.target.value] &&
-                    academicSemesters[e.target.value].map(
-                      (entry) =>
-                      (contains_semester =
-                        entry.key == semester ? true : contains_semester)
-                    );
-                }
-                setSemester(contains_semester ? semester : "All");
-              }}
-              inputProps={{ "aria-label": "Without label" }}
-            >
-              <MenuItem value="All">
-                <em>All</em>
-              </MenuItem>{" "}
-              {Object.keys(academicSemesters).map((year) => (
-                <MenuItem value={year}>{year}</MenuItem>
-              ))}
-            </Select>
-            <label>Year Taken</label>
-          </FormControl>
-          <FormControl sx={{ mx: 6 }}>
-            <Select
-              style={term_dropdown_style}
-              value={semester}
-              displayEmpty
-              name="semester"
-              onChange={(e) => {
-                setSemester(e.target.value);
-              }}
-              inputProps={{ "aria-label": "Without label" }}
-            >
-              <MenuItem value="All">
-                <em>All</em>
-              </MenuItem>
-              {academicYear != "All"
-                ? academicSemesters[academicYear].map((entry) => (
-                  <MenuItem value={entry.key}>{entry.value}</MenuItem>
-                ))
-                : Object.keys(semesters).map((key) => (
-                  <MenuItem value={key}>{semesters[key]}</MenuItem>
-                ))}
-            </Select>
-            <label>Semester</label>
-          </FormControl>
-          <Button sx={{ mx: 3 }}
-            onClick={() => {
-              let year = academicYear.substring(0, 4);
-              let section_term =
-                (year == "All" ? "" : year) +
-                (semester == "All" ? "" : semester);
-              filters.section_term = section_term;
-              filters.page = 1;
-              updateTable();
-            }}
-            align="center"
-            variant="contained"
+        <Grid container md={12}>
+          <Grid container item md={8}>
+            <Container
+              sx={{ my: 1 }}>
+              <FormControl sx={{ mx: -3 }}>
+                <Select
+                  style={term_dropdown_style}
+                  value={academicYear}
+                  displayEmpty
+                  name="year"
+                  onChange={(e) => {
+                    setAcademicYear(e.target.value);
+                    //assume that the selected year doesn't contains the selected academic semester
+                    let contains_semester = false;
+                    {
+                      academicSemesters[e.target.value] &&
+                        academicSemesters[e.target.value].map(
+                          (entry) =>
+                          (contains_semester =
+                            entry.key == semester ? true : contains_semester)
+                        );
+                    }
+                    setSemester(contains_semester ? semester : "All");
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  <MenuItem value="All">
+                    <em>All</em>
+                  </MenuItem>{" "}
+                  {Object.keys(academicSemesters).map((year) => (
+                    <MenuItem value={year}>{year}</MenuItem>
+                  ))}
+                </Select>
+                <label>Year Taken</label>
+              </FormControl>
+              <FormControl sx={{ mx: 6 }}>
+                <Select
+                  style={term_dropdown_style}
+                  value={semester}
+                  displayEmpty
+                  name="semester"
+                  onChange={(e) => {
+                    setSemester(e.target.value);
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  <MenuItem value="All">
+                    <em>All</em>
+                  </MenuItem>
+                  {academicYear != "All"
+                    ? academicSemesters[academicYear].map((entry) => (
+                      <MenuItem value={entry.key}>{entry.value}</MenuItem>
+                    ))
+                    : Object.keys(semesters).map((key) => (
+                      <MenuItem value={key}>{semesters[key]}</MenuItem>
+                    ))}
+                </Select>
+                <label>Semester</label>
+              </FormControl>
+              <Button sx={{ mx: 3 }}
+                onClick={() => {
+                  let year = academicYear.substring(0, 4);
+                  let section_term =
+                    (year == "All" ? "" : year) +
+                    (semester == "All" ? "" : semester);
+                  filters.section_term = section_term;
+                  filters.page = 1;
+                  updateTable();
+                }}
+                align="center"
+                variant="contained"
+              >
+                Apply Filters
+              </Button>
+            </Container>
+          </Grid>
+          <Grid container justifyContent="flex-end" item md={4} style={{marginTop: 5}}>
+            <Typography align={"center"}>{(filters.section_term.length == 6 ? "Semester GPA: " :
+              filters.section_term.length == 4 ? "Academic Year GPA: " :
+                "GPA: ")}
+            </Typography>
+            <Typography style={{fontWeight: "bold", marginLeft: 2.5}} >{(studentGPA ? studentGPA : "N/A")}</Typography>
+                
+          </Grid>
 
-          >
-            Apply Filters
-          </Button>
-        </Container>
+        </Grid>
+
       </Grid>
     );
   }
