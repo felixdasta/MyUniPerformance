@@ -72,9 +72,16 @@ function StudentStatistics(props) {
     result = result / GPA.length
     result = result.toFixed(2)
     {
+      let student_dept_id = student.curriculums[0].department.department_id;
       student.enrolled_sections.map((courseData) => {
-
-        if(courseData.grade_obtained !== "F" || "W"){
+        let course_dept_id = courseData.section.course.department.department_id;
+        let grade = courseData.grade_obtained;
+        if (student_dept_id === course_dept_id
+          && (grade !== "F" && grade !== "D" && grade !== "W")) {
+          takenCredits += courseData.section.course.course_credits;
+        }
+        else if (student_dept_id !== course_dept_id
+          && (grade !== "F" && grade !== "W")) {
           takenCredits += courseData.section.course.course_credits;
         }
 
