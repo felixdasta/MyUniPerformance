@@ -99,19 +99,19 @@ export default function CurriculumCoursePicker(props) {
     const handleFormData = (e) => {
         switch (e.target.name) {
             case "department_id":
-                setFormData({ ...formData, department_id: e.target.value });
+                setFormData({ ...formData, department_id: e.target.value, course_id: "", year: "", semester: "", section_id: "" });
                 getCoursesByDepartmentID(e.target.value);
                 break;
             case "course_id":
-                setFormData({ ...formData, course_id: e.target.value });
+                setFormData({ ...formData, course_id: e.target.value, year: "", semester: "", section_id: "" });
                 getSectionsByCourseID(e.target.value);
                 break;
             case "year":
-                setFormData({ ...formData, year: e.target.value });
+                setFormData({ ...formData, year: e.target.value, semester: "", section_id: "" });
                 filterSectionsByYear(e.target.value);
                 break;
             case "semester":
-                setFormData({ ...formData, semester: e.target.value });
+                setFormData({ ...formData, semester: e.target.value, section_id: "" });
                 filterSectionsBySemester(formData.year, e.target.value);
                 break;
             case "section_id":
@@ -214,8 +214,8 @@ export default function CurriculumCoursePicker(props) {
                 </InfiniteScroll>}
             </List>
 
-            <Dialog open={open} onClose={handleClose} maxWidth={"Lg"}>
-                <DialogTitle>Add {course ? ((course.course.course_code.slice(4, 8) !== "XXXX" || course.course.course_code !== "----") ? course.course.course_code : course.course.course_name) : "None"} to Curriculum</DialogTitle>
+            {course && <Dialog open={open} onClose={handleClose} maxWidth={"Lg"}>
+                <DialogTitle>Add {course && (course.course.course_code === "----" || course.course.course_code.slice(4, 8) === "XXXX") ? course.course.course_name : course.course.course_code} to Curriculum</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please choose the year, semester, and section code of the course taken, as well as the grade obtained for this course
@@ -223,19 +223,23 @@ export default function CurriculumCoursePicker(props) {
 
                     {/* Department input */}
                     {selectDepartments ?
-                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
-                            <InputLabel id="department-label">Department</InputLabel>
-                            <Select
-                                value={formData.department}
-                                onChange={handleFormData}
-                                label="department"
-                                name="department_id"
-                            >
-                                {(selectDepartments).map((record) => (
-                                    <MenuItem value={record.department_id}>{record.department_name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl> :
+                        ((course.course.course_code !== "----") ?
+                            <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                                <InputLabel id="department-label">{selectDepartments[0].department_name}</InputLabel>
+                            </FormControl> :
+                            <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                                <InputLabel id="department-label">Department</InputLabel>
+                                <Select
+                                    value={formData.department}
+                                    onChange={handleFormData}
+                                    label="department"
+                                    name="department_id"
+                                >
+                                    {(selectDepartments).map((record) => (
+                                        <MenuItem value={record.department_id}>{record.department_name}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>) :
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
                             <InputLabel id="department-label">Department</InputLabel>
                         </FormControl>
@@ -243,18 +247,22 @@ export default function CurriculumCoursePicker(props) {
 
                     {/* Course input */}
                     {selectCourses ?
-                        <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
-                            <InputLabel id="course-label">Course</InputLabel>
-                            <Select
-                                value={formData.course_id}
-                                onChange={handleFormData}
-                                label="course"
-                                name="course_id"
-                            >{(selectCourses).map((record) => (
-                                <MenuItem value={record.course_id}>{record.course_code}</MenuItem>
-                            ))}
-                            </Select>
-                        </FormControl> :
+                        ((course.course.course_code !== "----" && course.course.course_code.slice(4, 8) !== "XXXX") ?
+                            <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
+                                <InputLabel id="department-label">{selectCourses[0].course_code}</InputLabel>
+                            </FormControl> :
+                            <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }}>
+                                <InputLabel id="course-label">Course</InputLabel>
+                                <Select
+                                    value={formData.course_id}
+                                    onChange={handleFormData}
+                                    label="course"
+                                    name="course_id"
+                                >{(selectCourses).map((record) => (
+                                    <MenuItem value={record.course_id}>{record.course_code}</MenuItem>
+                                ))}
+                                </Select>
+                            </FormControl>) :
                         <FormControl variant="standard" sx={{ m: 1.5, minWidth: 120 }} disabled>
                             <InputLabel id="course-label">Course</InputLabel>
                         </FormControl>
@@ -336,7 +344,7 @@ export default function CurriculumCoursePicker(props) {
                     <Button onClick={handleClose} color={"error"}>Cancel</Button>
                     <Button onClick={handleSubmit} variant={"contained"}>Submit</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog>}
         </Box >
 
     );
