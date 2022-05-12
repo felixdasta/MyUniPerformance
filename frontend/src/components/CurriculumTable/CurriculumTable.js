@@ -16,6 +16,7 @@ import {
   DialogContent,
   Dialog,
   DialogContentText,
+  CardContent,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -154,13 +155,11 @@ function CurriculumTable(props) {
     return async (e) => {
       e.preventDefault()
       if (action === "edit") {
-        console.log(course)
         props.refreshTable();
       }
       else {
         setDeleteConfirmationOpen(true)
         setDeleteCourseSection(course)
-        console.log(course)
       }
     }
   }, [])
@@ -182,10 +181,14 @@ function CurriculumTable(props) {
 
   if (student.enrolled_sections) {
     let sectionGPA = [];
+    let sections_gpa_sum = 0;
     filteredClasses.map((payload, i) => {
-      let grades_count = get_sections_grades_stats([payload.section])
-      sectionGPA.push(calculate_gpa_based_on_counts(grades_count))
-    })
+      let grades_count = get_sections_grades_stats([payload.section]);
+      let curr_section_gpa = calculate_gpa_based_on_counts(grades_count);
+      sections_gpa_sum += parseFloat(curr_section_gpa);
+      sectionGPA.push(curr_section_gpa);
+    });
+    let avg_sections_gpa = (sections_gpa_sum / sectionGPA.length).toFixed(2);
     return (
       <Grid
         item
@@ -293,7 +296,7 @@ function CurriculumTable(props) {
                     <MenuItem value={year}>{year}</MenuItem>
                   ))}
                 </Select>
-                <label>Year Taken</label>
+                <label>Academic Year</label>
               </FormControl>
               <FormControl sx={{ mx: 6 }}>
                 <Select
@@ -336,13 +339,20 @@ function CurriculumTable(props) {
               </Button>
             </Container>
           </Grid>
-          <Grid container justifyContent="flex-end" item md={4} style={{marginTop: 5}}>
-            <Typography align={"center"}>{(filters.section_term.length == 6 ? "Semester GPA: " :
-              filters.section_term.length == 4 ? "Academic Year GPA: " :
-                "GPA: ")}
-            </Typography>
-            <Typography style={{fontWeight: "bold", marginLeft: 5}} >{(studentGPA ? studentGPA : "N/A")}</Typography>
-                
+          <Grid container justifyContent="flex-end" item md={4} style={{ marginTop: 5 }}>
+            <CardContent>
+              <div>
+                <Typography align={"right"}>{(filters.section_term.length == 6 ? "Semester GPA: " :
+                  filters.section_term.length == 4 ? "Academic Year GPA: " :
+                    "GPA: ") + (studentGPA ? studentGPA : "N/A")}
+                </Typography>
+              </div>
+
+              <Typography align={"right"}>{"Average Sections GPA: " + avg_sections_gpa}
+              </Typography>
+            </CardContent>
+
+
           </Grid>
 
         </Grid>
@@ -358,7 +368,7 @@ function CurriculumTable(props) {
           </DialogActions>
         </Dialog>}
       </Grid>
-      
+
     );
   }
 }
