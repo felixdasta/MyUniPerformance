@@ -11,8 +11,11 @@ import {
   FormControl,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { makeStyles } from "@material-ui/styles";
 import {
   get_available_semesters_by_academic_year,
@@ -61,12 +64,12 @@ function CurriculumTable(props) {
       get_available_semesters_by_academic_year(terms_taken);
     setAvailableAcademicSemesters(academic_semesters);
     setFilteredClasses(student.enrolled_sections.sort(
-      function(a, b) {          
-         if (a.section.section_term === b.section.section_term) {
-            // Grade is only important when sections are the same
-            return a.grade_obtained - b.grade_obtained;
-         }
-         return a.section.section_term > b.section.section_term ? 1 : -1;
+      function (a, b) {
+        if (a.section.section_term === b.section.section_term) {
+          // Grade is only important when sections are the same
+          return a.grade_obtained - b.grade_obtained;
+        }
+        return a.section.section_term > b.section.section_term ? 1 : -1;
       }));
   }, [props.student]);
 
@@ -95,6 +98,22 @@ function CurriculumTable(props) {
     return async (e) => {
       e.preventDefault()
       props.changeSection(section)
+    }
+  }, [])
+
+  const deleteClickHandler = useCallback((course) => {
+    return async (e) => {
+      e.preventDefault()
+      console.log(course)
+      //props.refreshTable();
+    }
+  }, [])
+
+  const editClickHandler = useCallback((course) => {
+    return async (e) => {
+      e.preventDefault()
+      console.log(course)
+      //props.refreshTable();
     }
   }, [])
 
@@ -128,12 +147,13 @@ function CurriculumTable(props) {
           >
             <TableHead>
               <TableRow>
-                <TableCell>Course Name</TableCell>
-                <TableCell align="right">Course Code</TableCell>
-                <TableCell align="right">Credit Hours</TableCell>
-                <TableCell align="right">Department Name</TableCell>
-                <TableCell align="right">Grade Obtained</TableCell>
-                <TableCell align="right">Term Taken</TableCell>
+                <TableCell>Modify</TableCell>
+                <TableCell align="left"> Course Name</TableCell>
+                <TableCell align="center">Course Code</TableCell>
+                <TableCell align="center">Credit Hours</TableCell>
+                <TableCell align="left">Department Name</TableCell>
+                <TableCell align="center">Grade Obtained</TableCell>
+                <TableCell align="left">Term Taken</TableCell>
                 <TableCell align="right">Section GPA</TableCell>
               </TableRow>
             </TableHead>
@@ -143,22 +163,28 @@ function CurriculumTable(props) {
                   key={courseData.section.course.course_name}
                   onClick={sectionClickHandler(courseData)}
                   hover={true}>
+                  <IconButton aria-label="delete" color="error" onClick={deleteClickHandler(courseData)}>
+                    <DeleteIcon />
+                  </IconButton>
+                  <IconButton aria-label="edit" color="primary" onClick={editClickHandler(courseData)}>
+                    <EditIcon />
+                  </IconButton>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.section.course.course_code}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.section.course.course_credits}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     {courseData.section.course.department.department_name}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     {courseData.grade_obtained}
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     {formatTerm(courseData.section.section_term)}
                   </TableCell>
                   <TableCell align="right">

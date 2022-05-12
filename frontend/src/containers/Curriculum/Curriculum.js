@@ -58,7 +58,7 @@ export default function Curriculum() {
             </Grid>
             <Grid item container lg={9} direction={"column"} rowGap={3}>{section ?
                 <div>
-                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} refreshTable={refreshTable} lg={12} />
+                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} refreshTable={refreshTableHandler} lg={12} />
                     <Grid item container lg={12} justifyContent="center" columnGap={3}>
                         <Grid item component={SectionCourseInfo} student={student} university={university} section={section} lg={6} />
                         <Grid item component={CurriculumInfo} student={student} university={university} lg={6} />

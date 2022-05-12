@@ -53,7 +53,7 @@ export const get_available_semesters_by_academic_year = (terms) => {
     let sorted_response = {};
 
     //sort the academic years
-    for(let k of keys){
+    for (let k of keys) {
         sorted_response[k] = unsorted_response[k];
     }
 
@@ -264,6 +264,15 @@ export const get_section_info_by_id = async (section_id) => {
 
 export const enroll_student_or_update_grade = async (student_id, section_id, grade_obtained) => {
     const response = await axios.put(url + 'students/' + student_id + '/sections/' + section_id, {
+        student_id: student_id,
+        section_id: section_id,
+        grade_obtained: grade_obtained
+    });
+    return response;
+}
+
+export const drop_student_from_course = async (student_id, section_id, grade_obtained) => {
+    const response = await axios.delete(url + 'students/' + student_id + '/sections/' + section_id, {
         student_id: student_id,
         section_id: section_id,
         grade_obtained: grade_obtained
