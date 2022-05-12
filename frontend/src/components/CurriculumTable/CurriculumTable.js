@@ -22,6 +22,7 @@ import {
   get_sections_grades_stats,
   calculate_gpa_based_on_counts
 } from '../../actions/sections';
+import { formatTerm } from "../../actions/sections";
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -59,7 +60,14 @@ function CurriculumTable(props) {
     let academic_semesters =
       get_available_semesters_by_academic_year(terms_taken);
     setAvailableAcademicSemesters(academic_semesters);
-    setFilteredClasses(student.enrolled_sections);
+    setFilteredClasses(student.enrolled_sections.sort(
+      function(a, b) {          
+         if (a.section.section_term === b.section.section_term) {
+            // Grade is only important when sections are the same
+            return a.grade_obtained - b.grade_obtained;
+         }
+         return a.section.section_term > b.section.section_term ? 1 : -1;
+      }));
   }, [props.student]);
 
   if (student.enrolled_sections) {
@@ -73,9 +81,8 @@ function CurriculumTable(props) {
   function updateTable() {
     if (student.enrolled_sections) {
       if (filters.section_term !== "") {
-        setFilteredClasses(student.enrolled_sections);
         let payload = student.enrolled_sections.filter(
-          (payload) => payload.section.section_term === filters.section_term
+          (payload) => payload.section.section_term.includes(filters.section_term)
         );
         setFilteredClasses(payload);
       } else if (filters.section_term === "") {
@@ -97,8 +104,7 @@ function CurriculumTable(props) {
       let grades_count = get_sections_grades_stats([payload.section])
       GPA.push(calculate_gpa_based_on_counts(grades_count))
     })
-    let result = [];
-    result.push(
+    return (
       <Grid
         item
       >
@@ -153,7 +159,7 @@ function CurriculumTable(props) {
                     {courseData.grade_obtained}
                   </TableCell>
                   <TableCell align="right">
-                    {courseData.section.section_term}
+                    {formatTerm(courseData.section.section_term)}
                   </TableCell>
                   <TableCell align="right">
                     {GPA[i]}
@@ -239,7 +245,6 @@ function CurriculumTable(props) {
         </Container>
       </Grid>
     );
-    return result;
   }
 }
 export default CurriculumTable;

@@ -8,7 +8,7 @@ export const semesters = {
     "S2": "Spring Semester",
 }
 
-const formatTerm = value => {
+export const formatTerm = value => {
     let year = parseInt(value.substring(0, 4));
     let semester = value.substring(4);
     year = semester == "S2" ? year + 1 : year;
@@ -17,7 +17,7 @@ const formatTerm = value => {
 };
 
 export const get_available_semesters_by_academic_year = (terms) => {
-    let response = {};
+    let unsorted_response = {};
     for (let i = 0; i < terms.length; i++) {
         let term = terms[i];
         let year = parseInt(term.substring(0, 4));
@@ -30,15 +30,15 @@ export const get_available_semesters_by_academic_year = (terms) => {
         //push the newly found semester in the available ones!
         //otherwise, create a new array of available semesters
         //and add the only semester that is currently available
-        let available_semesters = response[year] ? response[year] : [];
+        let available_semesters = unsorted_response[year] ? unsorted_response[year] : [];
         available_semesters.push(semester);
-        response[year] = available_semesters;
+        unsorted_response[year] = available_semesters;
     }
 
     //Sort the semesters in the following order: spring, first summer, second summer, fall
-    for (let academic_year in response) {
+    for (let academic_year in unsorted_response) {
         //Get available semesters of a given year
-        let current_semesters = response[academic_year];
+        let current_semesters = unsorted_response[academic_year];
         let result = []
         for (let semester in semesters) {
             //Does the available semesters of a given year includes this semester?
@@ -46,9 +46,18 @@ export const get_available_semesters_by_academic_year = (terms) => {
                 result.push({ key: semester, value: semesters[semester] })
             }
         }
-        response[academic_year] = result;
+        unsorted_response[academic_year] = result;
     }
-    return response;
+
+    let keys = Object.keys(unsorted_response).sort();
+    let sorted_response = {};
+
+    //sort the academic years
+    for(let k of keys){
+        sorted_response[k] = unsorted_response[k];
+    }
+
+    return sorted_response;
 }
 
 export const get_available_sections_filters = (sections) => {

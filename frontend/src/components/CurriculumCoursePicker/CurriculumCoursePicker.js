@@ -5,9 +5,10 @@ import ListItemText from '@mui/material/ListItemText';
 import InfiniteScroll from 'react-infinite-scroller';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { FormControl, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, IconButton, InputLabel, List, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { enroll_student_or_update_grade, get_sections_grades_stats } from "../../actions/sections";
+import { enroll_student_or_update_grade } from "../../actions/sections";
 import { get_courses_by_id, get_courses_by_university } from "../../actions/courses";
 import { get_departments_by_university } from "../../actions/departments";
+import { get_specified_academic_year, semesters } from "../../actions/sections";
 
 export default function CurriculumCoursePicker(props) {
     const [open, setOpen] = useState(false);
@@ -138,7 +139,7 @@ export default function CurriculumCoursePicker(props) {
             response.data.sections.forEach(record => {
                 yearsSet.add(record.section_term.slice(0, 4))
             })
-            setSelectYears(Array.from(yearsSet))
+            setSelectYears(Array.from(yearsSet).sort())
         })
     }
 
@@ -150,7 +151,7 @@ export default function CurriculumCoursePicker(props) {
                 newSelectSemesters.add(record.section_term.slice(4, 6))
             }
         });
-        setSelectSemesters(Array.from(newSelectSemesters))
+        setSelectSemesters(Array.from(newSelectSemesters).sort())
     }
 
     const filterSectionsBySemester = (year, semester) => {
@@ -161,7 +162,7 @@ export default function CurriculumCoursePicker(props) {
                 newSelectSections.push(record)
             }
         });
-        setSelectSections(newSelectSections)
+        setSelectSections(newSelectSections);
     }
 
     useEffect(() => {
@@ -269,7 +270,7 @@ export default function CurriculumCoursePicker(props) {
                                 label="year"
                                 name="year"
                             >{(selectYears).map((year) => (
-                                <MenuItem value={year}>{year}</MenuItem>
+                                <MenuItem value={year}>{get_specified_academic_year(year)}</MenuItem>
                             ))}
                             </Select>
                         </FormControl> :
@@ -288,7 +289,7 @@ export default function CurriculumCoursePicker(props) {
                                 label="semester"
                                 name="semester"
                             >{(selectSemesters).map((record) => (
-                                <MenuItem value={record}>{record}</MenuItem>
+                                <MenuItem value={record}>{semesters[record]}</MenuItem>
                             ))}
                             </Select>
                         </FormControl> :
