@@ -127,7 +127,7 @@ export default function CurriculumCoursePicker(props) {
 
     const getCoursesByDepartmentID = (department_id) => {
         get_courses_by_department_id(department_id).then(response => {
-            setSelectCourses(response.data.courses)
+            setSelectCourses(response.data.sort((a,b) => a.course_code.localeCompare(b.course_code)));
         })
     }
 
@@ -162,7 +162,7 @@ export default function CurriculumCoursePicker(props) {
                 newSelectSections.push(record)
             }
         });
-        setSelectSections(newSelectSections);
+        setSelectSections(newSelectSections.sort((a,b)=> a.section_code.localeCompare(b.section_code)));
     }
 
     useEffect(() => {
