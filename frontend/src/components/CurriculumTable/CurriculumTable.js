@@ -12,12 +12,17 @@ import {
   Select,
   MenuItem,
   IconButton,
+  DialogActions,
+  DialogContent,
+  Dialog,
+  DialogContentText,
 } from "@mui/material";
 import { Paper, Table, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { makeStyles } from "@material-ui/styles";
 import {
+  drop_student_from_course,
   get_available_semesters_by_academic_year,
   semesters,
 } from "../../actions/sections";
@@ -57,6 +62,8 @@ function CurriculumTable(props) {
   const [academicYear, setAcademicYear] = useState("All");
   const [semester, setSemester] = useState("All");
   const [filteredClasses, setFilteredClasses] = useState([]);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState();
+  const [deleteCourseSection, setDeleteCourseSection] = useState();
 
   //Defining styles for table
   useEffect(() => {
@@ -101,21 +108,35 @@ function CurriculumTable(props) {
     }
   }, [])
 
-  const deleteClickHandler = useCallback((course) => {
+  const modificationClickHandler = useCallback((action, course) => {
     return async (e) => {
       e.preventDefault()
-      console.log(course)
-      //props.refreshTable();
+      if (action === "edit") {
+        console.log(course)
+        props.refreshTable();
+      }
+      else {
+        setDeleteConfirmationOpen(true)
+        setDeleteCourseSection(course)
+        console.log(course)
+      }
     }
   }, [])
 
-  const editClickHandler = useCallback((course) => {
-    return async (e) => {
-      e.preventDefault()
-      console.log(course)
-      //props.refreshTable();
-    }
-  }, [])
+  const handleSubmit = () => {
+    drop_student_from_course(student.user_id, deleteCourseSection.section.section_id, deleteCourseSection.grade_obtained).then(response => {
+      props.refreshTable(response.data.message);
+      setDeleteCourseSection();
+      setDeleteConfirmationOpen(false);
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const handleClose = () => {
+    setDeleteCourseSection();
+    setDeleteConfirmationOpen(false);
+  }
 
   if (student.enrolled_sections) {
     let GPA = [];
@@ -163,12 +184,14 @@ function CurriculumTable(props) {
                   key={courseData.section.course.course_name}
                   onClick={sectionClickHandler(courseData)}
                   hover={true}>
-                  <IconButton aria-label="delete" color="error" onClick={deleteClickHandler(courseData)}>
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton aria-label="edit" color="primary" onClick={editClickHandler(courseData)}>
-                    <EditIcon />
-                  </IconButton>
+                  <TableCell align="left">
+                    <IconButton aria-label="delete" color="error" onClick={modificationClickHandler("delete", courseData)}>
+                      <DeleteIcon />
+                    </IconButton>
+                    <IconButton aria-label="edit" color="primary" onClick={modificationClickHandler("edit", courseData)}>
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
                   </TableCell>
@@ -269,6 +292,17 @@ function CurriculumTable(props) {
             Apply Filters
           </Button>
         </Container>
+        {deleteCourseSection && <Dialog open={deleteConfirmationOpen} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText>
+              {"Are you sure you want to delete " + deleteCourseSection.section.course.course_code + " ?"}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button edge="start" onClick={handleClose} color="error">Cancel</Button>
+            <Button edge="end" onClick={handleSubmit} color="error" variant="contained">Delete</Button>
+          </DialogActions>
+        </Dialog>}
       </Grid>
     );
   }

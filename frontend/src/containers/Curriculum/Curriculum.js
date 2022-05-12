@@ -33,6 +33,7 @@ export default function Curriculum() {
                     navigate("/")
                 })
                 setUniversity(response.data.curriculums[0].department.university)
+                setSection();
             }
         ).catch((error) => {
             console.log(error.response.data)
@@ -46,7 +47,7 @@ export default function Curriculum() {
         setSection(newSection)
     }
     const refreshTableHandler = (message) => {
-        setSectionEnrollMessage(message != null ? message : false);
+        setSectionEnrollMessage(message !== null ? message : false);
         setRefreshTable(!refreshTable);
     }
 
@@ -64,7 +65,7 @@ export default function Curriculum() {
                         <Grid item component={CurriculumInfo} student={student} university={university} lg={6} />
                     </Grid>
                 </div> : <div>
-                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} lg={12} />
+                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} refreshTable={refreshTableHandler} lg={12} />
                     <Grid item component={CurriculumInfo} student={student} university={university} lg={12} />
                 </div>}
             </Grid>
