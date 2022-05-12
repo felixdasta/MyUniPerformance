@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Grid } from "@mui/material";
+import { Alert, Card, Grid, Snackbar } from "@mui/material";
 import { Box } from "@mui/system";
 import * as Loader from "react-loader-spinner";
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ export default function Curriculum() {
     const [student, setStudent] = useState();
     const [university, setUniversity] = useState();
     const [section, setSection] = useState();
+    const [sectionEnrollMessage, setSectionEnrollMessage] = useState();
     const [refreshTable, setRefreshTable] = useState(false);
 
     let navigate = useNavigate();
@@ -44,7 +45,8 @@ export default function Curriculum() {
     const changeSectionHandler = (newSection) => {
         setSection(newSection)
     }
-    const refreshTableHandler = () => {
+    const refreshTableHandler = (message) => {
+        setSectionEnrollMessage(message != null ? message : false);
         setRefreshTable(!refreshTable);
     }
 
@@ -66,6 +68,11 @@ export default function Curriculum() {
                     <Grid item component={CurriculumInfo} student={student} university={university} lg={12} />
                 </div>}
             </Grid>
+            <Snackbar open={sectionEnrollMessage} autoHideDuration={6000} onClose={() => setSectionEnrollMessage(null)}>
+                <Alert onClose={() => setSectionEnrollMessage(null)} severity="success" sx={{ width: '100%' }}>
+                    {sectionEnrollMessage}
+                </Alert>
+            </Snackbar>
         </Grid> : <div className="loader">
             <Loader.ThreeDots color="black" height={120} width={120} />
 

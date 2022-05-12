@@ -89,7 +89,7 @@ export default function CurriculumCoursePicker(props) {
         setSelectSections();
         enroll_student_or_update_grade(props.student.user_id, formData.section_id, formData.grade).then(response => {
             //maybe some success alert
-            props.refreshTable();
+            props.refreshTable(response.data.message);
         }).catch((error) => {
             //maybe some failure alert
         })
