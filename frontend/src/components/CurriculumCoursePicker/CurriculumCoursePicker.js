@@ -89,6 +89,7 @@ export default function CurriculumCoursePicker(props) {
         setSelectSections();
         enroll_student_or_update_grade(props.student.user_id, formData.section_id, formData.grade).then(response => {
             //maybe some success alert
+            props.refreshTable();
         }).catch((error) => {
             //maybe some failure alert
         })
@@ -180,7 +181,7 @@ export default function CurriculumCoursePicker(props) {
             }
         });
         setMissingCourses(coursesMissing)
-    }, [open])
+    }, [open, props.student])
 
     return (
         <Box boxShadow={1} height={716} sx={{ border: '1px' }}>

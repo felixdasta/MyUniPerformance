@@ -60,7 +60,7 @@ function CurriculumTable(props) {
       get_available_semesters_by_academic_year(terms_taken);
     setAvailableAcademicSemesters(academic_semesters);
     setFilteredClasses(student.enrolled_sections);
-  }, []);
+  }, [props.student]);
 
   if (student.enrolled_sections) {
     student.enrolled_sections.map((termData) => {
@@ -133,10 +133,10 @@ function CurriculumTable(props) {
             </TableHead>
             <TableBody>
               {filteredClasses.map((courseData, i) => (
-                <TableRow  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                key={courseData.section.course.course_name}
-                onClick={sectionClickHandler(courseData)}
-                hover={true}>
+                <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  key={courseData.section.course.course_name}
+                  onClick={sectionClickHandler(courseData)}
+                  hover={true}>
                   <TableCell component="th" scope="row">
                     {courseData.section.course.course_name}
                   </TableCell>

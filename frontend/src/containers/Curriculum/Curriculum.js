@@ -14,6 +14,7 @@ export default function Curriculum() {
     const [student, setStudent] = useState();
     const [university, setUniversity] = useState();
     const [section, setSection] = useState();
+    const [refreshTable, setRefreshTable] = useState(false);
 
     let navigate = useNavigate();
 
@@ -37,19 +38,25 @@ export default function Curriculum() {
             localStorage.removeItem("user_id");
             navigate("/");
         })
-    }, [])
+    }, [refreshTable])
+
+
     const changeSectionHandler = (newSection) => {
         setSection(newSection)
     }
+    const refreshTableHandler = () => {
+        setRefreshTable(!refreshTable);
+    }
+
     return (
         <Box sx={{ mx: 3, my: 3 }}> {student && university ? <Grid container spacing={0} columnSpacing={3} rowGap={3}>
             {/* Top Row Container, each item container can be adjusted for width by changing lg*/}
             <Grid item container lg={3} justifyContent="center">
-                <Grid item component={CurriculumCoursePicker} student={student} university={university} lg={12} />
+                <Grid item component={CurriculumCoursePicker} student={student} university={university} refreshTable={refreshTableHandler} lg={12} />
             </Grid>
             <Grid item container lg={9} direction={"column"} rowGap={3}>{section ?
                 <div>
-                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} lg={12} />
+                    <Grid item component={CurriculumTable} student={student} university={university} changeSection={changeSectionHandler} refreshTable={refreshTable} lg={12} />
                     <Grid item container lg={12} justifyContent="center" columnGap={3}>
                         <Grid item component={SectionCourseInfo} student={student} university={university} section={section} lg={6} />
                         <Grid item component={CurriculumInfo} student={student} university={university} lg={6} />
