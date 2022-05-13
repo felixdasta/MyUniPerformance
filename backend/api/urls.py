@@ -3,7 +3,7 @@ from api.views \
 import student, curriculum, \
 course, university, section, \
 grade_stats, feedback, grade_stats, \
-department, staff_member
+department, staff_member, utils
 
 
 urlpatterns = [
@@ -32,6 +32,7 @@ urlpatterns = [
     path('sections/<section_id>/feedbacks', feedback.FeedbackList.as_view()),
     path('sections/<pk>/grade-stats', grade_stats.GradeStatsDetail.as_view()),
 
+    path('loaderio-2cfac6fc22e5d24034475d0fcb53e6e1/', utils.get_loader_io),
     path('feedbacks/<pk>', feedback.FeedbackDetail.as_view()),
     path('students/<user_id>/feedbacks/<feedback_id>/like', feedback.FeedbackLike.as_view()),
     path('students/<user_id>/feedbacks/<feedback_id>/report', feedback.report_feedback),
