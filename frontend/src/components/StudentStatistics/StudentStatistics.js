@@ -141,7 +141,7 @@ function StudentStatistics(props) {
 
   const data01 = [
     { name: "Remaining Credits", value: remainingCredits },
-    { name: "Taken Credits", value: takenCredits },
+    { name: "Approved Credits", value: takenCredits },
   ];
 
   const data02 = [
