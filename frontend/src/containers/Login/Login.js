@@ -68,6 +68,7 @@ export default function Login() {
 
             }}>Sign In</Button>
               <p className="message">Not registered? <a onClick = {() => navigate("/create-account") }>Create an account</a></p>
+              {/*<p className="message">Forgot your password? <a onClick = {() => navigate("/change-password") }>Change password</a></p>*/}
             </form>
           </div>
         </div>

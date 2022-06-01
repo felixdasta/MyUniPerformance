@@ -46,7 +46,9 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  if (window.location.pathname !== "/login" && window.location.pathname !== "/create-account") {
+  if (window.location.pathname !== "/login" 
+  && window.location.pathname !== "/create-account" 
+  && window.location.pathname !== "/change-password") {
     if (loggedInUser) {
       if(hasCurriculums === 'true'){
         return (

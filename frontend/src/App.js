@@ -6,7 +6,8 @@ import Curriculum from './containers/Curriculum/Curriculum';
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./containers/Home/Home";
 import Login from "./containers/Login/Login";
-import SignUp from "./containers/Sign Up/SignUp";
+import SignUp from "./containers/SignUp/SignUp";
+import ChangePassword from "./containers/ChangePassword/ChangePassword";
 import Instructors from "./containers/Instructors/Instructors";
 import InstructorInsights from "./containers/InstructorInsights/InstructorInsights";
 import UserInformation from "./containers/UserInformation/UserInformation";
@@ -25,6 +26,7 @@ function App() {
         <Route path="/curriculum" element={<Curriculum />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create-account" element={<SignUp />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/profile" element={<UserInformation />} />
       </Routes>
     </BrowserRouter>
